@@ -13,7 +13,7 @@ const formatList = <T,>(title: string, items: T[], formatter: (item: T) => strin
 
 export const getRetirementInsights = async (plan: RetirementPlan, result: CalculationResult): Promise<string> => {
     try {
-        const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_API_KEY });
+        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
         const totalInvestments = [...plan.retirementAccounts, ...plan.investmentAccounts].reduce((sum, acc) => sum + acc.balance, 0);
 
