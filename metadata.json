@@ -1,0 +1,5 @@
+{
+  "name": "Retirement Income Planner",
+  "description": "An application to estimate your monthly retirement income by factoring in taxes, social security, investments, and expenses. Plan for an individual or a couple and get AI-powered insights.",
+  "requestFramePermissions": []
+}
