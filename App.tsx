@@ -456,7 +456,7 @@ const App: React.FC = () => {
                                 </div>
                             </div>
                             <p className="col-span-full text-xs text-brand-text-secondary mt-2">
-                                Note: This data is stored in your browser. If you clear your browser cache, you WILL LOSE your scenarios.
+                                Note: This data is stored in your browser. If you clear your browser cache, you <span className="font-bold text-red-600">WILL LOSE</span> your scenarios.
                             </p>
                         </InputSection>
 
@@ -688,7 +688,7 @@ const App: React.FC = () => {
                          {filteredProjections.length > 0 && (
                             <InputSection title="Annual Projection" subtitle="A year-by-year breakdown of your retirement finances." titleColorClass="text-gray-600" gridCols={1}>
                                 <div className="col-span-full">
-                                    <ProjectionTable data={filteredProjections} planType={plan.planType} />
+                                    <ProjectionTable data={filteredProjections} plan={plan} />
                                 </div>
                             </InputSection>
                          )}

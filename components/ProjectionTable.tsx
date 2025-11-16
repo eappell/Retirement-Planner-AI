@@ -1,10 +1,11 @@
 
+
 import React from 'react';
-import { YearlyProjection, PlanType } from '../types';
+import { YearlyProjection, RetirementPlan, PlanType } from '../types';
 
 interface ProjectionTableProps {
   data: YearlyProjection[];
-  planType: PlanType;
+  plan: RetirementPlan;
 }
 
 const formatCurrency = (value: number) => {
@@ -21,8 +22,9 @@ const formatCurrencyShort = (value: number) => {
     return value.toFixed(0);
 }
 
-export const ProjectionTable: React.FC<ProjectionTableProps> = ({ data, planType }) => {
-    const isCouple = planType === PlanType.COUPLE;
+export const ProjectionTable: React.FC<ProjectionTableProps> = ({ data, plan }) => {
+    const isCouple = plan.planType === PlanType.COUPLE;
+    const { person1, person2 } = plan;
 
     const renderHeader = () => (
         <thead className="text-gray-600 sticky top-0 z-10">
@@ -43,22 +45,35 @@ export const ProjectionTable: React.FC<ProjectionTableProps> = ({ data, planType
         </thead>
     );
 
-    const renderRow = (row: YearlyProjection) => (
-        <tr key={row.year} className="border-b border-gray-200 odd:bg-white even:bg-gray-50 text-base text-gray-800">
-            <td className="p-2 text-left">{row.year}</td>
-            <td className="p-2 text-left">{isCouple ? `${row.age1}/${row.age2}` : row.age1}</td>
-            <td className="p-2 text-right">{formatCurrency(row.investmentBalance)}</td>
-            <td className="p-2 text-right">{formatCurrency(row.retirementBalance)}</td>
-            <td className="p-2 text-right">{formatCurrency(row.rmd / 12)}</td>
-            <td className="p-2 text-right bg-blue-50 text-blue-800">{formatCurrency(row.grossIncome / 12)}</td>
-            <td className="p-2 text-right">{formatCurrency(row.expenses / 12)}</td>
-            <td className="p-2 text-right bg-red-50 text-red-800">{formatCurrency(row.federalTax / 12)}</td>
-            <td className="p-2 text-right bg-red-50 text-red-800">{formatCurrency(row.stateTax / 12)}</td>
-            <td className="p-2 text-right bg-green-50 text-green-800 font-semibold">{formatCurrency(row.netIncome / 12)}</td>
-            <td className={`p-2 text-right ${row.surplus >= 0 ? 'text-green-600' : 'text-red-600'}`}>{formatCurrency(row.surplus / 12)}</td>
-            <td className="p-2 text-right font-bold text-brand-primary">{formatCurrency(row.netWorth)}</td>
-        </tr>
-    );
+    const renderRow = (row: YearlyProjection) => {
+        const p1Dead = row.age1 > person1.lifeExpectancy;
+        const p2Dead = isCouple && row.age2 && row.age2 > person2.lifeExpectancy;
+
+        return (
+            <tr key={row.year} className="border-b border-gray-200 odd:bg-white even:bg-gray-50 text-base text-gray-800">
+                <td className="p-2 text-left">{row.year}</td>
+                <td className="p-2 text-left">
+                    {isCouple ? (
+                        <>
+                            <span className={p1Dead ? 'text-gray-400' : ''}>{row.age1}</span>
+                            /
+                            <span className={p2Dead ? 'text-gray-400' : ''}>{row.age2}</span>
+                        </>
+                    ) : row.age1}
+                </td>
+                <td className="p-2 text-right">{formatCurrency(row.investmentBalance)}</td>
+                <td className="p-2 text-right">{formatCurrency(row.retirementBalance)}</td>
+                <td className="p-2 text-right">{formatCurrency(row.rmd / 12)}</td>
+                <td className="p-2 text-right bg-blue-50 text-blue-800">{formatCurrency(row.grossIncome / 12)}</td>
+                <td className="p-2 text-right">{formatCurrency(row.expenses / 12)}</td>
+                <td className="p-2 text-right bg-red-50 text-red-800">{formatCurrency(row.federalTax / 12)}</td>
+                <td className="p-2 text-right bg-red-50 text-red-800">{formatCurrency(row.stateTax / 12)}</td>
+                <td className="p-2 text-right bg-green-50 text-green-800 font-semibold">{formatCurrency(row.netIncome / 12)}</td>
+                <td className={`p-2 text-right ${row.surplus >= 0 ? 'text-green-600' : 'text-red-600'}`}>{formatCurrency(row.surplus / 12)}</td>
+                <td className="p-2 text-right font-bold text-brand-primary">{formatCurrency(row.netWorth)}</td>
+            </tr>
+        );
+    };
 
     return (
         <div className="w-full overflow-x-auto max-h-[600px] relative rounded-lg border">
