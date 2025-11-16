@@ -24,7 +24,7 @@ const InfoRow: React.FC<{ label: string; value: string | number }> = ({ label, v
     </div>
 );
 
-export const PrintableReport: React.FC<{ plan: RetirementPlan; results: CalculationResult | null }> = ({ plan, results }) => {
+export const PrintableReport: React.FC<{ plan: RetirementPlan; results: CalculationResult | null; scenarioName: string }> = ({ plan, results, scenarioName }) => {
     if (!results) return null;
 
     const isCouple = plan.planType === PlanType.COUPLE;
@@ -44,6 +44,7 @@ export const PrintableReport: React.FC<{ plan: RetirementPlan; results: Calculat
         <div className="hidden print:block font-sans p-4">
             <header className="text-center mb-6 border-b-4 border-indigo-500 pb-4">
                 <h1 className="text-4xl font-bold text-indigo-600">Retirement Plan Summary</h1>
+                <h2 className="text-2xl font-semibold text-gray-700 mt-2">Scenario: {scenarioName}</h2>
                 <p className="text-gray-600 mt-1">Generated for {plan.person1.name}{isCouple ? ` & ${plan.person2.name}` : ''} on {new Date().toLocaleDateString()}</p>
             </header>
 

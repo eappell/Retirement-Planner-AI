@@ -414,7 +414,7 @@ const App: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-brand-background text-brand-text-primary">
-            <PrintableReport plan={plan} results={results} />
+            <PrintableReport plan={plan} results={results} scenarioName={activeScenario.name} />
             <div className="print:hidden">
                 <header className="bg-brand-surface shadow-md h-14 flex items-center justify-between px-4 sm:px-6 lg:px-8 sticky top-0 z-20">
                     <div className="flex items-baseline space-x-3 overflow-hidden">
@@ -724,7 +724,7 @@ const App: React.FC = () => {
                         </InputSection>
 
                          {filteredProjections.length > 0 && (
-                            <InputSection title="Annual Projection" subtitle="A year-by-year breakdown of your monthly retirement finances." titleColorClass="text-gray-600" gridCols={1}>
+                            <InputSection title="Annual Projection" subtitle="A year-by-year breakdown of your retirement finances." titleColorClass="text-gray-600" gridCols={1}>
                                 <div className="col-span-full">
                                     <ProjectionTable data={filteredProjections} plan={plan} />
                                 </div>
