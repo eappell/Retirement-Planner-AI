@@ -36,6 +36,10 @@ export const PrintableReport: React.FC<{ plan: RetirementPlan; results: Calculat
         return p.age1 >= plan.person1.retirementAge;
     });
 
+    const currentNetWorth =
+        plan.retirementAccounts.reduce((sum, acc) => sum + acc.balance, 0) +
+        plan.investmentAccounts.reduce((sum, acc) => sum + acc.balance, 0);
+
     return (
         <div className="hidden print:block font-sans p-4">
             <header className="text-center mb-6 border-b-4 border-indigo-500 pb-4">
@@ -47,6 +51,7 @@ export const PrintableReport: React.FC<{ plan: RetirementPlan; results: Calculat
                 <div className="grid grid-cols-2 gap-x-6">
                     <div className="col-span-1">
                          <ReportSection title="Key Projections" color="bg-indigo-500">
+                            <InfoRow label="Current Net Worth" value={formatCurrency(currentNetWorth)} />
                             <InfoRow label="Avg. Monthly Net Income" value={formatCurrency(results.avgMonthlyNetIncomeFuture)} />
                             <InfoRow label="Final Net Worth (Future $)" value={formatCurrency(results.netWorthAtEndFuture)} />
                             <InfoRow label="Avg. Federal Tax Rate" value={`${results.federalTaxRate.toFixed(1)}%`} />
