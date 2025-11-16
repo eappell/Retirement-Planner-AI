@@ -227,6 +227,18 @@ const App: React.FC = () => {
     const handlePrint = () => {
         window.print();
     };
+    
+    const handleResetPlan = () => {
+        if (window.confirm('Are you sure you want to reset all your data? This action cannot be undone.')) {
+            localStorage.removeItem(STORAGE_KEY);
+            setPlan(initialPlanState);
+            setResults(null);
+            setAiInsights('');
+            setMonteCarloResults(null);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    };
+
 
     // --- Real-time Calculation ---
     useEffect(() => {
@@ -282,6 +294,15 @@ const App: React.FC = () => {
                         <button type="button" onClick={handlePrint} className="flex items-center space-x-2 text-sm text-gray-600 hover:text-brand-primary transition-colors font-medium p-2 rounded-md hover:bg-gray-100">
                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
                             <span>Print Report</span>
+                        </button>
+                         <button 
+                            type="button" 
+                            onClick={handleResetPlan} 
+                            className="flex items-center space-x-2 text-sm text-red-600 hover:text-red-800 transition-colors font-medium p-2 rounded-md hover:bg-red-100"
+                            title="Reset all data to default"
+                        >
+                           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                            <span>Reset Plan</span>
                         </button>
                     </div>
                 </header>
