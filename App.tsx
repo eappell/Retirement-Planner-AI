@@ -243,6 +243,26 @@ const App: React.FC = () => {
         }
     };
     
+    const handleCopyScenario = () => {
+        if (!activeScenarioId || !activeScenario) return;
+
+        const newId = `scenario-${Date.now()}`;
+        const newScenario: Scenario = {
+            id: newId,
+            name: `${activeScenario.name} Copy`,
+            plan: JSON.parse(JSON.stringify(activeScenario.plan)),
+        };
+
+        setScenariosState(prev => ({
+            activeScenarioId: newId,
+            scenarios: { ...prev.scenarios, [newId]: newScenario },
+        }));
+
+        setResults(null);
+        setAiInsights('');
+        setMonteCarloResults(null);
+    };
+    
     const handleUpdateScenarioName = (newName: string) => {
         if (!activeScenarioId) return;
         setScenariosState(prev => ({
@@ -469,7 +489,8 @@ const App: React.FC = () => {
                                 </div>
                                 <TextInput label="Scenario Name" value={activeScenario.name} onChange={e => handleUpdateScenarioName(e.target.value)} />
                                 <div className="flex items-end space-x-2">
-                                    <button onClick={handleNewScenario} className="w-full px-3 py-1.5 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors">New Scenario</button>
+                                    <button onClick={handleNewScenario} className="w-full px-3 py-1.5 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors">New</button>
+                                    <button onClick={handleCopyScenario} className="w-full px-3 py-1.5 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">Copy</button>
                                     <button onClick={handleDeleteScenario} disabled={Object.keys(scenarios).length <= 1} className="w-full px-3 py-1.5 text-sm bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-400 transition-colors">Delete</button>
                                 </div>
                             </div>
