@@ -456,7 +456,7 @@ const App: React.FC = () => {
                                 </div>
                             </div>
                             <p className="col-span-full text-xs text-brand-text-secondary mt-2">
-                                Note: This data is stored in your browser. If you clear your browser cache, you <span style="color:#CC0000">WILL LOSE</span> your scenarios.
+                                Note: This data is stored in your browser. If you clear your browser cache, you will lose your scenarios.
                             </p>
                         </InputSection>
 
