@@ -175,16 +175,19 @@ const App: React.FC = () => {
         listName: K,
         id: string,
         field: keyof RetirementPlan[K][number],
-        value: string
+        value: string | boolean
     ) => {
         updateActivePlan(prev => {
             const list = prev[listName] as ({ id: string } & object)[];
             const updatedList = list.map(item => {
                 if (item.id !== id) return item;
                 const originalValue = item[field as keyof typeof item];
-                const finalValue = typeof originalValue === 'number'
-                    ? (Number(value) >= 0 ? Number(value) : 0)
-                    : value;
+                let finalValue: any;
+                if (typeof originalValue === 'number' && typeof value === 'string') {
+                    finalValue = (Number(value) >= 0 ? Number(value) : 0);
+                } else {
+                    finalValue = value;
+                }
                 return { ...item, [field]: finalValue };
             });
             return { ...prev, [listName]: updatedList };
@@ -606,15 +609,15 @@ const App: React.FC = () => {
                                 'Expense Periods': 'text-red-600'
                             };
                             
-                            const addPension = () => addToList('pensions', { id: Date.now().toString(), owner: 'person1', name: 'New Pension', monthlyBenefit: 0, startAge: Math.min(plan.person1.retirementAge, isCouple ? plan.person2.retirementAge : Infinity), cola: 0, survivorBenefit: 0 });
-                            const addOtherIncome = () => addToList('otherIncomes', { id: Date.now().toString(), owner: 'person1', name: 'New Income', monthlyAmount: 0, startAge: plan.person1.retirementAge, endAge: plan.person1.lifeExpectancy, cola: 0 });
+                            const addPension = () => addToList('pensions', { id: Date.now().toString(), owner: 'person1', name: 'New Pension', monthlyBenefit: 0, startAge: Math.min(plan.person1.retirementAge, isCouple ? plan.person2.retirementAge : Infinity), cola: 0, survivorBenefit: 0, taxable: true });
+                            const addOtherIncome = () => addToList('otherIncomes', { id: Date.now().toString(), owner: 'person1', name: 'New Income', monthlyAmount: 0, startAge: plan.person1.retirementAge, endAge: plan.person1.lifeExpectancy, cola: 0, taxable: true });
 
                             return (
                                 <InputSection key={section} title={section} subtitle={subtitles[section]} titleColorClass={colors[section]} gridCols={1}>
                                     <div className="col-span-full space-y-2">
                                         {items.map((item, index) => (
                                             <div key={item.id} className={`grid gap-x-4 items-end p-2 rounded-md ${
-                                                {'Retirement Accounts': 'bg-cyan-50/50 grid-cols-7', 'Investment Accounts': 'bg-teal-50/50 grid-cols-5', 'Pensions': 'bg-sky-50/50 grid-cols-7', 'Other Incomes': 'bg-lime-50/50 grid-cols-7', 'Expense Periods': 'bg-red-50/50 grid-cols-6'}[section]
+                                                {'Retirement Accounts': 'bg-cyan-50/50 grid-cols-7', 'Investment Accounts': 'bg-teal-50/50 grid-cols-5', 'Pensions': 'bg-sky-50/50 grid-cols-8', 'Other Incomes': 'bg-lime-50/50 grid-cols-8', 'Expense Periods': 'bg-red-50/50 grid-cols-6'}[section]
                                             }`}>
                                                 {/* Common fields */}
                                                 {listName !== 'expensePeriods' && (
@@ -653,6 +656,16 @@ const App: React.FC = () => {
                                                     <NumberInput label="Start Age" value={item.startAge} onChange={e => handleDynamicListChange(listName, item.id, 'startAge', e.target.value)}/>
                                                     <NumberInput label="COLA" suffix="%" value={item.cola} onChange={e => handleDynamicListChange(listName, item.id, 'cola', e.target.value)}/>
                                                     <NumberInput label="Survivor" suffix="%" value={item.survivorBenefit} onChange={e => handleDynamicListChange(listName, item.id, 'survivorBenefit', e.target.value)}/>
+                                                    <div className="flex flex-col items-center justify-end h-full pb-1">
+                                                        <label htmlFor={`taxable-${item.id}`} className="mb-1 text-sm font-medium text-brand-text-secondary">Taxable</label>
+                                                        <input
+                                                            type="checkbox"
+                                                            id={`taxable-${item.id}`}
+                                                            checked={item.taxable !== false}
+                                                            onChange={e => handleDynamicListChange(listName, item.id, 'taxable', e.target.checked)}
+                                                            className="h-5 w-5 rounded text-brand-primary focus:ring-brand-primary"
+                                                        />
+                                                    </div>
                                                     <div className="flex items-end">
                                                         <ActionIcons onAdd={addPension} onRemove={() => removeFromList('pensions', item.id)} canRemove={items.length > 0} />
                                                     </div>
@@ -662,6 +675,16 @@ const App: React.FC = () => {
                                                     <NumberInput label="Start Age" value={item.startAge} onChange={e => handleDynamicListChange(listName, item.id, 'startAge', e.target.value)}/>
                                                     <NumberInput label="End Age" value={item.endAge} onChange={e => handleDynamicListChange(listName, item.id, 'endAge', e.target.value)}/>
                                                     <NumberInput label="COLA" suffix="%" value={item.cola} onChange={e => handleDynamicListChange(listName, item.id, 'cola', e.target.value)}/>
+                                                     <div className="flex flex-col items-center justify-end h-full pb-1">
+                                                        <label htmlFor={`taxable-${item.id}`} className="mb-1 text-sm font-medium text-brand-text-secondary">Taxable</label>
+                                                        <input
+                                                            type="checkbox"
+                                                            id={`taxable-${item.id}`}
+                                                            checked={item.taxable !== false}
+                                                            onChange={e => handleDynamicListChange(listName, item.id, 'taxable', e.target.checked)}
+                                                            className="h-5 w-5 rounded text-brand-primary focus:ring-brand-primary"
+                                                        />
+                                                    </div>
                                                      <div className="flex items-end">
                                                         <ActionIcons onAdd={addOtherIncome} onRemove={() => removeFromList('otherIncomes', item.id)} canRemove={items.length > 0} />
                                                     </div>

@@ -5,9 +5,9 @@ const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
 };
 
-const formatList = <T,>(title: string, items: T[], formatter: (item: T) => string): string => {
+const formatList = <T extends { taxable?: boolean }>(title: string, items: T[], formatter: (item: T) => string): string => {
     if (items.length === 0) return '';
-    return `\n**${title}:**\n${items.map(item => `- ${formatter(item)}`).join('\n')}`;
+    return `\n**${title}:**\n${items.map(item => `- ${formatter(item)}${item.taxable === false ? ' (non-taxable)' : ''}`).join('\n')}`;
 }
 
 
@@ -31,11 +31,14 @@ export const getRetirementInsights = async (plan: RetirementPlan, result: Calcul
         
         **Financials:**
         - Total Retirement & Investment Balance: ${formatCurrency(totalInvestments)}
-        ${formatList<RetirementAccount>('Retirement Accounts', plan.retirementAccounts, (acc) => `${acc.name} (${acc.type}): ${formatCurrency(acc.balance)}`)}
-        ${formatList<InvestmentAccount>('Investment Accounts', plan.investmentAccounts, (acc) => `${acc.name}: ${formatCurrency(acc.balance)}`)}
-        ${formatList<Pension>('Pensions', plan.pensions, (p) => `Starts at age ${p.startAge}, ${formatCurrency(p.monthlyBenefit)}/month with ${p.cola}% COLA`)}
-        ${formatList<OtherIncome>('Other Incomes', plan.otherIncomes, (i) => `${i.name}: ${formatCurrency(i.monthlyAmount)}/month from age ${i.startAge} to ${i.endAge}`)}
-        ${formatList<ExpensePeriod>('Expense Planning', plan.expensePeriods, (e) => `${e.name}: ${formatCurrency(e.monthlyAmount)}/month from age ${e.startAge} to ${e.endAge}`)}
+        ${/* FIX: Add taxable property to RetirementAccount objects to match formatList constraint. */ ''}
+        ${formatList('Retirement Accounts', plan.retirementAccounts.map(acc => ({ ...acc, taxable: acc.type !== 'Roth IRA' })), (acc) => `${acc.name} (${acc.type}): ${formatCurrency(acc.balance)}`)}
+        ${/* FIX: Add taxable property to InvestmentAccount objects to match formatList constraint. */ ''}
+        ${formatList('Investment Accounts', plan.investmentAccounts.map(acc => ({...acc, taxable: true})), (acc) => `${acc.name}: ${formatCurrency(acc.balance)}`)}
+        ${formatList('Pensions', plan.pensions, (p) => `${p.name}: Starts at age ${p.startAge}, ${formatCurrency(p.monthlyBenefit)}/month with ${p.cola}% COLA`)}
+        ${formatList('Other Incomes', plan.otherIncomes, (i) => `${i.name}: ${formatCurrency(i.monthlyAmount)}/month from age ${i.startAge} to ${i.endAge}`)}
+        ${/* FIX: ExpensePeriod does not have a 'taxable' property; use direct formatting instead of formatList. */ ''}
+        ${plan.expensePeriods.length > 0 ? `\n**Expense Planning:**\n${plan.expensePeriods.map(e => `- ${e.name}: ${formatCurrency(e.monthlyAmount)}/month from age ${e.startAge} to ${e.endAge}`).join('\n')}` : ''}
 
         **Calculation Results (in today's dollars):**
         - Average Monthly Net Income in Retirement: ${formatCurrency(result.avgMonthlyNetIncomeToday)}

@@ -33,8 +33,10 @@ export const runSimulation = (plan: RetirementPlan): CalculationResult => {
         const p2Alive = isCouple && currentAge2 <= plan.person2.lifeExpectancy;
         
         let incomeFromPensions = 0;
+        let taxableIncomeFromPensions = 0;
         let incomeFromSS = 0;
         let incomeFromOther = 0;
+        let taxableIncomeFromOther = 0;
         let annualWithdrawal = 0;
         let inflatedExpenses = 0;
         let annualGrossIncome = 0;
@@ -102,11 +104,14 @@ export const runSimulation = (plan: RetirementPlan): CalculationResult => {
 
                 if (isOwnerAlive && ownerAge >= p.startAge) {
                     incomeFromPensions += benefit;
+                    if (p.taxable !== false) taxableIncomeFromPensions += benefit;
                 } else if (isCouple && !isOwnerAlive) {
                     const spouseAge = p.owner === 'person1' ? currentAge2 : currentAge1;
                     const isSpouseAlive = p.owner === 'person1' ? p2Alive : p1Alive;
                     if (isSpouseAlive && spouseAge >= p.startAge) {
-                         incomeFromPensions += benefit * (p.survivorBenefit / 100);
+                         const survivorBenefit = benefit * (p.survivorBenefit / 100);
+                         incomeFromPensions += survivorBenefit;
+                         if (p.taxable !== false) taxableIncomeFromPensions += survivorBenefit;
                     }
                 }
             });
@@ -116,7 +121,9 @@ export const runSimulation = (plan: RetirementPlan): CalculationResult => {
                 const ownerAge = i.owner === 'person1' ? currentAge1 : currentAge2;
                 const isOwnerAlive = i.owner === 'person1' ? p1Alive : p2Alive;
                 if (isOwnerAlive && ownerAge >= i.startAge && ownerAge <= i.endAge) {
-                    incomeFromOther += (i.monthlyAmount * Math.pow(1 + i.cola / 100, ownerAge - i.startAge)) * 12;
+                    const incomeAmount = (i.monthlyAmount * Math.pow(1 + i.cola / 100, ownerAge - i.startAge)) * 12;
+                    incomeFromOther += incomeAmount;
+                    if (i.taxable !== false) taxableIncomeFromOther += incomeAmount;
                 }
             });
 
@@ -223,11 +230,14 @@ export const runSimulation = (plan: RetirementPlan): CalculationResult => {
                 }
             }
 
-            annualGrossIncome = incomeFromPensions + incomeFromSS + incomeFromOther + annualWithdrawal;
-            const finalTaxes = calculateTaxes(annualGrossIncome, plan.state, filingStatus);
+            const taxableGrossIncome = taxableIncomeFromPensions + taxableIncomeFromOther + incomeFromSS + annualWithdrawal;
+            const totalGrossIncome = incomeFromPensions + incomeFromOther + incomeFromSS + annualWithdrawal;
+
+            const finalTaxes = calculateTaxes(taxableGrossIncome, plan.state, filingStatus);
             federalTax = finalTaxes.federalTax;
             stateTax = finalTaxes.stateTax;
-            netAnnualIncome = annualGrossIncome - federalTax - stateTax;
+            netAnnualIncome = totalGrossIncome - federalTax - stateTax;
+            annualGrossIncome = totalGrossIncome;
 
             retirementNetIncomes.push(netAnnualIncome);
             retirementGrossIncomes.push(annualGrossIncome);

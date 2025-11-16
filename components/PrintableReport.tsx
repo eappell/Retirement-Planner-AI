@@ -17,7 +17,7 @@ const ReportSection: React.FC<{ title: string; children: React.ReactNode; color:
 );
 
 // Reusable item row
-const InfoRow: React.FC<{ label: string; value: string | number }> = ({ label, value }) => (
+const InfoRow: React.FC<{ label: React.ReactNode; value: string | number }> = ({ label, value }) => (
     <div className="flex justify-between py-1.5 border-b">
         <span className="font-semibold text-gray-700">{label}:</span>
         <span>{value}</span>
@@ -113,7 +113,12 @@ export const PrintableReport: React.FC<{ plan: RetirementPlan; results: Calculat
                         {plan.pensions.map(pension => (
                             <InfoRow 
                                 key={pension.id} 
-                                label={`${pension.name} (${pension.owner === 'person2' && isCouple ? plan.person2.name : plan.person1.name}, starts age ${pension.startAge})`} 
+                                label={
+                                    <>
+                                        {`${pension.name} (${pension.owner === 'person2' && isCouple ? plan.person2.name : plan.person1.name}, starts age ${pension.startAge})`}
+                                        {pension.taxable === false && <span className="text-xs text-gray-500 ml-2">(non-taxable)</span>}
+                                    </>
+                                } 
                                 value={`${formatCurrency(pension.monthlyBenefit)}/mo`} 
                             />
                         ))}
@@ -126,7 +131,12 @@ export const PrintableReport: React.FC<{ plan: RetirementPlan; results: Calculat
                         {plan.otherIncomes.map(income => (
                             <InfoRow 
                                 key={income.id} 
-                                label={`${income.name} (${income.owner === 'person2' && isCouple ? plan.person2.name : plan.person1.name}, ages ${income.startAge}-${income.endAge})`} 
+                                label={
+                                     <>
+                                        {`${income.name} (${income.owner === 'person2' && isCouple ? plan.person2.name : plan.person1.name}, ages ${income.startAge}-${income.endAge})`}
+                                        {income.taxable === false && <span className="text-xs text-gray-500 ml-2">(non-taxable)</span>}
+                                    </>
+                                }
                                 value={`${formatCurrency(income.monthlyAmount)}/mo`} 
                             />
                         ))}

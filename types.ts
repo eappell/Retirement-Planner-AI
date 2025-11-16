@@ -44,6 +44,7 @@ export interface Pension {
     startAge: number;
     cola: number; // cost of living adjustment %
     survivorBenefit: number; // %
+    taxable: boolean;
 }
 
 export interface OtherIncome {
@@ -54,6 +55,7 @@ export interface OtherIncome {
     startAge: number;
     endAge: number;
     cola: number;
+    taxable: boolean;
 }
 
 export interface ExpensePeriod {
