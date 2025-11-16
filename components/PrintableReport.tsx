@@ -59,11 +59,9 @@ export const PrintableReport: React.FC<{ plan: RetirementPlan; results: Calculat
                         </ReportSection>
                     </div>
                      <div className="col-span-1">
-                        <ReportSection title="Accounts & Incomes" color="bg-green-600">
+                        <ReportSection title="Account Balances" color="bg-green-600">
                             {plan.retirementAccounts.length > 0 && <InfoRow label="Retirement Accounts" value={formatCurrency(plan.retirementAccounts.reduce((s,a) => s + a.balance, 0))} />}
                             {plan.investmentAccounts.length > 0 && <InfoRow label="Investment Accounts" value={formatCurrency(plan.investmentAccounts.reduce((s,a) => s + a.balance, 0))} />}
-                            {plan.pensions.length > 0 && <InfoRow label="Total Pension Income" value={`${formatCurrency(plan.pensions.reduce((s,p) => s + p.monthlyBenefit, 0))}/mo`} />}
-                            {plan.otherIncomes.length > 0 && <InfoRow label="Other Income" value={`${formatCurrency(plan.otherIncomes.reduce((s,i) => s + i.monthlyAmount, 0))}/mo`} />}
                         </ReportSection>
                     </div>
                 </div>
@@ -107,6 +105,32 @@ export const PrintableReport: React.FC<{ plan: RetirementPlan; results: Calculat
                         <InfoRow key={exp.id} label={`${exp.name} (Ages ${exp.startAge}-${exp.endAge})`} value={`${formatCurrency(exp.monthlyAmount)}/mo`} />
                     ))}
                 </ReportSection>
+
+                {/* Pension Income */}
+                {plan.pensions.length > 0 && (
+                    <ReportSection title="Pension Income" color="bg-sky-500">
+                        {plan.pensions.map(pension => (
+                            <InfoRow 
+                                key={pension.id} 
+                                label={`${pension.name} (${pension.owner === 'person2' && isCouple ? plan.person2.name : plan.person1.name}, starts age ${pension.startAge})`} 
+                                value={`${formatCurrency(pension.monthlyBenefit)}/mo`} 
+                            />
+                        ))}
+                    </ReportSection>
+                )}
+
+                {/* Other Income */}
+                {plan.otherIncomes.length > 0 && (
+                    <ReportSection title="Other Income Sources" color="bg-teal-500">
+                        {plan.otherIncomes.map(income => (
+                            <InfoRow 
+                                key={income.id} 
+                                label={`${income.name} (${income.owner === 'person2' && isCouple ? plan.person2.name : plan.person1.name}, ages ${income.startAge}-${income.endAge})`} 
+                                value={`${formatCurrency(income.monthlyAmount)}/mo`} 
+                            />
+                        ))}
+                    </ReportSection>
+                )}
 
 
                 {/* Projection Table */}
