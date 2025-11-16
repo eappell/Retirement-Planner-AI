@@ -8,6 +8,7 @@ export const runSimulation = (plan: RetirementPlan): CalculationResult => {
     const filingStatus = isCouple ? FilingStatus.MARRIED_FILING_JOINTLY : FilingStatus.SINGLE;
     const inflation = plan.inflationRate / 100;
     const withdrawalRate = plan.annualWithdrawalRate / 100;
+    const avgReturn = plan.avgReturn / 100;
 
     const startAge = Math.min(plan.person1.currentAge, isCouple ? plan.person2.currentAge : Infinity);
     const endAge = Math.max(plan.person1.lifeExpectancy, isCouple ? plan.person2.lifeExpectancy : 0);
@@ -60,7 +61,7 @@ export const runSimulation = (plan: RetirementPlan): CalculationResult => {
                 const employerMatch = (owner.currentSalary * (acc.match / 100));
                 acc.balance += acc.annualContribution + employerMatch;
             }
-            acc.balance *= (1 + acc.avgReturn / 100);
+            acc.balance *= (1 + avgReturn);
         });
         investmentAccounts.forEach(acc => {
             const owner = plan[acc.owner as keyof typeof plan] as Person;
@@ -68,7 +69,7 @@ export const runSimulation = (plan: RetirementPlan): CalculationResult => {
             if(ownerAge < owner.retirementAge) {
                 acc.balance += acc.annualContribution;
             }
-            acc.balance *= (1 + acc.avgReturn / 100);
+            acc.balance *= (1 + avgReturn);
         });
         
         // --- Retirement Phase ---
@@ -143,12 +144,12 @@ export const runSimulation = (plan: RetirementPlan): CalculationResult => {
                     const totalRetirementBalance = retirementAccounts.reduce((s, a) => s + a.balance, 0);
                     const totalInvestmentBalance = investmentAccounts.reduce((s, a) => s + a.balance, 0);
                     
-                    const weightedRetirementReturn = totalRetirementBalance > 0 ? retirementAccounts.reduce((s, a) => s + a.balance * (a.avgReturn / 100), 0) / totalRetirementBalance : 0;
-                    const weightedInvestmentReturn = totalInvestmentBalance > 0 ? investmentAccounts.reduce((s, a) => s + a.balance * (a.avgReturn / 100), 0) / totalInvestmentBalance : 0;
+                    const weightedRetirementReturn = avgReturn;
+                    const weightedInvestmentReturn = avgReturn;
                     
-                    const avgReturn = totalAssets > 0 ? (totalRetirementBalance * weightedRetirementReturn + totalInvestmentBalance * weightedInvestmentReturn) / totalAssets : 0;
+                    const avgReturnForAnnuity = totalAssets > 0 ? (totalRetirementBalance * weightedRetirementReturn + totalInvestmentBalance * weightedInvestmentReturn) / totalAssets : 0;
                     
-                    const r = avgReturn;
+                    const r = avgReturnForAnnuity;
                     let legacyPV = plan.legacyAmount;
                     // Prevent division by zero if avg return is -100%
                     if (1 + r > 0) {

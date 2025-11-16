@@ -48,7 +48,7 @@ const generateScenarioData = (plan: RetirementPlan): ScenarioData[] => {
                      const employerMatch = (owner.currentSalary * (acc.match / 100));
                      acc.balance += acc.annualContribution + employerMatch;
                 }
-                acc.balance *= (1 + (acc.avgReturn / 100) + adjustment);
+                acc.balance *= (1 + (plan.avgReturn / 100) + adjustment);
             });
             investmentAccounts.forEach(acc => {
                 const owner = plan[acc.owner as keyof typeof plan] as Person;
@@ -56,7 +56,7 @@ const generateScenarioData = (plan: RetirementPlan): ScenarioData[] => {
                 if(ownerAge < owner.retirementAge) {
                     acc.balance += acc.annualContribution;
                 }
-                acc.balance *= (1 + (acc.avgReturn / 100) + adjustment);
+                acc.balance *= (1 + (plan.avgReturn / 100) + adjustment);
             });
             
             // Simplified withdrawal

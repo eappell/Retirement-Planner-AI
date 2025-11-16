@@ -24,7 +24,6 @@ export interface RetirementAccount {
     name: string;
     balance: number;
     annualContribution: number;
-    avgReturn: number;
     match: number;
     type: '401k' | '457b' | 'IRA' | 'Roth IRA' | 'Other';
 }
@@ -35,7 +34,6 @@ export interface InvestmentAccount {
     name: string;
     balance: number;
     annualContribution: number;
-    avgReturn: number;
 }
 
 export interface Pension {
@@ -84,6 +82,7 @@ export interface RetirementPlan {
   };
   state: string;
   inflationRate: number;
+  avgReturn: number;
   annualWithdrawalRate: number;
   dieWithZero: boolean;
   legacyAmount: number;

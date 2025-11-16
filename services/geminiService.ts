@@ -22,6 +22,7 @@ export const getRetirementInsights = async (plan: RetirementPlan, result: Calcul
         - Planning for: ${plan.planType}
         - State of Residence: ${plan.state}
         - Assumed Annual Inflation: ${plan.inflationRate}%
+        - Assumed Average Annual Investment Return: ${plan.avgReturn}%
         
         **People:**
         - ${plan.person1.name} (Person 1): Current Age ${plan.person1.currentAge}, Retiring at ${plan.person1.retirementAge}, Life Expectancy ${plan.person1.lifeExpectancy}
@@ -30,10 +31,10 @@ export const getRetirementInsights = async (plan: RetirementPlan, result: Calcul
         
         **Financials:**
         - Total Retirement & Investment Balance: ${formatCurrency(totalInvestments)}
-        ${formatList<RetirementAccount>('Retirement Accounts', plan.retirementAccounts, (acc) => `${acc.name} (${acc.type}): ${formatCurrency(acc.balance)} returning ${acc.avgReturn}%`)}
-        ${formatList<InvestmentAccount>('Investment Accounts', plan.investmentAccounts, (acc) => `${acc.name}: ${formatCurrency(acc.balance)} returning ${acc.avgReturn}%`)}
+        ${formatList<RetirementAccount>('Retirement Accounts', plan.retirementAccounts, (acc) => `${acc.name} (${acc.type}): ${formatCurrency(acc.balance)}`)}
+        ${formatList<InvestmentAccount>('Investment Accounts', plan.investmentAccounts, (acc) => `${acc.name}: ${formatCurrency(acc.balance)}`)}
         ${formatList<Pension>('Pensions', plan.pensions, (p) => `Starts at age ${p.startAge}, ${formatCurrency(p.monthlyBenefit)}/month with ${p.cola}% COLA`)}
-        ${formatList<OtherIncome>('Other Income', plan.otherIncomes, (i) => `${i.name}: ${formatCurrency(i.monthlyAmount)}/month from age ${i.startAge} to ${i.endAge}`)}
+        ${formatList<OtherIncome>('Other Incomes', plan.otherIncomes, (i) => `${i.name}: ${formatCurrency(i.monthlyAmount)}/month from age ${i.startAge} to ${i.endAge}`)}
         ${formatList<ExpensePeriod>('Expense Planning', plan.expensePeriods, (e) => `${e.name}: ${formatCurrency(e.monthlyAmount)}/month from age ${e.startAge} to ${e.endAge}`)}
 
         **Calculation Results (in today's dollars):**

@@ -22,10 +22,10 @@ const initialPlanState: RetirementPlan = {
   person1: { name: 'Person 1', currentAge: 40, retirementAge: 67, lifeExpectancy: 90, currentSalary: 80000, claimingAge: 67 },
   person2: { name: 'Person 2', currentAge: 40, retirementAge: 67, lifeExpectancy: 90, currentSalary: 75000, claimingAge: 67 },
   retirementAccounts: [
-    { id: '1', owner: 'person1', name: '401k', balance: 500000, annualContribution: 10000, avgReturn: 7, match: 5, type: '401k' }
+    { id: '1', owner: 'person1', name: '401k', balance: 500000, annualContribution: 10000, match: 5, type: '401k' }
   ],
   investmentAccounts: [
-    { id: '1', owner: 'person1', name: 'Brokerage', balance: 100000, annualContribution: 5000, avgReturn: 7 }
+    { id: '1', owner: 'person1', name: 'Brokerage', balance: 100000, annualContribution: 5000 }
   ],
   pensions: [],
   otherIncomes: [],
@@ -35,6 +35,7 @@ const initialPlanState: RetirementPlan = {
   socialSecurity: { person1EstimatedBenefit: 0, person2EstimatedBenefit: 0 },
   state: 'CA',
   inflationRate: 2.5,
+  avgReturn: 7,
   annualWithdrawalRate: 4,
   dieWithZero: false,
   legacyAmount: 0,
@@ -476,11 +477,12 @@ const App: React.FC = () => {
                                 ))}
                             </div>
                         }>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 col-span-full">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 col-span-full">
                                 <SelectInput label="State" value={plan.state} onChange={e => handlePlanChange('state', e.target.value)}>
                                         {Object.entries(STATES).map(([abbr, name]) => <option key={abbr} value={abbr}>{name}</option>)}
                                 </SelectInput>
                                 <NumberInput label="Inflation" suffix="%" value={plan.inflationRate} onChange={e => handlePlanChange('inflationRate', Number(e.target.value))}/>
+                                <NumberInput label="Avg. Return" suffix="%" value={plan.avgReturn} onChange={e => handlePlanChange('avgReturn', Number(e.target.value))}/>
                                 <NumberInput label="Withdrawal Rate" suffix="%" value={plan.annualWithdrawalRate} onChange={e => handlePlanChange('annualWithdrawalRate', Number(e.target.value))} disabled={plan.dieWithZero}/>
                                 <div className="flex items-center space-x-2 pt-4">
                                         <input type="checkbox" id="dieWithZero" checked={plan.dieWithZero} onChange={e => handlePlanChange('dieWithZero', e.target.checked)} className="h-4 w-4 rounded text-brand-primary focus:ring-brand-primary"/>
@@ -574,7 +576,7 @@ const App: React.FC = () => {
                                     <div className="col-span-full space-y-2">
                                         {items.map((item, index) => (
                                             <div key={item.id} className={`grid gap-x-4 items-end p-2 rounded-md ${
-                                                {'Retirement Accounts': 'bg-cyan-50/50 grid-cols-8', 'Investment Accounts': 'bg-teal-50/50 grid-cols-6', 'Pensions': 'bg-sky-50/50 grid-cols-7', 'Other Incomes': 'bg-lime-50/50 grid-cols-7', 'Expense Periods': 'bg-red-50/50 grid-cols-6'}[section]
+                                                {'Retirement Accounts': 'bg-cyan-50/50 grid-cols-7', 'Investment Accounts': 'bg-teal-50/50 grid-cols-5', 'Pensions': 'bg-sky-50/50 grid-cols-7', 'Other Incomes': 'bg-lime-50/50 grid-cols-7', 'Expense Periods': 'bg-red-50/50 grid-cols-6'}[section]
                                             }`}>
                                                 {/* Common fields */}
                                                 {listName !== 'expensePeriods' && (
@@ -596,7 +598,6 @@ const App: React.FC = () => {
                                                     </SelectInput>
                                                     <NumberInput label="Balance" prefix="$" value={item.balance} onChange={e => handleDynamicListChange(listName, item.id, 'balance', e.target.value)}/>
                                                     <NumberInput label="Annual Contrib." prefix="$" value={item.annualContribution} onChange={e => handleDynamicListChange(listName, item.id, 'annualContribution', e.target.value)}/>
-                                                    <NumberInput label="Return" suffix="%" value={item.avgReturn} onChange={e => handleDynamicListChange(listName, item.id, 'avgReturn', e.target.value)}/>
                                                     <NumberInput label="Match" suffix="%" value={item.match} onChange={e => handleDynamicListChange(listName, item.id, 'match', e.target.value)}/>
                                                     <div className="flex items-end">
                                                         <ActionIcons onAdd={() => addToList('retirementAccounts', { ...item, id: Date.now().toString(), balance: 0, annualContribution: 0, match: 0 })} onRemove={() => removeFromList('retirementAccounts', item.id)} canRemove={items.length > 1} />
@@ -605,7 +606,6 @@ const App: React.FC = () => {
                                                 {listName === 'investmentAccounts' && <>
                                                     <NumberInput label="Balance" prefix="$" value={item.balance} onChange={e => handleDynamicListChange(listName, item.id, 'balance', e.target.value)}/>
                                                     <NumberInput label="Annual Contrib." prefix="$" value={item.annualContribution} onChange={e => handleDynamicListChange(listName, item.id, 'annualContribution', e.target.value)}/>
-                                                    <NumberInput label="Return" suffix="%" value={item.avgReturn} onChange={e => handleDynamicListChange(listName, item.id, 'avgReturn', e.target.value)}/>
                                                     <div className="flex items-end">
                                                         <ActionIcons onAdd={() => addToList('investmentAccounts', { ...item, id: Date.now().toString(), balance: 0, annualContribution: 0 })} onRemove={() => removeFromList('investmentAccounts', item.id)} canRemove={items.length > 1} />
                                                     </div>
