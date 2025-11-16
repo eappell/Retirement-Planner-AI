@@ -107,13 +107,26 @@ const NetWorthScenarioChart: React.FC<{ scenarioData: ScenarioData[] }> = ({ sce
 
     const handleMouseMove = (e: React.MouseEvent<SVGRectElement>) => {
         const rect = e.currentTarget.getBoundingClientRect();
-        const mouseX = e.clientX - rect.left;
-        const yearRange = maxYear - minYear;
-        const yearIndex = Math.round(((mouseX - padding.left) / (width - padding.left - padding.right)) * (scenarioData.length - 1));
-        const dataPoint = scenarioData[Math.max(0, Math.min(yearIndex, scenarioData.length - 1))];
+        if (!rect.width) return; // Avoid division by zero if element isn't rendered yet
+
+        // The SVG is scaled via viewBox. We need to convert mouse coordinates (screen pixels)
+        // into the SVG's internal coordinate system.
+        const svgX = (e.clientX - rect.left) * (width / rect.width);
+
+        // Calculate the index based on the position within the chart's drawing area.
+        const chartAreaWidth = width - padding.left - padding.right;
+        const positionInChart = svgX - padding.left;
+
+        // Calculate the ratio (0 to 1) of how far the mouse is across the chart and clamp it.
+        const ratio = Math.max(0, Math.min(1, positionInChart / chartAreaWidth));
+        
+        // Find the closest data point based on the ratio.
+        const yearIndex = Math.round(ratio * (scenarioData.length - 1));
+        const dataPoint = scenarioData[yearIndex];
         
         if (dataPoint) {
-            setTooltip({ x: mouseX, y: e.clientY - rect.top, data: dataPoint });
+            // Use original mouse coordinates for the tooltip popup to keep it near the cursor.
+            setTooltip({ x: e.clientX - rect.left, y: e.clientY - rect.top, data: dataPoint });
         }
     };
     
