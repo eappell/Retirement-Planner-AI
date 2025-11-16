@@ -1,4 +1,5 @@
 
+
 import React, { useState, useCallback, useEffect } from 'react';
 import { RetirementPlan, CalculationResult, PlanType, RetirementAccount, InvestmentAccount, Pension, OtherIncome, ExpensePeriod, Person, YearlyProjection, MonteCarloResult } from './types';
 import { STATES } from './constants';
@@ -39,27 +40,56 @@ const initialPlanState: RetirementPlan = {
   legacyAmount: 0,
 };
 
+// --- Scenario Management Types ---
+interface Scenario {
+  id: string;
+  name: string;
+  plan: RetirementPlan;
+}
+
+interface ScenariosState {
+  activeScenarioId: string | null;
+  scenarios: Record<string, Scenario>;
+}
+
+
 type DynamicListKey = {
   [K in keyof RetirementPlan]: RetirementPlan[K] extends Array<{ id: string }> ? K : never
 }[keyof RetirementPlan];
 
-const STORAGE_KEY = 'retirementPlan';
+const STORAGE_KEY = 'retirementScenarios';
 
 const App: React.FC = () => {
-    const [plan, setPlan] = useState<RetirementPlan>(() => {
+    const getDefaultScenario = (): Scenario => ({
+        id: `scenario-${Date.now()}`,
+        name: 'Default Plan',
+        plan: initialPlanState,
+    });
+    
+    const [scenariosState, setScenariosState] = useState<ScenariosState>(() => {
         try {
-            const savedPlan = localStorage.getItem(STORAGE_KEY);
-            if (savedPlan) {
-                const parsed = JSON.parse(savedPlan);
-                if (parsed && typeof parsed === 'object' && parsed.planType) {
+            const savedData = localStorage.getItem(STORAGE_KEY);
+            if (savedData) {
+                const parsed = JSON.parse(savedData);
+                if (parsed && parsed.scenarios && parsed.activeScenarioId && parsed.scenarios[parsed.activeScenarioId]) {
                     return parsed;
                 }
             }
         } catch (error) {
-            console.error("Failed to load plan from local storage", error);
+            console.error("Failed to load scenarios from local storage", error);
         }
-        return initialPlanState;
+        const defaultScenario = getDefaultScenario();
+        return {
+            activeScenarioId: defaultScenario.id,
+            scenarios: { [defaultScenario.id]: defaultScenario },
+        };
     });
+
+    const { activeScenarioId, scenarios } = scenariosState;
+    const activeScenario = activeScenarioId ? scenarios[activeScenarioId] : null;
+
+    // The plan is now derived from the active scenario
+    const plan = activeScenario?.plan;
 
     const [results, setResults] = useState<CalculationResult | null>(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -74,12 +104,11 @@ const App: React.FC = () => {
     // --- Local Storage Persistence ---
     useEffect(() => {
         try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(plan));
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(scenariosState));
         } catch (error) {
-            console.error("Failed to save plan to local storage", error);
+            console.error("Failed to save scenarios to local storage", error);
         }
-    }, [plan]);
-
+    }, [scenariosState]);
 
     // --- Auto-focus on new item ---
     useEffect(() => {
@@ -91,13 +120,32 @@ const App: React.FC = () => {
             setLastAddedInfo(null); // Reset after focusing
         }
     }, [lastAddedInfo]);
-
+    
+    // Helper to update the plan within the active scenario
+    const updateActivePlan = (updater: (prevPlan: RetirementPlan) => RetirementPlan) => {
+        if (!activeScenarioId) return;
+        setScenariosState(prev => {
+            const currentPlan = prev.scenarios[activeScenarioId].plan;
+            const updatedPlan = updater(currentPlan);
+            if (updatedPlan === currentPlan) return prev; // No change
+            return {
+                ...prev,
+                scenarios: {
+                    ...prev.scenarios,
+                    [activeScenarioId]: {
+                        ...prev.scenarios[activeScenarioId],
+                        plan: updatedPlan,
+                    },
+                },
+            };
+        });
+    };
 
     // --- State Management ---
     const formatCurrency = (value: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
 
     const handlePlanChange = <T extends keyof RetirementPlan>(field: T, value: RetirementPlan[T]) => {
-        setPlan(prev => ({ ...prev, [field]: value }));
+        updateActivePlan(prev => ({ ...prev, [field]: value }));
     };
 
     const handlePersonChange = (person: 'person1' | 'person2', field: keyof Person, value: string) => {
@@ -107,7 +155,7 @@ const App: React.FC = () => {
             ? (Number(value) >= 0 ? Number(value) : 0)
             : value;
 
-        setPlan(prev => ({
+        updateActivePlan(prev => ({
             ...prev,
             [person]: { ...prev[person], [field]: finalValue }
         }));
@@ -117,18 +165,16 @@ const App: React.FC = () => {
         listName: K,
         id: string,
         field: keyof RetirementPlan[K][number],
-        value: string // Value from input is always a string
+        value: string
     ) => {
-        setPlan(prev => {
+        updateActivePlan(prev => {
             const list = prev[listName] as ({ id: string } & object)[];
             const updatedList = list.map(item => {
                 if (item.id !== id) return item;
-
                 const originalValue = item[field as keyof typeof item];
                 const finalValue = typeof originalValue === 'number'
-                    ? (Number(value) >= 0 ? Number(value) : 0) // Convert to number if original was a number
-                    : value; // Otherwise, keep as string
-
+                    ? (Number(value) >= 0 ? Number(value) : 0)
+                    : value;
                 return { ...item, [field]: finalValue };
             });
             return { ...prev, [listName]: updatedList };
@@ -136,30 +182,85 @@ const App: React.FC = () => {
     };
 
     const addToList = <K extends DynamicListKey>(listName: K, newItem: RetirementPlan[K][number]) => {
-        setPlan(prev => ({ ...prev, [listName]: [...prev[listName], newItem] }));
+        updateActivePlan(prev => ({ ...prev, [listName]: [...prev[listName], newItem] }));
         setLastAddedInfo({ list: listName, id: newItem.id });
     };
 
     const removeFromList = (listName: DynamicListKey, id: string) => {
-        setPlan(prev => ({ ...prev, [listName]: (prev[listName] as { id: string }[]).filter(item => item.id !== id) }));
+        updateActivePlan(prev => ({ ...prev, [listName]: (prev[listName] as { id: string }[]).filter(item => item.id !== id) }));
+    };
+
+    // --- Scenario Management Handlers ---
+    const handleSelectScenario = (id: string) => {
+        setScenariosState(prev => ({ ...prev, activeScenarioId: id }));
+        setResults(null);
+        setAiInsights('');
+        setMonteCarloResults(null);
+    };
+
+    const handleNewScenario = () => {
+        const newId = `scenario-${Date.now()}`;
+        const newScenario: Scenario = {
+            id: newId,
+            name: `New Scenario ${Object.keys(scenarios).length + 1}`,
+            plan: initialPlanState,
+        };
+        setScenariosState(prev => ({
+            activeScenarioId: newId,
+            scenarios: { ...prev.scenarios, [newId]: newScenario },
+        }));
+        setResults(null);
+        setAiInsights('');
+        setMonteCarloResults(null);
+    };
+
+    const handleDeleteScenario = () => {
+        if (!activeScenarioId || !activeScenario || Object.keys(scenarios).length <= 1) {
+            alert("You cannot delete the last scenario.");
+            return;
+        }
+
+        if (window.confirm(`Are you sure you want to delete the "${activeScenario.name}" scenario?`)) {
+            setScenariosState(prev => {
+                const newScenarios = { ...prev.scenarios };
+                delete newScenarios[activeScenarioId];
+                const newActiveId = Object.keys(newScenarios)[0] || null;
+                return { scenarios: newScenarios, activeScenarioId: newActiveId };
+            });
+            setResults(null);
+            setAiInsights('');
+            setMonteCarloResults(null);
+        }
+    };
+    
+    const handleUpdateScenarioName = (newName: string) => {
+        if (!activeScenarioId) return;
+        setScenariosState(prev => ({
+            ...prev,
+            scenarios: {
+                ...prev.scenarios,
+                [activeScenarioId]: { ...prev.scenarios[activeScenarioId], name: newName },
+            },
+        }));
     };
     
     // --- Social Security Calculation ---
     useEffect(() => {
+        if (!plan) return;
         const p1Benefit = estimateSocialSecurityBenefit(plan.person1.currentSalary, plan.person1.claimingAge);
         const p2Benefit = estimateSocialSecurityBenefit(plan.person2.currentSalary, plan.person2.claimingAge);
-        setPlan(prev => ({
+        updateActivePlan(prev => ({
             ...prev,
             socialSecurity: { person1EstimatedBenefit: p1Benefit, person2EstimatedBenefit: p2Benefit }
         }));
-    }, [plan.person1.currentSalary, plan.person1.claimingAge, plan.person2.currentSalary, plan.person2.claimingAge]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [plan?.person1.currentSalary, plan?.person1.claimingAge, plan?.person2.currentSalary, plan?.person2.claimingAge]);
 
     // --- Expense Age Sync ---
     useEffect(() => {
-        setPlan(prev => {
-            if (prev.expensePeriods.length === 0) {
-                return prev;
-            }
+        if (!plan) return;
+        updateActivePlan(prev => {
+            if (prev.expensePeriods.length === 0) return prev;
             const isCouple = prev.planType === PlanType.COUPLE;
             let earliestRetirementAge: number;
             let earliestRetirementRef: 'person1' | 'person2' = 'person1';
@@ -185,13 +286,14 @@ const App: React.FC = () => {
                 updatedExpensePeriods[0] = firstExpense;
                 return { ...prev, expensePeriods: updatedExpensePeriods };
             }
-
             return prev;
         });
-    }, [plan.person1.retirementAge, plan.person2.retirementAge, plan.planType]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [plan?.person1.retirementAge, plan?.person2.retirementAge, plan?.planType]);
 
     // --- Main Calculation Trigger ---
     const calculatePlan = useCallback(() => {
+        if (!plan) return;
         setIsLoading(true);
         setResults(null);
         setProjectionData([]);
@@ -204,7 +306,7 @@ const App: React.FC = () => {
     }, [plan]);
 
     const handleGetInsights = useCallback(async () => {
-        if (!results) return;
+        if (!results || !plan) return;
         setIsAiLoading(true);
         setAiInsights('');
         const insights = await getRetirementInsights(plan, results);
@@ -213,9 +315,9 @@ const App: React.FC = () => {
     }, [plan, results]);
 
      const handleRunSimulation = useCallback((numSimulations: number, volatility: number) => {
+        if (!plan) return;
         setIsMcLoading(true);
         setMonteCarloResults(null);
-        // Run in a timeout to allow UI to update to loading state
         setTimeout(() => {
             const mcResults = runMonteCarloSimulation(plan, numSimulations, volatility);
             setMonteCarloResults(mcResults);
@@ -223,15 +325,16 @@ const App: React.FC = () => {
         }, 50);
     }, [plan]);
 
-
-    const handlePrint = () => {
-        window.print();
-    };
+    const handlePrint = () => window.print();
     
     const handleResetPlan = () => {
-        if (window.confirm('Are you sure you want to reset all your data? This action cannot be undone.')) {
+        if (window.confirm('Are you sure you want to reset all your data? This will delete ALL saved scenarios and cannot be undone.')) {
             localStorage.removeItem(STORAGE_KEY);
-            setPlan(initialPlanState);
+            const defaultScenario = getDefaultScenario();
+            setScenariosState({
+                activeScenarioId: defaultScenario.id,
+                scenarios: { [defaultScenario.id]: defaultScenario },
+            });
             setResults(null);
             setAiInsights('');
             setMonteCarloResults(null);
@@ -239,18 +342,19 @@ const App: React.FC = () => {
         }
     };
 
-
     // --- Real-time Calculation ---
     useEffect(() => {
+        if (!plan) return;
         const handler = setTimeout(() => {
             calculatePlan();
         }, 1000); // Debounce requests
-
-        return () => {
-            clearTimeout(handler);
-        };
+        return () => clearTimeout(handler);
     }, [plan, calculatePlan]);
     
+    if (!plan || !activeScenario) {
+        return <div className="p-8 text-center">Loading scenarios...</div>;
+    }
+
     // --- UI Components ---
     const ActionIcons = ({ onAdd, onRemove, canRemove }: { onAdd: () => void; onRemove: () => void; canRemove: boolean }) => (
         <div className="flex items-center space-x-1 pl-2">
@@ -299,7 +403,7 @@ const App: React.FC = () => {
                             type="button" 
                             onClick={handleResetPlan} 
                             className="flex items-center space-x-2 text-sm text-red-600 hover:text-red-800 transition-colors font-medium p-2 rounded-md hover:bg-red-100"
-                            title="Reset all data to default"
+                            title="Reset all data and scenarios"
                         >
                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                             <span>Reset Plan</span>
@@ -338,6 +442,21 @@ const App: React.FC = () => {
                     </div>
                     
                     <div className="mt-4 space-y-6">
+                        <InputSection title="Scenario Manager" subtitle="Save and load different retirement plans to compare strategies.">
+                            <div className="col-span-full grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                                <div className="md:col-span-2">
+                                    <SelectInput label="Current Scenario" value={activeScenarioId || ''} onChange={e => handleSelectScenario(e.target.value)}>
+                                        {Object.values(scenarios).map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                                    </SelectInput>
+                                </div>
+                                <TextInput label="Scenario Name" value={activeScenario.name} onChange={e => handleUpdateScenarioName(e.target.value)} />
+                                <div className="flex items-end space-x-2">
+                                    <button onClick={handleNewScenario} className="w-full px-3 py-1.5 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors">New Scenario</button>
+                                    <button onClick={handleDeleteScenario} disabled={Object.keys(scenarios).length <= 1} className="w-full px-3 py-1.5 text-sm bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-400 transition-colors">Delete</button>
+                                </div>
+                            </div>
+                        </InputSection>
+
                         <InputSection 
                             title="Plan Information"
                             subtitle="Set the high-level assumptions for your retirement plan."
