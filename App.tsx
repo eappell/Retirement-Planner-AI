@@ -724,7 +724,7 @@ const App: React.FC = () => {
                         </InputSection>
 
                          {filteredProjections.length > 0 && (
-                            <InputSection title="Annual Projection" subtitle="A year-by-year breakdown of your retirement finances." titleColorClass="text-gray-600" gridCols={1}>
+                            <InputSection title="Annual Projection" subtitle="A year-by-year breakdown of your monthly retirement finances." titleColorClass="text-gray-600" gridCols={1}>
                                 <div className="col-span-full">
                                     <ProjectionTable data={filteredProjections} plan={plan} />
                                 </div>
