@@ -455,6 +455,9 @@ const App: React.FC = () => {
                                     <button onClick={handleDeleteScenario} disabled={Object.keys(scenarios).length <= 1} className="w-full px-3 py-1.5 text-sm bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-400 transition-colors">Delete</button>
                                 </div>
                             </div>
+                            <p className="col-span-full text-xs text-brand-text-secondary mt-2">
+                                Note: This data is stored in your browser. If you clear your browser cache, you may lose your scenarios.
+                            </p>
                         </InputSection>
 
                         <InputSection 
