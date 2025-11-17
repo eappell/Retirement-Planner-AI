@@ -86,6 +86,7 @@ const App: React.FC = () => {
 
     const [results, setResults] = useState<CalculationResult | null>(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
     const [isAiLoading, setIsAiLoading] = useState(false);
     const [aiInsights, setAiInsights] = useState<string>('');
     const [projectionData, setProjectionData] = useState<YearlyProjection[]>([]);
@@ -212,6 +213,7 @@ const App: React.FC = () => {
     const handleSelectScenario = (id: string) => {
         setScenariosState(prev => ({ ...prev, activeScenarioId: id }));
         setResults(null);
+        setError(null);
         setAiInsights('');
         setMonteCarloResults(null);
     };
@@ -228,6 +230,7 @@ const App: React.FC = () => {
             scenarios: { ...prev.scenarios, [newId]: newScenario },
         }));
         setResults(null);
+        setError(null);
         setAiInsights('');
         setMonteCarloResults(null);
     };
@@ -246,6 +249,7 @@ const App: React.FC = () => {
                 return { scenarios: newScenarios, activeScenarioId: newActiveId };
             });
             setResults(null);
+            setError(null);
             setAiInsights('');
             setMonteCarloResults(null);
         }
@@ -267,6 +271,7 @@ const App: React.FC = () => {
         }));
 
         setResults(null);
+        setError(null);
         setAiInsights('');
         setMonteCarloResults(null);
     };
@@ -320,6 +325,7 @@ const App: React.FC = () => {
                      if (window.confirm('Are you sure you want to upload this file? This will overwrite all your current scenarios.')) {
                         setScenariosState(uploadedState);
                         setResults(null);
+                        setError(null);
                         setAiInsights('');
                         setMonteCarloResults(null);
                         alert("Scenarios loaded successfully!");
@@ -391,6 +397,7 @@ const App: React.FC = () => {
     const calculatePlan = useCallback(async () => {
         if (!plan) return;
         setIsLoading(true);
+        setError(null);
         setResults(null);
         setProjectionData([]);
         
@@ -398,9 +405,9 @@ const App: React.FC = () => {
             const simulationResults = await runSimulation(plan);
             setResults(simulationResults);
             setProjectionData(simulationResults.yearlyProjections);
-        } catch (error) {
-            console.error("Calculation failed:", error);
-            // Optionally, set an error state to show in the UI
+        } catch (err: any) {
+            console.error("Calculation failed:", err);
+            setError(err.message || "An unknown error occurred during calculation.");
         } finally {
             setIsLoading(false);
         }
@@ -437,6 +444,7 @@ const App: React.FC = () => {
                 scenarios: { [defaultScenario.id]: defaultScenario },
             });
             setResults(null);
+            setError(null);
             setAiInsights('');
             setMonteCarloResults(null);
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -590,32 +598,51 @@ const App: React.FC = () => {
                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 sticky top-[56px] z-10 bg-brand-background py-4 shadow-sm -mx-8 px-8">
                         <IndicatorCard 
                             title="Avg. Monthly Net Income" 
-                            value={results ? formatCurrency(results.avgMonthlyNetIncomeFuture) : '---'}
-                            subValue={results ? `(in today's $)` : ''}
+                            value={results && !isLoading ? formatCurrency(results.avgMonthlyNetIncomeFuture) : '---'}
+                            subValue={results && !isLoading ? `(${formatCurrency(results.avgMonthlyNetIncomeToday)} today's $)` : ''}
                             icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm-5-5a2 2 0 114 0 2 2 0 01-4 0z" /></svg>}
                             colorClass="bg-green-500"
                         />
                          <IndicatorCard 
                             title="Final Net Worth" 
-                            value={results ? formatCurrency(results.netWorthAtEndFuture) : '---'}
-                            subValue={results ? `(${formatCurrency(results.netWorthAtEnd)} today's $)` : ''}
+                            value={results && !isLoading ? formatCurrency(results.netWorthAtEndFuture) : '---'}
+                            subValue={results && !isLoading ? `(${formatCurrency(results.netWorthAtEnd)} today's $)` : ''}
                             icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>}
                             colorClass="bg-indigo-500"
                         />
                          <IndicatorCard 
                             title="Federal Tax Rate" 
-                            value={results ? `${results.federalTaxRate.toFixed(1)}%` : '---'}
+                            value={results && !isLoading ? `${results.federalTaxRate.toFixed(1)}%` : '---'}
                             icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.002 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.002 0M18 7l3 9m-3-9l-6-2" /></svg>}
                             colorClass="bg-red-500"
                         />
                          <IndicatorCard 
                             title="State Tax Rate" 
-                            value={results ? `${results.stateTaxRate.toFixed(1)}%` : '---'}
+                            value={results && !isLoading ? `${results.stateTaxRate.toFixed(1)}%` : '---'}
                             icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>}
                             colorClass="bg-yellow-500"
                         />
                     </div>
                     
+                    {isLoading && (
+                        <div className="my-6">
+                            <div className="flex flex-col items-center justify-center p-8 bg-white rounded-lg shadow-md text-center">
+                                <svg className="animate-spin h-8 w-8 text-brand-primary mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                <p className="text-lg font-semibold text-brand-text-primary">Calculating...</p>
+                                {plan.dieWithZero && <p className="text-sm text-brand-text-secondary mt-1">The AI is modeling your plan. This may take a moment.</p>}
+                            </div>
+                        </div>
+                    )}
+                    {error && (
+                        <div className="my-6 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md shadow" role="alert">
+                            <p className="font-bold">An Error Occurred</p>
+                            <p>{error}</p>
+                        </div>
+                    )}
+
                     <div className="mt-4 space-y-6">
                         <InputSection 
                             title="Plan Information"
@@ -877,7 +904,7 @@ const App: React.FC = () => {
 
                          <InputSection title="Charts & Analysis" subtitle="Visualize your retirement projections." titleColorClass="text-yellow-600">
                             <div className="col-span-full">
-                                <DynamicCharts projectionData={projectionData} plan={plan} />
+                                { !isLoading && !error && results && <DynamicCharts projectionData={projectionData} plan={plan} /> }
                             </div>
                          </InputSection>
 
@@ -887,11 +914,12 @@ const App: React.FC = () => {
                                     onRunSimulation={handleRunSimulation}
                                     results={monteCarloResults}
                                     isLoading={isMcLoading}
+                                    disabled={plan.dieWithZero}
                                 />
                             </div>
                         </InputSection>
 
-                         {filteredProjections.length > 0 && (
+                         { !isLoading && !error && filteredProjections.length > 0 && (
                             <InputSection title="Annual Projection" subtitle="A year-by-year breakdown of your retirement finances." titleColorClass="text-gray-600" gridCols={1}>
                                 <div className="col-span-full">
                                     <ProjectionTable data={filteredProjections} plan={plan} />

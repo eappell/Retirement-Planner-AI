@@ -5,6 +5,7 @@ interface MonteCarloSimulatorProps {
     onRunSimulation: (numSimulations: number, volatility: number) => void;
     results: MonteCarloResult | null;
     isLoading: boolean;
+    disabled?: boolean;
 }
 
 const formatCurrencyShort = (value: number) => {
@@ -15,13 +16,23 @@ const formatCurrencyShort = (value: number) => {
 };
 
 
-export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ onRunSimulation, results, isLoading }) => {
+export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ onRunSimulation, results, isLoading, disabled }) => {
     const [numSimulations, setNumSimulations] = useState(1000);
     const [volatility, setVolatility] = useState(15);
 
     const handleRunClick = () => {
         onRunSimulation(numSimulations, volatility);
     };
+    
+    if (disabled) {
+        return (
+            <div className="text-center p-4 bg-gray-100 rounded-md text-gray-600">
+                <p className="font-semibold">Monte Carlo is disabled with "Die with Zero"</p>
+                <p className="text-xs mt-1">This feature tests fixed withdrawal rates, which is not compatible with the dynamic AI-powered withdrawal plan.</p>
+            </div>
+        );
+    }
+
 
     return (
         <div className="space-y-4">
