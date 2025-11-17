@@ -151,33 +151,44 @@ export const runSimulation = (plan: RetirementPlan, volatility?: number): Calcul
             });
             inflatedExpenses = annualExpenses * Math.pow(1 + inflation, year);
             
-            // --- Corrected Withdrawal Logic ---
+            // --- Withdrawal Logic ---
             const totalAssets = [...investmentAccounts, ...retirementAccounts].reduce((sum, acc) => sum + acc.balance, 0);
             let plannedAnnualWithdrawal = 0;
 
             if (plan.dieWithZero) {
                 // --- Die with Zero Strategy ---
-                // Calculates the maximum sustainable withdrawal to meet the legacy goal.
-                // This value is the withdrawal, regardless of expenses. If expenses are higher, the plan will show a shortfall.
+                // This strategy calculates the maximum sustainable withdrawal to ensure funds last
+                // until the end of the longer life expectancy, ending with the specified legacy amount.
+                // It uses an annuity due formula for withdrawals at the BEGINNING of each period.
                 const finalAge = isCouple ? Math.max(plan.person1.lifeExpectancy, plan.person2.lifeExpectancy) : plan.person1.lifeExpectancy;
                 const currentMaxAge = isCouple ? Math.max(currentAge1, currentAge2) : currentAge1;
-                const yearsRemaining = Math.max(1, finalAge - currentMaxAge);
+                const yearsRemaining = Math.max(1, finalAge - currentMaxAge + 1);
 
-                if (totalAssets > plan.legacyAmount && yearsRemaining > 0) {
-                    const r = avgReturn;
-                    // Calculate the present value of the legacy amount
+                if (totalAssets > 0) {
+                    const r = avgReturn; // Use the plan's average return for the annuity calculation
+                    
+                    // The legacy amount needs to be worth plan.legacyAmount at the END of the plan.
+                    // We discount it to find its present value at the START of the current year.
                     const legacyPV = plan.legacyAmount / Math.pow(1 + r, yearsRemaining);
-                    const spendableAssets = totalAssets - legacyPV;
+                    const spendableAssets = Math.max(0, totalAssets - legacyPV);
 
                     if (spendableAssets > 0) {
-                         if (r !== 0 && Math.abs(r) < 1) { // Use annuity formula for non-zero returns
-                            plannedAnnualWithdrawal = (spendableAssets * r) / (1 - Math.pow(1 + r, -yearsRemaining));
-                         } else { // Simple division for zero return or extreme returns
+                        if (yearsRemaining <= 1) {
+                            plannedAnnualWithdrawal = spendableAssets;
+                        } else if (r === 0) {
                             plannedAnnualWithdrawal = spendableAssets / yearsRemaining;
+                        } else {
+                            // Annuity Due formula: P = PV * r / ( (1 - (1+r)^-n) * (1+r) )
+                            const numerator = spendableAssets * r;
+                            const denominator = (1 - Math.pow(1 + r, -yearsRemaining)) * (1 + r);
+                            if (denominator !== 0) {
+                                plannedAnnualWithdrawal = numerator / denominator;
+                            } else {
+                                plannedAnnualWithdrawal = 0; // Avoid division by zero, e.g., if r = -1
+                            }
                         }
                     }
                 }
-
             } else {
                  // --- Fixed Withdrawal Rate Strategy ---
                 // Withdraws a fixed percentage, but takes more if needed to cover expenses.
