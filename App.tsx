@@ -394,7 +394,7 @@ const App: React.FC = () => {
     }, [plan?.person1.retirementAge, plan?.person2.retirementAge, plan?.planType]);
 
     // --- Main Calculation Trigger ---
-    const calculatePlan = useCallback(async () => {
+    const calculatePlan = useCallback(() => {
         if (!plan) return;
         setIsLoading(true);
         setError(null);
@@ -402,7 +402,7 @@ const App: React.FC = () => {
         setProjectionData([]);
         
         try {
-            const simulationResults = await runSimulation(plan);
+            const simulationResults = runSimulation(plan);
             setResults(simulationResults);
             setProjectionData(simulationResults.yearlyProjections);
         } catch (err: any) {
@@ -422,15 +422,16 @@ const App: React.FC = () => {
         setIsAiLoading(false);
     }, [plan, results]);
 
-     const handleRunSimulation = useCallback(async (numSimulations: number, volatility: number) => {
+     const handleRunSimulation = useCallback((numSimulations: number, volatility: number) => {
         if (!plan) return;
         setIsMcLoading(true);
         setMonteCarloResults(null);
         // Use a Promise to allow UI to update before blocking
-        await new Promise(resolve => setTimeout(resolve, 50));
-        const mcResults = await runMonteCarloSimulation(plan, numSimulations, volatility);
-        setMonteCarloResults(mcResults);
-        setIsMcLoading(false);
+        setTimeout(() => {
+            const mcResults = runMonteCarloSimulation(plan, numSimulations, volatility);
+            setMonteCarloResults(mcResults);
+            setIsMcLoading(false);
+        }, 50);
     }, [plan]);
 
     const handlePrint = () => window.print();
@@ -632,7 +633,6 @@ const App: React.FC = () => {
                                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                 </svg>
                                 <p className="text-lg font-semibold text-brand-text-primary">Calculating...</p>
-                                {plan.dieWithZero && <p className="text-sm text-brand-text-secondary mt-1">The AI is modeling your plan. This may take a moment.</p>}
                             </div>
                         </div>
                     )}
@@ -914,7 +914,6 @@ const App: React.FC = () => {
                                     onRunSimulation={handleRunSimulation}
                                     results={monteCarloResults}
                                     isLoading={isMcLoading}
-                                    disabled={plan.dieWithZero}
                                 />
                             </div>
                         </InputSection>

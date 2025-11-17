@@ -1,7 +1,6 @@
 import { RetirementPlan, CalculationResult, YearlyProjection, PlanType, FilingStatus, RetirementAccount, InvestmentAccount, Person } from '../types';
 import { RMD_START_AGE, RMD_UNIFORM_LIFETIME_TABLE } from '../constants';
 import { calculateTaxes } from './taxService';
-import { generateDieWithZeroProjection } from './geminiService';
 
 // Helper function to get a random number from a normal distribution (Box-Muller transform)
 const randomNormal = (mean: number, stdDev: number): number => {
@@ -16,7 +15,6 @@ const randomNormal = (mean: number, stdDev: number): number => {
 const calculateSummary = (projections: YearlyProjection[], plan: RetirementPlan): CalculationResult => {
     const isCouple = plan.planType === PlanType.COUPLE;
     const inflation = plan.inflationRate / 100;
-    const startAge = Math.min(plan.person1.currentAge, isCouple ? plan.person2.currentAge : Infinity);
 
     const retirementStartYearIndex = projections.findIndex(p => {
         if (isCouple) return p.age1 >= plan.person1.retirementAge || (p.age2 !== undefined && p.age2 >= plan.person2.retirementAge);
@@ -67,14 +65,7 @@ const calculateSummary = (projections: YearlyProjection[], plan: RetirementPlan)
 };
 
 
-export const runSimulation = async (plan: RetirementPlan, volatility?: number): Promise<CalculationResult> => {
-    // If "Die with Zero" is selected, use the AI model. Don't use for Monte Carlo sims.
-    if (plan.dieWithZero && !volatility) {
-        const aiProjections = await generateDieWithZeroProjection(plan);
-        return calculateSummary(aiProjections, plan);
-    }
-    
-    // --- Standard Local Simulation (Fixed Withdrawal or Monte Carlo) ---
+export const runSimulation = (plan: RetirementPlan, volatility?: number): CalculationResult => {
     const isCouple = plan.planType === PlanType.COUPLE;
     const filingStatus = isCouple ? FilingStatus.MARRIED_FILING_JOINTLY : FilingStatus.SINGLE;
     const inflation = plan.inflationRate / 100;
@@ -203,23 +194,49 @@ export const runSimulation = async (plan: RetirementPlan, volatility?: number): 
             
             const totalAssets = [...investmentAccounts, ...retirementAccounts].reduce((sum, acc) => sum + acc.balance, 0);
             
-            const fixedRateWithdrawal = totalAssets * withdrawalRate;
-            const fixedIncome = incomeFromPensions + incomeFromSS + incomeFromOther;
-            const taxableFixedIncome = taxableIncomeFromPensions + taxableIncomeFromOther + incomeFromSS;
-            const taxesOnFixedIncome = calculateTaxes(taxableFixedIncome, plan.state, filingStatus);
-            const netFixedIncome = fixedIncome - (taxesOnFixedIncome.federalTax + taxesOnFixedIncome.stateTax);
+            let plannedAnnualWithdrawal = 0;
 
-            let neededForExpenses = 0;
-            if (netFixedIncome < inflatedExpenses) {
-                const netShortfall = inflatedExpenses - netFixedIncome;
-                const incomeForMarginalRateCheck = taxableFixedIncome + 1000;
-                const taxesAtHigherIncome = calculateTaxes(incomeForMarginalRateCheck, plan.state, filingStatus);
-                const taxOnExtraAmount = (taxesAtHigherIncome.federalTax + taxesAtHigherIncome.stateTax) - (taxesOnFixedIncome.federalTax + taxesOnFixedIncome.stateTax);
-                const marginalTaxRate = Math.max(0, taxOnExtraAmount / 1000);
-                neededForExpenses = (marginalTaxRate < 1) ? netShortfall / (1 - marginalTaxRate) : netShortfall * 2;
+            if (plan.dieWithZero) {
+                 const finalLifeExpectancy = Math.max(plan.person1.lifeExpectancy, isCouple ? plan.person2.lifeExpectancy : 0);
+                 const finalCurrentAge = Math.max(p1Alive ? currentAge1 : -1, p2Alive ? currentAge2 : -1);
+                 const yearsRemaining = Math.max(1, finalLifeExpectancy - finalCurrentAge);
+
+                 if (totalAssets > plan.legacyAmount && yearsRemaining > 0) {
+                     const rate = currentYearReturn; 
+                     // Present value of the legacy amount
+                     const pvLegacy = plan.legacyAmount / Math.pow(1 + rate, yearsRemaining);
+                     const spendableAssets = totalAssets - pvLegacy;
+                     
+                     if (rate !== 0) {
+                         // Annuity Due Formula: C = P * r / (1 - (1+r)^-n) / (1+r)
+                         // This calculates the payment (C) from a present value (P)
+                         const pmt = spendableAssets * (rate / (1 - Math.pow(1 + rate, -yearsRemaining))) / (1 + rate);
+                         plannedAnnualWithdrawal = pmt;
+                     } else {
+                         // Simplified case if rate is zero (to avoid division by zero)
+                         plannedAnnualWithdrawal = spendableAssets / yearsRemaining;
+                     }
+                 } else {
+                    plannedAnnualWithdrawal = 0;
+                 }
+            } else {
+                const fixedRateWithdrawal = totalAssets * withdrawalRate;
+                const fixedIncome = incomeFromPensions + incomeFromSS + incomeFromOther;
+                const taxableFixedIncome = taxableIncomeFromPensions + taxableIncomeFromOther + incomeFromSS;
+                const taxesOnFixedIncome = calculateTaxes(taxableFixedIncome, plan.state, filingStatus);
+                const netFixedIncome = fixedIncome - (taxesOnFixedIncome.federalTax + taxesOnFixedIncome.stateTax);
+
+                let neededForExpenses = 0;
+                if (netFixedIncome < inflatedExpenses) {
+                    const netShortfall = inflatedExpenses - netFixedIncome;
+                    const incomeForMarginalRateCheck = taxableFixedIncome + 1000;
+                    const taxesAtHigherIncome = calculateTaxes(incomeForMarginalRateCheck, plan.state, filingStatus);
+                    const taxOnExtraAmount = (taxesAtHigherIncome.federalTax + taxesAtHigherIncome.stateTax) - (taxesOnFixedIncome.federalTax + taxesOnFixedIncome.stateTax);
+                    const marginalTaxRate = Math.max(0, taxOnExtraAmount / 1000);
+                    neededForExpenses = (marginalTaxRate < 1) ? netShortfall / (1 - marginalTaxRate) : netShortfall * 2;
+                }
+                plannedAnnualWithdrawal = Math.max(neededForExpenses, fixedRateWithdrawal);
             }
-            
-            let plannedAnnualWithdrawal = Math.max(neededForExpenses, fixedRateWithdrawal);
 
             annualWithdrawal = Math.max(plannedAnnualWithdrawal, totalRmd);
             annualWithdrawal = Math.min(annualWithdrawal, totalAssets);
