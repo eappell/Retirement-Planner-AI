@@ -260,6 +260,62 @@ const App: React.FC = () => {
         }));
     };
     
+    // --- Backup & Restore Handlers ---
+    const handleDownloadScenarios = () => {
+        try {
+            const jsonString = JSON.stringify(scenariosState, null, 2);
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'retirement_scenarios.json';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error("Error downloading scenarios:", error);
+            alert("Failed to download scenarios.");
+        }
+    };
+
+    const handleUploadScenarios = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const text = e.target?.result;
+                if (typeof text !== 'string') {
+                    throw new Error("Invalid file content");
+                }
+                const uploadedState = JSON.parse(text);
+
+                // Basic validation
+                if (uploadedState && uploadedState.scenarios && typeof uploadedState.activeScenarioId !== 'undefined') {
+                     if (window.confirm('Are you sure you want to upload this file? This will overwrite all your current scenarios.')) {
+                        setScenariosState(uploadedState);
+                        setResults(null);
+                        setAiInsights('');
+                        setMonteCarloResults(null);
+                        alert("Scenarios loaded successfully!");
+                     }
+                } else {
+                    throw new Error("Invalid scenario file format.");
+                }
+            } catch (error) {
+                console.error("Error uploading scenarios:", error);
+                alert("Failed to upload scenarios. Please make sure the file is a valid scenario backup.");
+            }
+            // Reset file input value to allow re-uploading the same file
+            if (event.target) {
+                event.target.value = '';
+            }
+        };
+        reader.readAsText(file);
+    };
+
     // --- Social Security Calculation ---
     useEffect(() => {
         if (!plan) return;
@@ -482,6 +538,23 @@ const App: React.FC = () => {
                             </div>
                              <div className="col-span-full mt-2">
                                 <p className="text-xs text-gray-500">This data is stored in your browser. If you clear your browser cache, you <strong className="text-red-600">WILL LOSE</strong> your scenarios.</p>
+                            </div>
+                        </InputSection>
+                        
+                        <InputSection title="Backup & Restore" subtitle="Download your scenarios to a file or upload them to restore your work.">
+                            <div className="col-span-full flex items-center space-x-4">
+                                <button onClick={handleDownloadScenarios} className="px-4 py-2 text-sm bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors">
+                                    Download Scenarios
+                                </button>
+                                <label className="px-4 py-2 text-sm bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors cursor-pointer">
+                                    Upload Scenarios
+                                    <input
+                                        type="file"
+                                        onChange={handleUploadScenarios}
+                                        accept=".json,application/json"
+                                        className="hidden"
+                                    />
+                                </label>
                             </div>
                         </InputSection>
 
