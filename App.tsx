@@ -617,13 +617,12 @@ const App: React.FC = () => {
                             subtitle="Set the high-level assumptions for your retirement plan."
                         >
                              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 col-span-full">
-                                <div className="flex flex-col space-y-2">
-                                    <label className="mb-1 text-sm font-medium text-brand-text-secondary">Plan For</label>
+                                <div className="flex flex-col space-y-2 h-full">
                                     {(Object.values(PlanType) as PlanType[]).map(type => (
                                         <button
                                             key={type}
                                             onClick={() => handlePlanChange('planType', type)}
-                                            className={`px-3 py-1.5 text-sm rounded-md w-full ${plan.planType === type ? 'bg-brand-primary text-white' : 'bg-gray-200 text-gray-700'}`}
+                                            className={`px-3 py-1.5 text-sm rounded-md w-full flex-1 ${plan.planType === type ? 'bg-brand-primary text-white' : 'bg-gray-200 text-gray-700'}`}
                                         >
                                             {type}
                                         </button>
@@ -639,15 +638,14 @@ const App: React.FC = () => {
                         </InputSection>
                         
                         <InputSection 
-                            title="Planning Strategy"
-                            subtitle="Choose your approach to spending down your assets in retirement."
+                            title="Die With Zero"
                             titleColorClass="text-blue-600"
                             gridCols={1}
                         >
                             <div className="col-span-full bg-blue-50 p-4 rounded-lg border border-blue-200">
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4">
-                                     <div className="md:col-span-1 flex flex-col space-y-4">
-                                        <div className="flex items-center space-x-2">
+                                <div className="space-y-3">
+                                    <div className="flex items-end space-x-4">
+                                        <div className="flex items-center space-x-2 pb-1">
                                             <input
                                                 type="checkbox"
                                                 id="dieWithZero"
@@ -655,7 +653,7 @@ const App: React.FC = () => {
                                                 onChange={e => handlePlanChange('dieWithZero', e.target.checked)}
                                                 className="h-4 w-4 rounded text-brand-primary focus:ring-brand-primary"
                                             />
-                                            <label htmlFor="dieWithZero" className="text-sm font-medium text-blue-800">Enable "Die with Zero"</label>
+                                            <label htmlFor="dieWithZero" className="text-sm font-medium text-blue-800">Enable</label>
                                         </div>
                                         <NumberInput
                                             label="Leave Behind"
@@ -665,12 +663,10 @@ const App: React.FC = () => {
                                             disabled={!plan.dieWithZero}
                                         />
                                     </div>
-                                    <div className="md:col-span-2 flex items-center">
-                                         <p className="text-sm text-blue-700 italic">
-                                            The "Die with Zero" strategy calculates the maximum amount you can withdraw each year to end with your target "Leave Behind" amount. 
-                                            This creates a dynamic withdrawal rate that adjusts annually based on your balance and life expectancy, overriding the fixed "Withdrawal Rate" above.
-                                        </p>
-                                    </div>
+                                    <p className="text-sm text-blue-700 italic">
+                                        The "Die with Zero" strategy calculates the maximum amount you can withdraw each year to end with your target "Leave Behind" amount. 
+                                        This creates a dynamic withdrawal rate that adjusts annually based on your balance and life expectancy, overriding the fixed "Withdrawal Rate" above.
+                                    </p>
                                 </div>
                             </div>
                         </InputSection>
