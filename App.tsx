@@ -793,7 +793,7 @@ const App: React.FC = () => {
                                     <div className="col-span-full space-y-2">
                                         {items.map((item, index) => (
                                             <div key={item.id} className={`grid gap-x-4 items-end p-2 rounded-md ${
-                                                {'Retirement Accounts': 'bg-cyan-50/50 grid-cols-7', 'Investment Accounts': 'bg-teal-50/50 grid-cols-5', 'Pensions': 'bg-sky-50/50 grid-cols-8', 'Other Incomes': 'bg-lime-50/50 grid-cols-8', 'Expense Periods': 'bg-red-50/50 grid-cols-6'}[section]
+                                                {'Retirement Accounts': 'bg-cyan-50/50 grid-cols-7', 'Investment Accounts': 'bg-teal-50/50 grid-cols-5', 'Pensions': 'bg-sky-50/50 grid-cols-8', 'Other Incomes': 'bg-lime-50/50 grid-cols-8', 'Expense Periods': 'bg-red-50/50 grid-cols-12'}[section]
                                             }`}>
                                                 {/* Common fields */}
                                                 {listName !== 'expensePeriods' && (
@@ -868,13 +868,13 @@ const App: React.FC = () => {
                                                     </div>
                                                 </>}
                                                 {listName === 'expensePeriods' && <>
-                                                     <TextInput containerClassName="col-span-2" label="Name" value={item.name} onChange={e => handleDynamicListChange(listName, item.id, 'name', e.target.value)} data-list={listName} data-id={item.id} />
-                                                     <NumberInput label="Total Monthly Expenses" prefix="$" value={item.monthlyAmount} onChange={e => handleDynamicListChange(listName, item.id, 'monthlyAmount', e.target.value)}/>
-                                                     <div className="flex items-end space-x-2">
+                                                     <TextInput containerClassName="col-span-5" label="Name" value={item.name} onChange={e => handleDynamicListChange(listName, item.id, 'name', e.target.value)} data-list={listName} data-id={item.id} />
+                                                     <NumberInput containerClassName="col-span-2" label="Total Monthly Expenses" prefix="$" value={item.monthlyAmount} onChange={e => handleDynamicListChange(listName, item.id, 'monthlyAmount', e.target.value)}/>
+                                                     <div className="flex items-end space-x-2 col-span-2">
                                                         {isCouple && <SelectInput label=" " value={item.startAgeRef} onChange={e => handleDynamicListChange(listName, item.id, 'startAgeRef', e.target.value)}><option value="person1">{plan.person1.name}</option><option value="person2">{plan.person2.name}</option></SelectInput>}
                                                         <NumberInput label="Start Age" value={item.startAge} onChange={e => handleDynamicListChange(listName, item.id, 'startAge', e.target.value)} />
                                                     </div>
-                                                     <div className="flex items-end space-x-2">
+                                                     <div className="flex items-end space-x-2 col-span-2">
                                                         {isCouple && <SelectInput label=" " value={item.endAgeRef} onChange={e => handleDynamicListChange(listName, item.id, 'endAgeRef', e.target.value)}><option value="person1">{plan.person1.name}</option><option value="person2">{plan.person2.name}</option></SelectInput>}
                                                         <NumberInput label="End Age" value={item.endAge} onChange={e => handleDynamicListChange(listName, item.id, 'endAge', e.target.value)}/>
                                                     </div>
