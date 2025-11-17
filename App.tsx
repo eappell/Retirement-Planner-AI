@@ -615,44 +615,62 @@ const App: React.FC = () => {
                         <InputSection 
                             title="Plan Information"
                             subtitle="Set the high-level assumptions for your retirement plan."
-                            actions={
-                            <div className="flex space-x-2">
-                                {(Object.values(PlanType) as PlanType[]).map(type => (
-                                    <button
-                                        key={type}
-                                        onClick={() => handlePlanChange('planType', type)}
-                                        className={`px-3 py-1 text-sm rounded-md ${plan.planType === type ? 'bg-brand-primary text-white' : 'bg-gray-200 text-gray-700'}`}
-                                    >
-                                        {type}
-                                    </button>
-                                ))}
-                            </div>
-                        }>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 col-span-full">
+                        >
+                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 col-span-full">
+                                <div className="flex flex-col space-y-2">
+                                    <label className="mb-1 text-sm font-medium text-brand-text-secondary">Plan For</label>
+                                    {(Object.values(PlanType) as PlanType[]).map(type => (
+                                        <button
+                                            key={type}
+                                            onClick={() => handlePlanChange('planType', type)}
+                                            className={`px-3 py-1.5 text-sm rounded-md w-full ${plan.planType === type ? 'bg-brand-primary text-white' : 'bg-gray-200 text-gray-700'}`}
+                                        >
+                                            {type}
+                                        </button>
+                                    ))}
+                                </div>
                                 <SelectInput label="State" value={plan.state} onChange={e => handlePlanChange('state', e.target.value)}>
                                         {Object.entries(STATES).map(([abbr, name]) => <option key={abbr} value={abbr}>{name}</option>)}
                                 </SelectInput>
                                 <NumberInput label="Inflation" suffix="%" value={plan.inflationRate} onChange={e => handlePlanChange('inflationRate', Number(e.target.value))}/>
                                 <NumberInput label="Avg. Return" suffix="%" value={plan.avgReturn} onChange={e => handlePlanChange('avgReturn', Number(e.target.value))}/>
                                 <NumberInput label="Withdrawal Rate" suffix="%" value={plan.annualWithdrawalRate} onChange={e => handlePlanChange('annualWithdrawalRate', Number(e.target.value))} disabled={plan.dieWithZero}/>
-                                <div className="lg:col-span-2 bg-amber-50 p-3 rounded-lg border border-amber-200 space-y-2">
-                                    <div className="flex items-center space-x-2">
-                                        <input
-                                            type="checkbox"
-                                            id="dieWithZero"
-                                            checked={plan.dieWithZero}
-                                            onChange={e => handlePlanChange('dieWithZero', e.target.checked)}
-                                            className="h-4 w-4 rounded text-brand-primary focus:ring-brand-primary"
+                            </div>
+                        </InputSection>
+                        
+                        <InputSection 
+                            title="Planning Strategy"
+                            subtitle="Choose your approach to spending down your assets in retirement."
+                            titleColorClass="text-blue-600"
+                            gridCols={1}
+                        >
+                            <div className="col-span-full bg-blue-50 p-4 rounded-lg border border-blue-200">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4">
+                                     <div className="md:col-span-1 flex flex-col space-y-4">
+                                        <div className="flex items-center space-x-2">
+                                            <input
+                                                type="checkbox"
+                                                id="dieWithZero"
+                                                checked={plan.dieWithZero}
+                                                onChange={e => handlePlanChange('dieWithZero', e.target.checked)}
+                                                className="h-4 w-4 rounded text-brand-primary focus:ring-brand-primary"
+                                            />
+                                            <label htmlFor="dieWithZero" className="text-sm font-medium text-blue-800">Enable "Die with Zero"</label>
+                                        </div>
+                                        <NumberInput
+                                            label="Leave Behind"
+                                            prefix="$"
+                                            value={plan.legacyAmount}
+                                            onChange={e => handlePlanChange('legacyAmount', Number(e.target.value))}
+                                            disabled={!plan.dieWithZero}
                                         />
-                                        <label htmlFor="dieWithZero" className="text-sm font-medium text-amber-800">Enable "Die with Zero"</label>
                                     </div>
-                                    <NumberInput
-                                        label="Leave Behind"
-                                        prefix="$"
-                                        value={plan.legacyAmount}
-                                        onChange={e => handlePlanChange('legacyAmount', Number(e.target.value))}
-                                        disabled={!plan.dieWithZero}
-                                    />
+                                    <div className="md:col-span-2 flex items-center">
+                                         <p className="text-sm text-blue-700 italic">
+                                            The "Die with Zero" strategy calculates the maximum amount you can withdraw each year to end with your target "Leave Behind" amount. 
+                                            This creates a dynamic withdrawal rate that adjusts annually based on your balance and life expectancy, overriding the fixed "Withdrawal Rate" above.
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </InputSection>
