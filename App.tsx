@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { RetirementPlan, CalculationResult, PlanType, RetirementAccount, InvestmentAccount, Pension, OtherIncome, ExpensePeriod, Person, YearlyProjection, MonteCarloResult } from './types.ts';
+import { RetirementPlan, CalculationResult, PlanType, RetirementAccount, InvestmentAccount, Pension, OtherIncome, ExpensePeriod, Person, YearlyProjection, MonteCarloResult, Scenario, ScenariosState } from './types.ts';
 import { STATES } from './constants.ts';
 import { getRetirementInsights } from './services/geminiService.ts';
 import { estimateSocialSecurityBenefit } from './services/socialSecurityService.ts';
@@ -43,19 +43,6 @@ const initialPlanState: RetirementPlan = {
   dieWithZero: false,
   legacyAmount: 0,
 };
-
-// --- Scenario Management Types ---
-export interface Scenario {
-  id: string;
-  name: string;
-  plan: RetirementPlan;
-}
-
-export interface ScenariosState {
-  activeScenarioId: string | null;
-  scenarios: Record<string, Scenario>;
-}
-
 
 type DynamicListKey = {
   [K in keyof RetirementPlan]: RetirementPlan[K] extends Array<{ id: string }> ? K : never

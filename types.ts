@@ -1,4 +1,5 @@
 
+
 export enum PlanType {
   INDIVIDUAL = 'Individual',
   COUPLE = 'Couple',
@@ -131,4 +132,16 @@ export interface TaxBracket {
 export interface MonteCarloResult {
     successRate: number;
     outcomes: number[];
+}
+
+// --- Scenario Management Types ---
+export interface Scenario {
+  id: string;
+  name: string;
+  plan: RetirementPlan;
+}
+
+export interface ScenariosState {
+  activeScenarioId: string | null;
+  scenarios: Record<string, Scenario>;
 }
