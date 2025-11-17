@@ -1,4 +1,4 @@
-import { TaxBracket } from './types';
+import { TaxBracket } from './types.ts';
 
 export const STATES = {
     AL: 'Alabama',

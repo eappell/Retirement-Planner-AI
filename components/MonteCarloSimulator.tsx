@@ -1,5 +1,3 @@
-
-
 import React, { useState } from 'react';
 import { MonteCarloResult } from '../types.ts';
 

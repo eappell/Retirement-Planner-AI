@@ -1,21 +1,17 @@
-import path from 'path';
-import { defineConfig, loadEnv } from 'vite';
+import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { fileURLToPath, URL } from 'url';
 
-export default defineConfig(({ mode }) => {
-    // const env = loadEnv(mode, '.', '');
-    return {
-      base: '/',
-      plugins: [react()],
-      define: {
-        'process.env.API_KEY': JSON.stringify(process.env.VITE_GEMINI_API_KEY)
-        //'process.env.API_KEY': JSON.stringify(env.VITE_GEMINI_API_KEY),
-        //'process.env.GEMINI_API_KEY': JSON.stringify(env.VITE_GEMINI_API_KEY)
-      },
-      resolve: {
-        alias: {
-          '@': path.resolve(__dirname, '.'),
-        }
-      }
-    };
+// This configuration is optimized for Vercel deployment.
+export default defineConfig({
+  base: '/',
+  plugins: [react()],
+  define: {
+    // Vite requires the 'VITE_' prefix for environment variables to be exposed to the client.
+    // This line reads the VITE_GEMINI_API_KEY from Vercel's build environment (and your local .env file)
+    // and makes it available in the application code as 'process.env.API_KEY'.
+    'process.env.API_KEY': JSON.stringify(process.env.VITE_GEMINI_API_KEY)
+  },
+  resolve: {
+  }
 });

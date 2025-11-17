@@ -1,4 +1,3 @@
-
 import { FilingStatus, TaxBracket } from '../types.ts';
 import { FEDERAL_TAX_BRACKETS, FEDERAL_STANDARD_DEDUCTION, STATE_TAX_BRACKETS } from '../constants.ts';
 

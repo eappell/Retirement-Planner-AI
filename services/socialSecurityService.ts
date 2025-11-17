@@ -1,4 +1,3 @@
-
 import { SS_BEND_POINTS, SS_BEND_FACTORS, SS_AGE_ADJUSTMENT_FACTORS, SS_FULL_RETIREMENT_AGE } from '../constants.ts';
 
 /**

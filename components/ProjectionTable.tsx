@@ -1,5 +1,3 @@
-
-
 import React from 'react';
 import { YearlyProjection, RetirementPlan, PlanType } from '../types.ts';
 
