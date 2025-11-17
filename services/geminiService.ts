@@ -1,5 +1,6 @@
-import { GoogleGenAI } from "@google/genai";
-import { RetirementPlan, CalculationResult, PlanType, RetirementAccount, InvestmentAccount, Pension, OtherIncome, ExpensePeriod } from '../types';
+import { GoogleGenAI, Type } from "@google/genai";
+import { RetirementPlan, CalculationResult, YearlyProjection, PlanType, RetirementAccount, InvestmentAccount, Pension, OtherIncome, ExpensePeriod } from '../types';
+import { FEDERAL_TAX_BRACKETS, FEDERAL_STANDARD_DEDUCTION, STATE_TAX_BRACKETS, RMD_UNIFORM_LIFETIME_TABLE } from '../constants';
 
 const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
@@ -73,5 +74,94 @@ export const getRetirementInsights = async (plan: RetirementPlan, result: Calcul
              return "You've made too many requests to the AI assistant. Please wait a moment before trying again.";
         }
         return "An error occurred while generating insights. Please check your connection and try again.";
+    }
+};
+
+
+export const generateDieWithZeroProjection = async (plan: RetirementPlan): Promise<YearlyProjection[]> => {
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const isCouple = plan.planType === PlanType.COUPLE;
+
+    const prompt = `
+    As a sophisticated financial modeling expert, your task is to generate a year-by-year retirement projection for a user based on the "Die with Zero" strategy.
+
+    **Goal:** Calculate the maximum sustainable annual withdrawal from assets to ensure the final net worth at the end of the plan equals the target "Legacy Amount". The plan ends in the year the last person reaches their life expectancy.
+
+    **Key Rules:**
+    1.  **Modeling Period:** Start the projection from the current year and continue until the end of the plan.
+    2.  **Asset Growth:** Grow all investment and retirement accounts by the "Average Annual Return" each year. In pre-retirement years, also add annual contributions and employer matches.
+    3.  **Income Sources:** Account for all income streams (Pensions, Social Security, Other Incomes) starting at their specified ages. Apply Cost-of-Living Adjustments (COLA) correctly. For pensions, handle survivor benefits. For Social Security, use the estimated benefit, and if one person in a couple passes away, the survivor should receive the higher of the two benefits.
+    4.  **Expenses:** Inflate the planned annual expenses by the "Inflation Rate" each year.
+    5.  **Taxes:** For each year, calculate the taxable income (withdrawals + taxable incomes), apply the provided federal and state tax brackets and standard deductions to determine the total tax liability.
+    6.  **RMDs (Required Minimum Distributions):** From age 73 onwards, calculate the RMD from non-Roth retirement accounts using the provided RMD table. The annual withdrawal MUST be at least the RMD amount for that year.
+    7.  **Core "Die with Zero" Withdrawal:** The annual withdrawal amount is the primary variable you must calculate for each year. It should be the amount that, when combined with all other factors, results in a smooth spend-down of assets to hit the target legacy amount precisely at the end of the plan. This is an annuity-style calculation.
+    8.  **Net Worth:** The final net worth for each year is the previous year's net worth, plus asset growth, minus all withdrawals and expenses.
+    
+    **Input Data:**
+    - Retirement Plan: ${JSON.stringify(plan, null, 2)}
+    - Federal Tax Brackets & Deductions: ${JSON.stringify({brackets: FEDERAL_TAX_BRACKETS, deduction: FEDERAL_STANDARD_DEDUCTION}, null, 2)}
+    - State Tax Brackets & Deductions for ${plan.state}: ${JSON.stringify(STATE_TAX_BRACKETS[plan.state], null, 2)}
+    - RMD Table: ${JSON.stringify(RMD_UNIFORM_LIFETIME_TABLE, null, 2)}
+
+    Generate a JSON array of yearly projection objects that strictly adheres to the provided schema. The projection must cover every year from the current ages until the final life expectancy.
+    `;
+
+    const responseSchema = {
+        type: Type.ARRAY,
+        items: {
+            type: Type.OBJECT,
+            properties: {
+                year: { type: Type.NUMBER },
+                age1: { type: Type.NUMBER },
+                age2: { type: isCouple ? Type.NUMBER : Type.NULL },
+                investmentBalance: { type: Type.NUMBER },
+                retirementBalance: { type: Type.NUMBER },
+                pensionIncome: { type: Type.NUMBER },
+                socialSecurityIncome: { type: Type.NUMBER },
+                otherIncome: { type: Type.NUMBER },
+                grossIncome: { type: Type.NUMBER },
+                withdrawal: { type: Type.NUMBER },
+                expenses: { type: Type.NUMBER },
+                federalTax: { type: Type.NUMBER },
+                stateTax: { type: Type.NUMBER },
+                netIncome: { type: Type.NUMBER },
+                surplus: { type: Type.NUMBER },
+                netWorth: { type: Type.NUMBER },
+                rmd: { type: Type.NUMBER },
+            },
+            required: [
+                'year', 'age1', 'investmentBalance', 'retirementBalance', 'pensionIncome',
+                'socialSecurityIncome', 'otherIncome', 'grossIncome', 'withdrawal', 'expenses',
+                'federalTax', 'stateTax', 'netIncome', 'surplus', 'netWorth', 'rmd'
+            ]
+        }
+    };
+
+    try {
+        const response = await ai.models.generateContent({
+            model: "gemini-2.5-pro",
+            contents: prompt,
+            config: {
+                responseMimeType: "application/json",
+                responseSchema: responseSchema,
+            },
+        });
+        
+        const jsonText = response.text.trim();
+        const projections = JSON.parse(jsonText) as YearlyProjection[];
+        
+        // Gemini might not include the optional age2 field, so add it if it's a couple plan
+        if (isCouple) {
+            return projections.map((p, i) => ({
+                ...p,
+                age2: plan.person2.currentAge + i
+            }));
+        }
+
+        return projections;
+
+    } catch (error) {
+        console.error("Error generating AI projection:", error);
+        throw new Error("The AI model could not generate a projection for this plan. This can happen with very complex or unusual scenarios. Please try adjusting your inputs or disabling the 'Die with Zero' feature.");
     }
 };

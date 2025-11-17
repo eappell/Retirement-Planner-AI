@@ -388,17 +388,22 @@ const App: React.FC = () => {
     }, [plan?.person1.retirementAge, plan?.person2.retirementAge, plan?.planType]);
 
     // --- Main Calculation Trigger ---
-    const calculatePlan = useCallback(() => {
+    const calculatePlan = useCallback(async () => {
         if (!plan) return;
         setIsLoading(true);
         setResults(null);
         setProjectionData([]);
         
-        const simulationResults = runSimulation(plan);
-        
-        setResults(simulationResults);
-        setProjectionData(simulationResults.yearlyProjections);
-        setIsLoading(false);
+        try {
+            const simulationResults = await runSimulation(plan);
+            setResults(simulationResults);
+            setProjectionData(simulationResults.yearlyProjections);
+        } catch (error) {
+            console.error("Calculation failed:", error);
+            // Optionally, set an error state to show in the UI
+        } finally {
+            setIsLoading(false);
+        }
     }, [plan]);
 
     const handleGetInsights = useCallback(async () => {
@@ -410,15 +415,15 @@ const App: React.FC = () => {
         setIsAiLoading(false);
     }, [plan, results]);
 
-     const handleRunSimulation = useCallback((numSimulations: number, volatility: number) => {
+     const handleRunSimulation = useCallback(async (numSimulations: number, volatility: number) => {
         if (!plan) return;
         setIsMcLoading(true);
         setMonteCarloResults(null);
-        setTimeout(() => {
-            const mcResults = runMonteCarloSimulation(plan, numSimulations, volatility);
-            setMonteCarloResults(mcResults);
-            setIsMcLoading(false);
-        }, 50);
+        // Use a Promise to allow UI to update before blocking
+        await new Promise(resolve => setTimeout(resolve, 50));
+        const mcResults = await runMonteCarloSimulation(plan, numSimulations, volatility);
+        setMonteCarloResults(mcResults);
+        setIsMcLoading(false);
     }, [plan]);
 
     const handlePrint = () => window.print();

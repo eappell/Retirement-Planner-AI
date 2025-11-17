@@ -1,19 +1,80 @@
 import { RetirementPlan, CalculationResult, YearlyProjection, PlanType, FilingStatus, RetirementAccount, InvestmentAccount, Person } from '../types';
 import { RMD_START_AGE, RMD_UNIFORM_LIFETIME_TABLE } from '../constants';
 import { calculateTaxes } from './taxService';
+import { generateDieWithZeroProjection } from './geminiService';
 
 // Helper function to get a random number from a normal distribution (Box-Muller transform)
-// Moved here from monteCarloService to be used in volatility mode.
 const randomNormal = (mean: number, stdDev: number): number => {
     let u1 = 0, u2 = 0;
-    while (u1 === 0) u1 = Math.random(); //Converting [0,1) to (0,1)
+    while (u1 === 0) u1 = Math.random();
     while (u2 === 0) u2 = Math.random();
     const z0 = Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(2.0 * Math.PI * u2);
     return z0 * stdDev + mean;
 };
 
+// Helper to calculate summary statistics from a projection array
+const calculateSummary = (projections: YearlyProjection[], plan: RetirementPlan): CalculationResult => {
+    const isCouple = plan.planType === PlanType.COUPLE;
+    const inflation = plan.inflationRate / 100;
+    const startAge = Math.min(plan.person1.currentAge, isCouple ? plan.person2.currentAge : Infinity);
 
-export const runSimulation = (plan: RetirementPlan, volatility?: number): CalculationResult => {
+    const retirementStartYearIndex = projections.findIndex(p => {
+        if (isCouple) return p.age1 >= plan.person1.retirementAge || (p.age2 !== undefined && p.age2 >= plan.person2.retirementAge);
+        return p.age1 >= plan.person1.retirementAge;
+    });
+
+    if (retirementStartYearIndex === -1) {
+        // Handle case where retirement never starts in the projection
+        const finalNetWorth = projections.length > 0 ? projections[projections.length - 1].netWorth : 0;
+        return {
+            avgMonthlyNetIncomeToday: 0, avgMonthlyNetIncomeFuture: 0,
+            netWorthAtEnd: finalNetWorth / Math.pow(1 + inflation, projections.length),
+            netWorthAtEndFuture: finalNetWorth, federalTaxRate: 0, stateTaxRate: 0, yearsInRetirement: 0,
+            yearlyProjections: projections,
+        };
+    }
+    
+    const retirementProjections = projections.slice(retirementStartYearIndex);
+    const retirementNetIncomes = retirementProjections.map(p => p.netIncome);
+    const retirementGrossIncomes = retirementProjections.map(p => p.grossIncome);
+    const retirementFederalTaxes = retirementProjections.map(p => p.federalTax);
+    const retirementStateTtaxes = retirementProjections.map(p => p.stateTax);
+    
+    const yearsInRetirement = retirementProjections.length;
+    const finalNetWorth = projections.length > 0 ? projections[projections.length - 1].netWorth : 0;
+    
+    const avgAnnualNetIncomeFuture = retirementNetIncomes.length > 0 ? retirementNetIncomes.reduce((a, b) => a + b, 0) / retirementNetIncomes.length : 0;
+    
+    const netIncomesInTodaysDollars = retirementNetIncomes.map((income, i) => income / Math.pow(1 + inflation, retirementStartYearIndex + i));
+    const avgAnnualNetIncomeToday = netIncomesInTodaysDollars.length > 0 ? netIncomesInTodaysDollars.reduce((a, b) => a + b, 0) / netIncomesInTodaysDollars.length : 0;
+    
+    const netWorthInTodaysDollars = finalNetWorth / Math.pow(1 + inflation, projections.length - 1);
+
+    const avgGrossIncome = retirementGrossIncomes.length > 0 ? retirementGrossIncomes.reduce((a, b) => a + b, 0) / retirementGrossIncomes.length : 0;
+    const avgFederalTax = retirementFederalTaxes.length > 0 ? retirementFederalTaxes.reduce((a, b) => a + b, 0) / retirementFederalTaxes.length : 0;
+    const avgStateTax = retirementStateTtaxes.length > 0 ? retirementStateTtaxes.reduce((a, b) => a + b, 0) / retirementStateTtaxes.length : 0;
+
+    return {
+        avgMonthlyNetIncomeToday: avgAnnualNetIncomeToday / 12,
+        avgMonthlyNetIncomeFuture: avgAnnualNetIncomeFuture / 12,
+        netWorthAtEnd: netWorthInTodaysDollars,
+        netWorthAtEndFuture: finalNetWorth,
+        federalTaxRate: avgGrossIncome > 0 ? (avgFederalTax / avgGrossIncome) * 100 : 0,
+        stateTaxRate: avgGrossIncome > 0 ? (avgStateTax / avgGrossIncome) * 100 : 0,
+        yearsInRetirement,
+        yearlyProjections: projections,
+    };
+};
+
+
+export const runSimulation = async (plan: RetirementPlan, volatility?: number): Promise<CalculationResult> => {
+    // If "Die with Zero" is selected, use the AI model. Don't use for Monte Carlo sims.
+    if (plan.dieWithZero && !volatility) {
+        const aiProjections = await generateDieWithZeroProjection(plan);
+        return calculateSummary(aiProjections, plan);
+    }
+    
+    // --- Standard Local Simulation (Fixed Withdrawal or Monte Carlo) ---
     const isCouple = plan.planType === PlanType.COUPLE;
     const filingStatus = isCouple ? FilingStatus.MARRIED_FILING_JOINTLY : FilingStatus.SINGLE;
     const inflation = plan.inflationRate / 100;
@@ -29,11 +90,7 @@ export const runSimulation = (plan: RetirementPlan, volatility?: number): Calcul
     let investmentAccounts = JSON.parse(JSON.stringify(plan.investmentAccounts)) as InvestmentAccount[];
     
     const yearlyProjections: YearlyProjection[] = [];
-    const retirementNetIncomes = [];
-    const retirementGrossIncomes = [];
-    const retirementFederalTaxes = [];
-    const retirementStateTtaxes = [];
-
+    
     let p1PrevYearRmdBalance = 0;
     let p2PrevYearRmdBalance = 0;
     
@@ -58,7 +115,6 @@ export const runSimulation = (plan: RetirementPlan, volatility?: number): Calcul
         
         const currentYearReturn = volatility ? randomNormal(avgReturn, stdDev) : avgReturn;
 
-        // --- RMD Calculation (based on previous year's balance) ---
         if (p1Alive && currentAge1 >= RMD_START_AGE) {
             const rmdFactor = RMD_UNIFORM_LIFETIME_TABLE[currentAge1] || 1;
             totalRmd += (p1PrevYearRmdBalance / rmdFactor) || 0;
@@ -68,7 +124,6 @@ export const runSimulation = (plan: RetirementPlan, volatility?: number): Calcul
             totalRmd += (p2PrevYearRmdBalance / rmdFactor) || 0;
         }
 
-        // --- Asset Growth ---
         retirementAccounts.forEach(acc => {
             const owner = plan[acc.owner as keyof typeof plan] as Person;
             const ownerAge = acc.owner === 'person1' ? currentAge1 : currentAge2;
@@ -87,13 +142,11 @@ export const runSimulation = (plan: RetirementPlan, volatility?: number): Calcul
             acc.balance *= (1 + currentYearReturn);
         });
         
-        // --- Retirement Phase ---
         const isP1Retired = currentAge1 >= plan.person1.retirementAge;
         const isP2Retired = isCouple && currentAge2 >= plan.person2.retirementAge;
         const inRetirement = isP1Retired || isP2Retired;
 
         if (inRetirement && (p1Alive || p2Alive)) {
-             // Social Security with Survivor Benefits
             const p1Benefit = plan.socialSecurity.person1EstimatedBenefit * 12;
             const p2Benefit = isCouple ? plan.socialSecurity.person2EstimatedBenefit * 12 : 0;
             const p1Receiving = currentAge1 >= plan.person1.claimingAge;
@@ -108,7 +161,6 @@ export const runSimulation = (plan: RetirementPlan, volatility?: number): Calcul
                 if (p2Receiving) incomeFromSS += Math.max(p1Benefit, p2Benefit);
             }
             
-            // Pensions with Survivor Benefits
             plan.pensions.forEach(p => {
                 const owner = plan[p.owner as keyof typeof plan] as Person;
                 const ownerAge = p.owner === 'person1' ? currentAge1 : currentAge2;
@@ -129,7 +181,6 @@ export const runSimulation = (plan: RetirementPlan, volatility?: number): Calcul
                 }
             });
             
-            // Other Incomes
             plan.otherIncomes.forEach(i => {
                 const ownerAge = i.owner === 'person1' ? currentAge1 : currentAge2;
                 const isOwnerAlive = i.owner === 'person1' ? p1Alive : p2Alive;
@@ -140,7 +191,6 @@ export const runSimulation = (plan: RetirementPlan, volatility?: number): Calcul
                 }
             });
 
-            // Expenses
             let annualExpenses = 0;
             plan.expensePeriods.forEach(exp => {
                 const startPersonAge = exp.startAgeRef === 'person1' ? currentAge1 : currentAge2;
@@ -151,71 +201,26 @@ export const runSimulation = (plan: RetirementPlan, volatility?: number): Calcul
             });
             inflatedExpenses = annualExpenses * Math.pow(1 + inflation, year);
             
-            // --- Withdrawal Logic ---
             const totalAssets = [...investmentAccounts, ...retirementAccounts].reduce((sum, acc) => sum + acc.balance, 0);
-            let plannedAnnualWithdrawal = 0;
+            
+            const fixedRateWithdrawal = totalAssets * withdrawalRate;
+            const fixedIncome = incomeFromPensions + incomeFromSS + incomeFromOther;
+            const taxableFixedIncome = taxableIncomeFromPensions + taxableIncomeFromOther + incomeFromSS;
+            const taxesOnFixedIncome = calculateTaxes(taxableFixedIncome, plan.state, filingStatus);
+            const netFixedIncome = fixedIncome - (taxesOnFixedIncome.federalTax + taxesOnFixedIncome.stateTax);
 
-            if (plan.dieWithZero) {
-                // --- Die with Zero Strategy ---
-                // This strategy calculates the maximum sustainable withdrawal to ensure funds last
-                // until the end of the longer life expectancy, ending with the specified legacy amount.
-                // It uses an annuity due formula for withdrawals at the BEGINNING of each period.
-                const finalAge = isCouple ? Math.max(plan.person1.lifeExpectancy, plan.person2.lifeExpectancy) : plan.person1.lifeExpectancy;
-                const currentMaxAge = isCouple ? Math.max(currentAge1, currentAge2) : currentAge1;
-                const yearsRemaining = Math.max(1, finalAge - currentMaxAge + 1);
-
-                if (totalAssets > 0) {
-                    const r = avgReturn; // Use the plan's average return for the annuity calculation
-                    
-                    // The legacy amount needs to be worth plan.legacyAmount at the END of the plan.
-                    // We discount it to find its present value at the START of the current year.
-                    const legacyPV = plan.legacyAmount / Math.pow(1 + r, yearsRemaining);
-                    const spendableAssets = Math.max(0, totalAssets - legacyPV);
-
-                    if (spendableAssets > 0) {
-                        if (yearsRemaining <= 1) {
-                            plannedAnnualWithdrawal = spendableAssets;
-                        } else if (r === 0) {
-                            plannedAnnualWithdrawal = spendableAssets / yearsRemaining;
-                        } else {
-                            // Annuity Due formula: P = PV * r / ( (1 - (1+r)^-n) * (1+r) )
-                            const numerator = spendableAssets * r;
-                            const denominator = (1 - Math.pow(1 + r, -yearsRemaining)) * (1 + r);
-                            if (denominator !== 0) {
-                                plannedAnnualWithdrawal = numerator / denominator;
-                            } else {
-                                plannedAnnualWithdrawal = 0; // Avoid division by zero, e.g., if r = -1
-                            }
-                        }
-                    }
-                }
-            } else {
-                 // --- Fixed Withdrawal Rate Strategy ---
-                // Withdraws a fixed percentage, but takes more if needed to cover expenses.
-                const fixedRateWithdrawal = totalAssets * withdrawalRate;
-
-                // 1. Calculate withdrawal needed to cover expenses after other income and taxes
-                const fixedIncome = incomeFromPensions + incomeFromSS + incomeFromOther;
-                const taxableFixedIncome = taxableIncomeFromPensions + taxableIncomeFromOther + incomeFromSS;
-                const taxesOnFixedIncome = calculateTaxes(taxableFixedIncome, plan.state, filingStatus);
-                const netFixedIncome = fixedIncome - (taxesOnFixedIncome.federalTax + taxesOnFixedIncome.stateTax);
-
-                let neededForExpenses = 0;
-                if (netFixedIncome < inflatedExpenses) {
-                    const netShortfall = inflatedExpenses - netFixedIncome;
-                    // Estimate marginal tax rate to calculate the gross (pre-tax) withdrawal needed
-                    const incomeForMarginalRateCheck = taxableFixedIncome + 1000;
-                    const taxesAtHigherIncome = calculateTaxes(incomeForMarginalRateCheck, plan.state, filingStatus);
-                    const taxOnExtraAmount = (taxesAtHigherIncome.federalTax + taxesAtHigherIncome.stateTax) - (taxesOnFixedIncome.federalTax + taxesOnFixedIncome.stateTax);
-                    const marginalTaxRate = Math.max(0, taxOnExtraAmount / 1000);
-                    
-                    neededForExpenses = (marginalTaxRate < 1) ? netShortfall / (1 - marginalTaxRate) : netShortfall * 2; // Gross up the shortfall
-                }
-                
-                plannedAnnualWithdrawal = Math.max(neededForExpenses, fixedRateWithdrawal);
+            let neededForExpenses = 0;
+            if (netFixedIncome < inflatedExpenses) {
+                const netShortfall = inflatedExpenses - netFixedIncome;
+                const incomeForMarginalRateCheck = taxableFixedIncome + 1000;
+                const taxesAtHigherIncome = calculateTaxes(incomeForMarginalRateCheck, plan.state, filingStatus);
+                const taxOnExtraAmount = (taxesAtHigherIncome.federalTax + taxesAtHigherIncome.stateTax) - (taxesOnFixedIncome.federalTax + taxesOnFixedIncome.stateTax);
+                const marginalTaxRate = Math.max(0, taxOnExtraAmount / 1000);
+                neededForExpenses = (marginalTaxRate < 1) ? netShortfall / (1 - marginalTaxRate) : netShortfall * 2;
             }
+            
+            let plannedAnnualWithdrawal = Math.max(neededForExpenses, fixedRateWithdrawal);
 
-            // Finalize, considering RMDs and ensuring we don't withdraw more than available
             annualWithdrawal = Math.max(plannedAnnualWithdrawal, totalRmd);
             annualWithdrawal = Math.min(annualWithdrawal, totalAssets);
             annualWithdrawal = isNaN(annualWithdrawal) ? 0 : annualWithdrawal;
@@ -247,11 +252,6 @@ export const runSimulation = (plan: RetirementPlan, volatility?: number): Calcul
             stateTax = finalTaxes.stateTax;
             netAnnualIncome = totalGrossIncome - federalTax - stateTax;
             annualGrossIncome = totalGrossIncome;
-
-            retirementNetIncomes.push(netAnnualIncome);
-            retirementGrossIncomes.push(annualGrossIncome);
-            retirementFederalTaxes.push(federalTax);
-            retirementStateTtaxes.push(stateTax);
         }
 
          yearlyProjections.push({
@@ -284,29 +284,5 @@ export const runSimulation = (plan: RetirementPlan, volatility?: number): Calcul
         }
     }
     
-    const retirementStartYear = Math.min(plan.person1.retirementAge, isCouple ? plan.person2.retirementAge : Infinity) - startAge;
-    const yearsInRetirement = simulationYears - retirementStartYear;
-    const finalNetWorth = yearlyProjections.length > 0 ? yearlyProjections[yearlyProjections.length - 1].netWorth : 0;
-    
-    const avgAnnualNetIncomeFuture = retirementNetIncomes.length > 0 ? retirementNetIncomes.reduce((a, b) => a + b, 0) / retirementNetIncomes.length : 0;
-    const netIncomesInTodaysDollars = retirementNetIncomes.map((income, i) => income / Math.pow(1 + inflation, retirementStartYear + i));
-    const avgAnnualNetIncomeToday = netIncomesInTodaysDollars.length > 0 ? netIncomesInTodaysDollars.reduce((a, b) => a + b, 0) / netIncomesInTodaysDollars.length : 0;
-    const netWorthInTodaysDollars = finalNetWorth / Math.pow(1 + inflation, simulationYears);
-
-    const avgGrossIncome = retirementGrossIncomes.length > 0 ? retirementGrossIncomes.reduce((a, b) => a + b, 0) / retirementGrossIncomes.length : 0;
-    const avgFederalTax = retirementFederalTaxes.length > 0 ? retirementFederalTaxes.reduce((a, b) => a + b, 0) / retirementFederalTaxes.length : 0;
-    const avgStateTax = retirementStateTtaxes.length > 0 ? retirementStateTtaxes.reduce((a, b) => a + b, 0) / retirementStateTtaxes.length : 0;
-
-    const finalResults: CalculationResult = {
-        avgMonthlyNetIncomeToday: avgAnnualNetIncomeToday / 12,
-        avgMonthlyNetIncomeFuture: avgAnnualNetIncomeFuture / 12,
-        netWorthAtEnd: netWorthInTodaysDollars,
-        netWorthAtEndFuture: finalNetWorth,
-        federalTaxRate: avgGrossIncome > 0 ? (avgFederalTax / avgGrossIncome) * 100 : 0,
-        stateTaxRate: avgGrossIncome > 0 ? (avgStateTax / avgGrossIncome) * 100 : 0,
-        yearsInRetirement,
-        yearlyProjections: yearlyProjections,
-    };
-    
-    return finalResults;
+    return calculateSummary(yearlyProjections, plan);
 };
