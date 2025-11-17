@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { YearlyProjection, RetirementPlan, Person } from '../types.ts';
+import { YearlyProjection, RetirementPlan, Person } from '../types';
 
 interface DynamicChartsProps {
   projectionData: YearlyProjection[];

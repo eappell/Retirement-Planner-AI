@@ -1,6 +1,6 @@
 import { doc, getDoc, setDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
-import { db } from './firebase.ts';
-import { ScenariosState } from '../types.ts';
+import { db } from './firebase';
+import { ScenariosState } from '../types';
 
 const getScenariosRef = (userId: string) => doc(db, 'users', userId);
 

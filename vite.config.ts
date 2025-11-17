@@ -1,6 +1,5 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import { fileURLToPath, URL } from 'url';
 
 // This configuration is optimized for Vercel deployment.
 export default defineConfig({

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { auth } from '../services/firebase.ts';
+import { auth } from '../services/firebase';
 import { 
     createUserWithEmailAndPassword, 
     signInWithEmailAndPassword,

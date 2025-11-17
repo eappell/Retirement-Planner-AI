@@ -1,5 +1,5 @@
 import React from 'react';
-import { RetirementPlan, CalculationResult, PlanType, YearlyProjection } from '../types.ts';
+import { RetirementPlan, CalculationResult, PlanType, YearlyProjection } from '../types';
 
 // Helper to format currency
 const formatCurrency = (value: number) => {

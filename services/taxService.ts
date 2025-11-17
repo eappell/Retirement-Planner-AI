@@ -1,5 +1,5 @@
-import { FilingStatus, TaxBracket } from '../types.ts';
-import { FEDERAL_TAX_BRACKETS, FEDERAL_STANDARD_DEDUCTION, STATE_TAX_BRACKETS } from '../constants.ts';
+import { FilingStatus, TaxBracket } from '../types';
+import { FEDERAL_TAX_BRACKETS, FEDERAL_STANDARD_DEDUCTION, STATE_TAX_BRACKETS } from '../constants';
 
 const calculateTaxForBrackets = (income: number, brackets: TaxBracket[]): number => {
     let tax = 0;

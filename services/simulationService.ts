@@ -1,6 +1,6 @@
-import { RetirementPlan, CalculationResult, YearlyProjection, PlanType, FilingStatus, RetirementAccount, InvestmentAccount, Person } from '../types.ts';
-import { RMD_START_AGE, RMD_UNIFORM_LIFETIME_TABLE } from '../constants.ts';
-import { calculateTaxes } from './taxService.ts';
+import { RetirementPlan, CalculationResult, YearlyProjection, PlanType, FilingStatus, RetirementAccount, InvestmentAccount, Person } from '../types';
+import { RMD_START_AGE, RMD_UNIFORM_LIFETIME_TABLE } from '../constants';
+import { calculateTaxes } from './taxService';
 
 
 export const runSimulation = (plan: RetirementPlan): CalculationResult => {
