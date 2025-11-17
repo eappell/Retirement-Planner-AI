@@ -151,56 +151,60 @@ export const runSimulation = (plan: RetirementPlan, volatility?: number): Calcul
             });
             inflatedExpenses = annualExpenses * Math.pow(1 + inflation, year);
             
-            // --- Refactored Withdrawal Logic ---
+            // --- Corrected Withdrawal Logic ---
             const totalAssets = [...investmentAccounts, ...retirementAccounts].reduce((sum, acc) => sum + acc.balance, 0);
+            let plannedAnnualWithdrawal = 0;
 
-            // 1. Calculate withdrawal needed to cover expenses
-            const fixedIncome = incomeFromPensions + incomeFromSS + incomeFromOther;
-            const taxableFixedIncome = taxableIncomeFromPensions + taxableIncomeFromOther + incomeFromSS; // Assume 100% of SS is taxable for this marginal calculation
-            const taxesOnFixedIncome = calculateTaxes(taxableFixedIncome, plan.state, filingStatus);
-            const netFixedIncome = fixedIncome - (taxesOnFixedIncome.federalTax + taxesOnFixedIncome.stateTax);
-
-            let neededForExpenses = 0;
-            if (netFixedIncome < inflatedExpenses) {
-                const netShortfall = inflatedExpenses - netFixedIncome;
-                // Estimate marginal tax rate on the withdrawal
-                const incomeForMarginalRateCheck = taxableFixedIncome + 1000;
-                const taxesAtHigherIncome = calculateTaxes(incomeForMarginalRateCheck, plan.state, filingStatus);
-                const taxOnExtraAmount = (taxesAtHigherIncome.federalTax + taxesAtHigherIncome.stateTax) - (taxesOnFixedIncome.federalTax + taxesOnFixedIncome.stateTax);
-                const marginalTaxRate = Math.max(0, taxOnExtraAmount / 1000);
-                
-                // Gross up the shortfall to get the pre-tax amount needed
-                neededForExpenses = (marginalTaxRate < 1) ? netShortfall / (1 - marginalTaxRate) : netShortfall * 2; // Failsafe
-            }
-
-            // 2. Calculate withdrawal based on chosen strategy
-            let strategyWithdrawal = 0;
             if (plan.dieWithZero) {
+                // --- Die with Zero Strategy ---
+                // Calculates the maximum sustainable withdrawal to meet the legacy goal.
+                // This value is the withdrawal, regardless of expenses. If expenses are higher, the plan will show a shortfall.
                 const finalAge = isCouple ? Math.max(plan.person1.lifeExpectancy, plan.person2.lifeExpectancy) : plan.person1.lifeExpectancy;
                 const currentMaxAge = isCouple ? Math.max(currentAge1, currentAge2) : currentAge1;
                 const yearsRemaining = Math.max(1, finalAge - currentMaxAge);
 
                 if (totalAssets > plan.legacyAmount && yearsRemaining > 0) {
                     const r = avgReturn;
+                    // Calculate the present value of the legacy amount
                     const legacyPV = plan.legacyAmount / Math.pow(1 + r, yearsRemaining);
                     const spendableAssets = totalAssets - legacyPV;
 
                     if (spendableAssets > 0) {
                          if (r !== 0 && Math.abs(r) < 1) { // Use annuity formula for non-zero returns
-                            strategyWithdrawal = (spendableAssets * r) / (1 - Math.pow(1 + r, -yearsRemaining));
+                            plannedAnnualWithdrawal = (spendableAssets * r) / (1 - Math.pow(1 + r, -yearsRemaining));
                          } else { // Simple division for zero return or extreme returns
-                            strategyWithdrawal = spendableAssets / yearsRemaining;
+                            plannedAnnualWithdrawal = spendableAssets / yearsRemaining;
                         }
                     }
                 }
-            } else {
-                strategyWithdrawal = totalAssets * withdrawalRate;
-            }
-            
-            // 3. Planned withdrawal is the greater of need vs. strategy
-            const plannedAnnualWithdrawal = Math.max(neededForExpenses, strategyWithdrawal);
 
-            // 4. Finalize, considering RMDs and available assets
+            } else {
+                 // --- Fixed Withdrawal Rate Strategy ---
+                // Withdraws a fixed percentage, but takes more if needed to cover expenses.
+                const fixedRateWithdrawal = totalAssets * withdrawalRate;
+
+                // 1. Calculate withdrawal needed to cover expenses after other income and taxes
+                const fixedIncome = incomeFromPensions + incomeFromSS + incomeFromOther;
+                const taxableFixedIncome = taxableIncomeFromPensions + taxableIncomeFromOther + incomeFromSS;
+                const taxesOnFixedIncome = calculateTaxes(taxableFixedIncome, plan.state, filingStatus);
+                const netFixedIncome = fixedIncome - (taxesOnFixedIncome.federalTax + taxesOnFixedIncome.stateTax);
+
+                let neededForExpenses = 0;
+                if (netFixedIncome < inflatedExpenses) {
+                    const netShortfall = inflatedExpenses - netFixedIncome;
+                    // Estimate marginal tax rate to calculate the gross (pre-tax) withdrawal needed
+                    const incomeForMarginalRateCheck = taxableFixedIncome + 1000;
+                    const taxesAtHigherIncome = calculateTaxes(incomeForMarginalRateCheck, plan.state, filingStatus);
+                    const taxOnExtraAmount = (taxesAtHigherIncome.federalTax + taxesAtHigherIncome.stateTax) - (taxesOnFixedIncome.federalTax + taxesOnFixedIncome.stateTax);
+                    const marginalTaxRate = Math.max(0, taxOnExtraAmount / 1000);
+                    
+                    neededForExpenses = (marginalTaxRate < 1) ? netShortfall / (1 - marginalTaxRate) : netShortfall * 2; // Gross up the shortfall
+                }
+                
+                plannedAnnualWithdrawal = Math.max(neededForExpenses, fixedRateWithdrawal);
+            }
+
+            // Finalize, considering RMDs and ensuring we don't withdraw more than available
             annualWithdrawal = Math.max(plannedAnnualWithdrawal, totalRmd);
             annualWithdrawal = Math.min(annualWithdrawal, totalAssets);
             annualWithdrawal = isNaN(annualWithdrawal) ? 0 : annualWithdrawal;
