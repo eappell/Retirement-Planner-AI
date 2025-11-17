@@ -1,18 +1,20 @@
 import { RetirementPlan } from '../types';
 import { runSimulation } from './simulationService';
 
-export const runMonteCarloSimulation = (
+// FIX: Make the function async and await the `runSimulation` call, as it returns a Promise.
+// The function's return type is also updated to be a Promise.
+export const runMonteCarloSimulation = async (
     plan: RetirementPlan,
     numSimulations: number,
     volatility: number
-): { successRate: number; outcomes: number[] } => {
+): Promise<{ successRate: number; outcomes: number[] }> => {
     let successfulRuns = 0;
     const finalNetWorths: number[] = [];
 
     for (let i = 0; i < numSimulations; i++) {
         // Run the main simulation, passing the volatility parameter.
         // The simulation engine will handle applying random returns for each year.
-        const result = runSimulation(plan, volatility);
+        const result = await runSimulation(plan, volatility);
 
         const finalNetWorth = result.netWorthAtEndFuture;
 
