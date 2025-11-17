@@ -1,6 +1,7 @@
 
+
 import React, { useState } from 'react';
-import { MonteCarloResult } from '../types';
+import { MonteCarloResult } from '../types.ts';
 
 interface MonteCarloSimulatorProps {
     onRunSimulation: (numSimulations: number, volatility: number) => void;

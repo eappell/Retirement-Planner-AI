@@ -1,5 +1,5 @@
-import { RetirementPlan } from '../types';
-import { runSimulation } from './simulationService'; // Import the main simulation engine
+import { RetirementPlan } from '../types.ts';
+import { runSimulation } from './simulationService.ts'; // Import the main simulation engine
 
 // Helper function to get a random number from a normal distribution (Box-Muller transform)
 const randomNormal = (mean: number, stdDev: number): number => {

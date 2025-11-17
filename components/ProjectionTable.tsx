@@ -1,7 +1,7 @@
 
 
 import React from 'react';
-import { YearlyProjection, RetirementPlan, PlanType } from '../types';
+import { YearlyProjection, RetirementPlan, PlanType } from '../types.ts';
 
 interface ProjectionTableProps {
   data: YearlyProjection[];
