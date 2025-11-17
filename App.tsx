@@ -529,7 +529,7 @@ const App: React.FC = () => {
                                             <button onClick={handleDeleteScenario} disabled={Object.keys(scenarios).length <= 1} className="w-full px-3 py-1.5 text-sm bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-400 transition-colors">Delete</button>
                                         </div>
                                         <div className="col-span-full pt-2 border-t">
-                                            <p className="text-xs text-gray-500">This data is stored in your browser. If you clear your browser cache, you <strong className="text-red-600">WILL LOSE</strong> your scenarios.</p>
+                                            <p className="text-xs text-gray-500">This data is stored in your browser. If you clear your browser cache without saving the scenarios file, you <strong className="text-red-600">WILL LOSE</strong> your scenarios. Use the Backup feature to download your scenarios file to save all your hard work.</p>
                                         </div>
                                     </div>
                                 </div>
