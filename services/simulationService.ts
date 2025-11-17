@@ -2,13 +2,24 @@ import { RetirementPlan, CalculationResult, YearlyProjection, PlanType, FilingSt
 import { RMD_START_AGE, RMD_UNIFORM_LIFETIME_TABLE } from '../constants';
 import { calculateTaxes } from './taxService';
 
+// Helper function to get a random number from a normal distribution (Box-Muller transform)
+// Moved here from monteCarloService to be used in volatility mode.
+const randomNormal = (mean: number, stdDev: number): number => {
+    let u1 = 0, u2 = 0;
+    while (u1 === 0) u1 = Math.random(); //Converting [0,1) to (0,1)
+    while (u2 === 0) u2 = Math.random();
+    const z0 = Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(2.0 * Math.PI * u2);
+    return z0 * stdDev + mean;
+};
 
-export const runSimulation = (plan: RetirementPlan): CalculationResult => {
+
+export const runSimulation = (plan: RetirementPlan, volatility?: number): CalculationResult => {
     const isCouple = plan.planType === PlanType.COUPLE;
     const filingStatus = isCouple ? FilingStatus.MARRIED_FILING_JOINTLY : FilingStatus.SINGLE;
     const inflation = plan.inflationRate / 100;
     const withdrawalRate = plan.annualWithdrawalRate / 100;
     const avgReturn = plan.avgReturn / 100;
+    const stdDev = volatility ? volatility / 100 : 0;
 
     const startAge = Math.min(plan.person1.currentAge, isCouple ? plan.person2.currentAge : Infinity);
     const endAge = Math.max(plan.person1.lifeExpectancy, isCouple ? plan.person2.lifeExpectancy : 0);
@@ -44,6 +55,8 @@ export const runSimulation = (plan: RetirementPlan): CalculationResult => {
         let stateTax = 0;
         let netAnnualIncome = 0;
         let totalRmd = 0;
+        
+        const currentYearReturn = volatility ? randomNormal(avgReturn, stdDev) : avgReturn;
 
         // --- RMD Calculation (based on previous year's balance) ---
         if (p1Alive && currentAge1 >= RMD_START_AGE) {
@@ -63,7 +76,7 @@ export const runSimulation = (plan: RetirementPlan): CalculationResult => {
                 const employerMatch = (owner.currentSalary * (acc.match / 100));
                 acc.balance += acc.annualContribution + employerMatch;
             }
-            acc.balance *= (1 + avgReturn);
+            acc.balance *= (1 + currentYearReturn);
         });
         investmentAccounts.forEach(acc => {
             const owner = plan[acc.owner as keyof typeof plan] as Person;
@@ -71,7 +84,7 @@ export const runSimulation = (plan: RetirementPlan): CalculationResult => {
             if(ownerAge < owner.retirementAge) {
                 acc.balance += acc.annualContribution;
             }
-            acc.balance *= (1 + avgReturn);
+            acc.balance *= (1 + currentYearReturn);
         });
         
         // --- Retirement Phase ---
