@@ -635,11 +635,25 @@ const App: React.FC = () => {
                                 <NumberInput label="Inflation" suffix="%" value={plan.inflationRate} onChange={e => handlePlanChange('inflationRate', Number(e.target.value))}/>
                                 <NumberInput label="Avg. Return" suffix="%" value={plan.avgReturn} onChange={e => handlePlanChange('avgReturn', Number(e.target.value))}/>
                                 <NumberInput label="Withdrawal Rate" suffix="%" value={plan.annualWithdrawalRate} onChange={e => handlePlanChange('annualWithdrawalRate', Number(e.target.value))} disabled={plan.dieWithZero}/>
-                                <div className="flex items-center space-x-2 pt-4">
-                                        <input type="checkbox" id="dieWithZero" checked={plan.dieWithZero} onChange={e => handlePlanChange('dieWithZero', e.target.checked)} className="h-4 w-4 rounded text-brand-primary focus:ring-brand-primary"/>
-                                        <label htmlFor="dieWithZero" className="text-sm font-medium text-brand-text-secondary">Enable Die with Zero</label>
+                                <div className="lg:col-span-2 bg-amber-50 p-3 rounded-lg border border-amber-200 space-y-2">
+                                    <div className="flex items-center space-x-2">
+                                        <input
+                                            type="checkbox"
+                                            id="dieWithZero"
+                                            checked={plan.dieWithZero}
+                                            onChange={e => handlePlanChange('dieWithZero', e.target.checked)}
+                                            className="h-4 w-4 rounded text-brand-primary focus:ring-brand-primary"
+                                        />
+                                        <label htmlFor="dieWithZero" className="text-sm font-medium text-amber-800">Enable "Die with Zero"</label>
                                     </div>
-                                <NumberInput label="Leave Behind" prefix="$" value={plan.legacyAmount} onChange={e => handlePlanChange('legacyAmount', Number(e.target.value))} disabled={!plan.dieWithZero}/>
+                                    <NumberInput
+                                        label="Leave Behind"
+                                        prefix="$"
+                                        value={plan.legacyAmount}
+                                        onChange={e => handlePlanChange('legacyAmount', Number(e.target.value))}
+                                        disabled={!plan.dieWithZero}
+                                    />
+                                </div>
                             </div>
                         </InputSection>
                         
