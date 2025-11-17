@@ -797,12 +797,14 @@ const App: React.FC = () => {
                                             }`}>
                                                 {/* Common fields */}
                                                 {listName !== 'expensePeriods' && (
-                                                     <SelectInput label="Owner" value={item.owner} onChange={e => handleDynamicListChange(listName, item.id, 'owner', e.target.value)} data-list={listName} data-id={item.id}>
-                                                        <option value="person1">{plan.person1.name}</option>
-                                                        {isCouple && <option value="person2">{plan.person2.name}</option>}
-                                                    </SelectInput>
+                                                    <>
+                                                        <SelectInput label="Owner" value={item.owner} onChange={e => handleDynamicListChange(listName, item.id, 'owner', e.target.value)} data-list={listName} data-id={item.id}>
+                                                            <option value="person1">{plan.person1.name}</option>
+                                                            {isCouple && <option value="person2">{plan.person2.name}</option>}
+                                                        </SelectInput>
+                                                        <TextInput label="Name" value={item.name} onChange={e => handleDynamicListChange(listName, item.id, 'name', e.target.value)} />
+                                                    </>
                                                 )}
-                                                <TextInput label="Name" value={item.name} onChange={e => handleDynamicListChange(listName, item.id, 'name', e.target.value)} data-list={listName} data-id={listName === 'expensePeriods' ? item.id : undefined} />
                                                 
                                                 {/* Specific fields */}
                                                 {listName === 'retirementAccounts' && <>
@@ -866,7 +868,7 @@ const App: React.FC = () => {
                                                     </div>
                                                 </>}
                                                 {listName === 'expensePeriods' && <>
-                                                     <TextInput containerClassName="col-span-2" label="Name" value={item.name} onChange={e => handleDynamicListChange(listName, item.id, 'name', e.target.value)} data-list={listName} data-id={listName === 'expensePeriods' ? item.id : undefined} />
+                                                     <TextInput containerClassName="col-span-2" label="Name" value={item.name} onChange={e => handleDynamicListChange(listName, item.id, 'name', e.target.value)} data-list={listName} data-id={item.id} />
                                                      <NumberInput label="Total Monthly Expenses" prefix="$" value={item.monthlyAmount} onChange={e => handleDynamicListChange(listName, item.id, 'monthlyAmount', e.target.value)}/>
                                                      <div className="flex items-end space-x-2">
                                                         {isCouple && <SelectInput label=" " value={item.startAgeRef} onChange={e => handleDynamicListChange(listName, item.id, 'startAgeRef', e.target.value)}><option value="person1">{plan.person1.name}</option><option value="person2">{plan.person2.name}</option></SelectInput>}
