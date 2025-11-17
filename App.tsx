@@ -93,6 +93,8 @@ const App: React.FC = () => {
     const [isManualOpen, setIsManualOpen] = useState(false);
     const [monteCarloResults, setMonteCarloResults] = useState<MonteCarloResult | null>(null);
     const [isMcLoading, setIsMcLoading] = useState(false);
+    const [isBackupMenuOpen, setIsBackupMenuOpen] = useState(false);
+    const backupMenuRef = useRef<HTMLDivElement>(null);
 
     // --- Update Browser Title ---
     useEffect(() => {
@@ -114,6 +116,19 @@ const App: React.FC = () => {
         }
     }, [lastAddedInfo]);
     
+     // --- Handle clicking outside of backup menu ---
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (backupMenuRef.current && !backupMenuRef.current.contains(event.target as Node)) {
+                setIsBackupMenuOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
     // Helper to update the plan within the active scenario
     const updateActivePlan = (updater: (prevPlan: RetirementPlan) => RetirementPlan) => {
         if (!activeScenarioId) return;
@@ -273,6 +288,7 @@ const App: React.FC = () => {
             link.click();
             document.body.removeChild(link);
             URL.revokeObjectURL(url);
+            setIsBackupMenuOpen(false);
         } catch (error) {
             console.error("Error downloading scenarios:", error);
             alert("Failed to download scenarios.");
@@ -314,6 +330,7 @@ const App: React.FC = () => {
             }
         };
         reader.readAsText(file);
+        setIsBackupMenuOpen(false);
     };
 
     // --- Social Security Calculation ---
@@ -479,6 +496,40 @@ const App: React.FC = () => {
                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
                             <span>Print Report</span>
                         </button>
+
+                        <div className="relative" ref={backupMenuRef}>
+                            <button
+                                type="button"
+                                onClick={() => setIsBackupMenuOpen(prev => !prev)}
+                                className="flex items-center space-x-2 text-sm text-gray-600 hover:text-brand-primary transition-colors font-medium p-2 rounded-md hover:bg-gray-100"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" /></svg>
+                                <span>Backup/Restore</span>
+                            </button>
+                            {isBackupMenuOpen && (
+                                <div className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-30">
+                                    <div className="py-1">
+                                        <button
+                                            onClick={handleDownloadScenarios}
+                                            className="flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                                            <span className="ml-3">Download Scenarios</span>
+                                        </button>
+                                        <label className="flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer">
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0l-4 4m4-4v12" /></svg>
+                                            <span className="ml-3">Upload Scenarios</span>
+                                            <input
+                                                type="file"
+                                                onChange={handleUploadScenarios}
+                                                accept=".json,application/json"
+                                                className="hidden"
+                                            />
+                                        </label>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                          <button 
                             type="button" 
                             onClick={handleResetPlan} 
@@ -541,23 +592,6 @@ const App: React.FC = () => {
                             </div>
                         </InputSection>
                         
-                        <InputSection title="Backup & Restore" subtitle="Download your scenarios to a file or upload them to restore your work.">
-                            <div className="col-span-full flex items-center space-x-4">
-                                <button onClick={handleDownloadScenarios} className="px-4 py-2 text-sm bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors">
-                                    Download Scenarios
-                                </button>
-                                <label className="px-4 py-2 text-sm bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors cursor-pointer">
-                                    Upload Scenarios
-                                    <input
-                                        type="file"
-                                        onChange={handleUploadScenarios}
-                                        accept=".json,application/json"
-                                        className="hidden"
-                                    />
-                                </label>
-                            </div>
-                        </InputSection>
-
                         <InputSection 
                             title="Plan Information"
                             subtitle="Set the high-level assumptions for your retirement plan."
