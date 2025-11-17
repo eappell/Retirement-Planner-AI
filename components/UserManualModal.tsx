@@ -77,6 +77,39 @@ const manualContent = [
                 <p className="mt-3 p-2 bg-indigo-50 border-l-4 border-indigo-400 rounded-r-md"><strong>Tip:</strong> After making significant changes to your plan, generate a new insight report to get fresh, relevant advice based on your updated situation.</p>
             </>
         )
+    },
+    {
+        id: 'scenarioManager',
+        title: 'Scenario Manager',
+        icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" /></svg>,
+        content: (
+            <>
+                <p>The Scenario Manager allows you to create and compare different retirement plans. You can access it via the "Scenarios" button in the top header.</p>
+                <ul>
+                    <li><strong>Current Scenario:</strong> Use the dropdown to switch between your saved scenarios.</li>
+                    <li><strong>Scenario Name:</strong> Edit the name of the currently selected scenario.</li>
+                    <li><strong>New:</strong> Creates a brand new, blank scenario with default values.</li>
+                    <li><strong>Copy:</strong> Creates an exact duplicate of the current scenario, allowing you to tweak it without starting over.</li>
+                    <li><strong>Delete:</strong> Removes the current scenario. You cannot delete the last remaining scenario.</li>
+                </ul>
+                <p className="mt-3 p-2 bg-yellow-50 border-l-4 border-yellow-400 rounded-r-md"><strong>Important:</strong> All your scenarios are saved in your browser's local storage. This data can be lost if you clear your cache. Always use the Backup feature to save your work!</p>
+            </>
+        )
+    },
+    {
+        id: 'backupRestore',
+        title: 'Backup & Restore',
+        icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" /></svg>,
+        content: (
+            <>
+                <p>This feature allows you to save all of your scenarios to a file and load them back later. This is perfect for moving your plans to a different computer or browser, or just for keeping a safe backup. Access it via the "Backup" button in the top header.</p>
+                <ul>
+                    <li><strong>Download Scenarios:</strong> This will save a single file named <code>retirement_scenarios.json</code> to your computer. This file contains all the scenarios and data you've created.</li>
+                    <li><strong>Upload Scenarios:</strong> This will open a file prompt. Select a previously downloaded <code>.json</code> file to load it.</li>
+                </ul>
+                <p className="mt-3 p-2 bg-red-50 border-l-4 border-red-400 rounded-r-md"><strong>Warning:</strong> Uploading a scenarios file will completely overwrite all scenarios currently in the application. This action cannot be undone.</p>
+            </>
+        )
     }
 ];
 
