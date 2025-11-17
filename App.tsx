@@ -866,6 +866,7 @@ const App: React.FC = () => {
                                                     </div>
                                                 </>}
                                                 {listName === 'expensePeriods' && <>
+                                                     <TextInput containerClassName="col-span-2" label="Name" value={item.name} onChange={e => handleDynamicListChange(listName, item.id, 'name', e.target.value)} data-list={listName} data-id={listName === 'expensePeriods' ? item.id : undefined} />
                                                      <NumberInput label="Total Monthly Expenses" prefix="$" value={item.monthlyAmount} onChange={e => handleDynamicListChange(listName, item.id, 'monthlyAmount', e.target.value)}/>
                                                      <div className="flex items-end space-x-2">
                                                         {isCouple && <SelectInput label=" " value={item.startAgeRef} onChange={e => handleDynamicListChange(listName, item.id, 'startAgeRef', e.target.value)}><option value="person1">{plan.person1.name}</option><option value="person2">{plan.person2.name}</option></SelectInput>}
@@ -875,7 +876,7 @@ const App: React.FC = () => {
                                                         {isCouple && <SelectInput label=" " value={item.endAgeRef} onChange={e => handleDynamicListChange(listName, item.id, 'endAgeRef', e.target.value)}><option value="person1">{plan.person1.name}</option><option value="person2">{plan.person2.name}</option></SelectInput>}
                                                         <NumberInput label="End Age" value={item.endAge} onChange={e => handleDynamicListChange(listName, item.id, 'endAge', e.target.value)}/>
                                                     </div>
-                                                    <div className="flex items-end col-start-6">
+                                                    <div className="flex items-end">
                                                         <ActionIcons onAdd={() => addToList('expensePeriods', { ...item, id: Date.now().toString(), monthlyAmount: 0, name: `Phase ${items.length + 1}`, startAge: items.length > 0 ? items[items.length - 1].endAge + 1 : plan.person1.retirementAge, startAgeRef: items[items.length - 1]?.startAgeRef || 'person1', endAge: plan.person1.lifeExpectancy, endAgeRef: items[items.length - 1]?.endAgeRef || 'person1' })} onRemove={() => removeFromList('expensePeriods', item.id)} canRemove={items.length > 1} />
                                                     </div>
                                                 </>}
