@@ -505,7 +505,7 @@ const App: React.FC = () => {
                             className="text-sm font-medium text-brand-text-secondary whitespace-nowrap overflow-hidden text-ellipsis"
                             title={activeScenario.name}
                         >
-                            (Scenario: {activeScenario.name})
+                            ({activeScenario.name})
                         </span>
                     </div>
                     <div className="flex items-center space-x-2">
@@ -866,7 +866,7 @@ const App: React.FC = () => {
                                                     </div>
                                                 </>}
                                                 {listName === 'expensePeriods' && <>
-                                                     <NumberInput label="Monthly Amount" prefix="$" value={item.monthlyAmount} onChange={e => handleDynamicListChange(listName, item.id, 'monthlyAmount', e.target.value)}/>
+                                                     <NumberInput label="Total Monthly Expenses" prefix="$" value={item.monthlyAmount} onChange={e => handleDynamicListChange(listName, item.id, 'monthlyAmount', e.target.value)}/>
                                                      <div className="flex items-end space-x-2">
                                                         {isCouple && <SelectInput label=" " value={item.startAgeRef} onChange={e => handleDynamicListChange(listName, item.id, 'startAgeRef', e.target.value)}><option value="person1">{plan.person1.name}</option><option value="person2">{plan.person2.name}</option></SelectInput>}
                                                         <NumberInput label="Start Age" value={item.startAge} onChange={e => handleDynamicListChange(listName, item.id, 'startAge', e.target.value)} />
