@@ -93,8 +93,12 @@ const App: React.FC = () => {
     const [isManualOpen, setIsManualOpen] = useState(false);
     const [monteCarloResults, setMonteCarloResults] = useState<MonteCarloResult | null>(null);
     const [isMcLoading, setIsMcLoading] = useState(false);
+    
+    // Dropdown menu states
     const [isBackupMenuOpen, setIsBackupMenuOpen] = useState(false);
+    const [isScenarioMenuOpen, setIsScenarioMenuOpen] = useState(false);
     const backupMenuRef = useRef<HTMLDivElement>(null);
+    const scenarioMenuRef = useRef<HTMLDivElement>(null);
 
     // --- Update Browser Title ---
     useEffect(() => {
@@ -116,11 +120,14 @@ const App: React.FC = () => {
         }
     }, [lastAddedInfo]);
     
-     // --- Handle clicking outside of backup menu ---
+     // --- Handle clicking outside of menus ---
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (backupMenuRef.current && !backupMenuRef.current.contains(event.target as Node)) {
                 setIsBackupMenuOpen(false);
+            }
+             if (scenarioMenuRef.current && !scenarioMenuRef.current.contains(event.target as Node)) {
+                setIsScenarioMenuOpen(false);
             }
         };
         document.addEventListener('mousedown', handleClickOutside);
@@ -488,6 +495,38 @@ const App: React.FC = () => {
                         </span>
                     </div>
                     <div className="flex items-center space-x-2">
+                         <div className="relative" ref={scenarioMenuRef}>
+                            <button
+                                type="button"
+                                onClick={() => setIsScenarioMenuOpen(prev => !prev)}
+                                className="flex items-center space-x-2 text-sm text-gray-600 hover:text-brand-primary transition-colors font-medium p-2 rounded-md hover:bg-gray-100"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" /></svg>
+                                <span>Scenarios</span>
+                            </button>
+                            {isScenarioMenuOpen && (
+                                <div className="origin-top-right absolute right-0 mt-2 w-96 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-30 p-4">
+                                    <div className="space-y-4">
+                                        <h3 className="text-lg font-semibold text-gray-800">Scenario Manager</h3>
+                                        <div>
+                                            <SelectInput label="Current Scenario" value={activeScenarioId || ''} onChange={e => handleSelectScenario(e.target.value)}>
+                                                {Object.values(scenarios).map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                                            </SelectInput>
+                                        </div>
+                                        <TextInput label="Scenario Name" value={activeScenario.name} onChange={e => handleUpdateScenarioName(e.target.value)} />
+                                        <div className="grid grid-cols-3 gap-2">
+                                            <button onClick={handleNewScenario} className="w-full px-3 py-1.5 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors">New</button>
+                                            <button onClick={handleCopyScenario} className="w-full px-3 py-1.5 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">Copy</button>
+                                            <button onClick={handleDeleteScenario} disabled={Object.keys(scenarios).length <= 1} className="w-full px-3 py-1.5 text-sm bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-400 transition-colors">Delete</button>
+                                        </div>
+                                        <div className="col-span-full pt-2 border-t">
+                                            <p className="text-xs text-gray-500">This data is stored in your browser. If you clear your browser cache, you <strong className="text-red-600">WILL LOSE</strong> your scenarios.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
                         <button type="button" onClick={() => setIsManualOpen(true)} className="flex items-center space-x-2 text-sm text-gray-600 hover:text-brand-primary transition-colors font-medium p-2 rounded-md hover:bg-gray-100">
                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
                             <span>User Manual</span>
@@ -573,25 +612,6 @@ const App: React.FC = () => {
                     </div>
                     
                     <div className="mt-4 space-y-6">
-                        <InputSection title="Scenario Manager">
-                            <div className="col-span-full grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-                                <div className="md:col-span-2">
-                                    <SelectInput label="Current Scenario" value={activeScenarioId || ''} onChange={e => handleSelectScenario(e.target.value)}>
-                                        {Object.values(scenarios).map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-                                    </SelectInput>
-                                </div>
-                                <TextInput label="Scenario Name" value={activeScenario.name} onChange={e => handleUpdateScenarioName(e.target.value)} />
-                                <div className="flex items-end space-x-2">
-                                    <button onClick={handleNewScenario} className="w-full px-3 py-1.5 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors">New</button>
-                                    <button onClick={handleCopyScenario} className="w-full px-3 py-1.5 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">Copy</button>
-                                    <button onClick={handleDeleteScenario} disabled={Object.keys(scenarios).length <= 1} className="w-full px-3 py-1.5 text-sm bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-400 transition-colors">Delete</button>
-                                </div>
-                            </div>
-                             <div className="col-span-full mt-2">
-                                <p className="text-xs text-gray-500">This data is stored in your browser. If you clear your browser cache, you <strong className="text-red-600">WILL LOSE</strong> your scenarios.</p>
-                            </div>
-                        </InputSection>
-                        
                         <InputSection 
                             title="Plan Information"
                             subtitle="Set the high-level assumptions for your retirement plan."
