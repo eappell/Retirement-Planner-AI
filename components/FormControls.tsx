@@ -7,17 +7,22 @@ interface NumberInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 }
 
 export const NumberInput: React.FC<NumberInputProps> = ({ label, prefix, suffix, ...props }) => {
+  const isDisabled = props.disabled;
   return (
-    <div className="flex flex-col w-full">
-      {label && <label className="mb-1 text-sm font-medium text-brand-text-secondary">{label}</label>}
+    <div className={`flex flex-col w-full transition-all duration-300 ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}>
+      {label && <label className={`mb-1 text-sm font-medium ${isDisabled ? 'text-gray-400' : 'text-brand-text-secondary'}`}>{label}</label>}
       <div className="flex items-center">
-        {prefix && <span className="text-gray-500 mr-2">{prefix}</span>}
+        {prefix && <span className={`mr-2 ${isDisabled ? 'text-gray-400' : 'text-gray-500'}`}>{prefix}</span>}
         <input
           type="number"
-          className="w-full px-2 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-brand-primary focus:border-transparent bg-white text-sm"
+          className={`w-full px-2 py-1.5 border rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-brand-primary focus:border-transparent text-sm ${
+            isDisabled 
+              ? 'bg-gray-200 text-gray-500 cursor-not-allowed border-gray-200' 
+              : 'bg-white text-brand-text-primary border-gray-300'
+          }`}
           {...props}
         />
-        {suffix && <span className="text-gray-500 ml-2">{suffix}</span>}
+        {suffix && <span className={`ml-2 ${isDisabled ? 'text-gray-400' : 'text-gray-500'}`}>{suffix}</span>}
       </div>
     </div>
   );
@@ -30,11 +35,16 @@ interface SelectInputProps extends React.SelectHTMLAttributes<HTMLSelectElement>
 }
 
 export const SelectInput: React.FC<SelectInputProps> = ({ label, children, ...props }) => {
+    const isDisabled = props.disabled;
     return (
-        <div className="flex flex-col w-full">
-            {label && <label className="mb-1 text-sm font-medium text-brand-text-secondary">{label}</label>}
+        <div className={`flex flex-col w-full transition-all duration-300 ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}>
+            {label && <label className={`mb-1 text-sm font-medium ${isDisabled ? 'text-gray-400' : 'text-brand-text-secondary'}`}>{label}</label>}
             <select
-                className="w-full px-2 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-brand-primary focus:border-transparent bg-white text-sm"
+                className={`w-full px-2 py-1.5 border rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-brand-primary focus:border-transparent text-sm ${
+                    isDisabled 
+                        ? 'bg-gray-200 text-gray-500 cursor-not-allowed border-gray-200' 
+                        : 'bg-white text-brand-text-primary border-gray-300'
+                }`}
                 {...props}
             >
                 {children}
@@ -48,11 +58,16 @@ interface TextInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 }
 
 export const TextInput: React.FC<TextInputProps> = ({ label, className, ...props }) => {
-  const baseClasses = "w-full px-2 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-brand-primary focus:border-transparent bg-white text-sm text-black";
+  const isDisabled = props.disabled;
+  const baseClasses = `w-full px-2 py-1.5 border rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-brand-primary focus:border-transparent text-sm ${
+    isDisabled 
+      ? 'bg-gray-200 text-gray-500 cursor-not-allowed border-gray-200' 
+      : 'bg-white text-brand-text-primary border-gray-300'
+  }`;
   
   return (
-    <div className="flex flex-col w-full">
-      {label && <label className="mb-1 text-sm font-medium text-brand-text-secondary">{label}</label>}
+    <div className={`flex flex-col w-full transition-all duration-300 ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}>
+      {label && <label className={`mb-1 text-sm font-medium ${isDisabled ? 'text-gray-400' : 'text-brand-text-secondary'}`}>{label}</label>}
       <input
         type="text"
         className={`${baseClasses} ${className || ''}`}
