@@ -269,7 +269,7 @@ const App: React.FC = () => {
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
-            link.download = 'retirement_scenarios.json';
+            link.download = 'retirement_scenarios.retire';
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);

@@ -104,8 +104,8 @@ const manualContent = [
             <>
                 <p>This feature allows you to save all of your scenarios to a file and load them back later. This is perfect for moving your plans to a different computer or browser, or just for keeping a safe backup. Access it via the "Backup" button in the top header.</p>
                 <ul>
-                    <li><strong>Download Scenarios:</strong> This will save a single file named <code>retirement_scenarios.json</code> to your computer. This file contains all the scenarios and data you've created.</li>
-                    <li><strong>Upload Scenarios:</strong> This will open a file prompt. Select a previously downloaded <code>.json</code> file to load it.</li>
+                    <li><strong>Download Scenarios:</strong> This will save a single file named <code>retirement_scenarios.retire</code> to your computer. This file contains all the scenarios and data you've created.</li>
+                    <li><strong>Upload Scenarios:</strong> This will open a file prompt. Select a previously downloaded <code>.retire</code> file to load it.</li>
                 </ul>
                 <p className="mt-3 p-2 bg-red-50 border-l-4 border-red-400 rounded-r-md"><strong>Warning:</strong> Uploading a scenarios file will completely overwrite all scenarios currently in the application. This action cannot be undone.</p>
             </>
