@@ -19,6 +19,67 @@ interface AnalysisSectionsProps {
     handleRunSimulation: (numSimulations: number, volatility: number) => void;
 }
 
+const markdownToHtml = (text: string): string => {
+    if (!text) return '';
+    const lines = text.split('\n');
+    let htmlOutput = '';
+    let inList = false;
+
+    for (const line of lines) {
+        let processedLine = line;
+        
+        // Handle bold text first
+        processedLine = processedLine.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+        // Check for headings
+        if (processedLine.startsWith('## ')) {
+            if (inList) {
+                htmlOutput += '</ul>\n';
+                inList = false;
+            }
+            htmlOutput += `<h3>${processedLine.substring(3)}</h3>\n`;
+        } 
+        else if (processedLine.startsWith('### ')) {
+            if (inList) {
+                htmlOutput += '</ul>\n';
+                inList = false;
+            }
+            htmlOutput += `<h3>${processedLine.substring(4)}</h3>\n`;
+        }
+        // Check for list items
+        else if (processedLine.startsWith('* ') || processedLine.startsWith('- ')) {
+            if (!inList) {
+                htmlOutput += '<ul>\n';
+                inList = true;
+            }
+            htmlOutput += `<li>${processedLine.substring(2)}</li>\n`;
+        } 
+        // Handle empty lines (as paragraph breaks)
+        else if (processedLine.trim() === '') {
+            if (inList) {
+                htmlOutput += '</ul>\n';
+                inList = false;
+            }
+        } 
+        // Handle paragraphs
+        else {
+            if (inList) {
+                htmlOutput += '</ul>\n';
+                inList = false;
+            }
+            htmlOutput += `<p>${processedLine}</p>\n`;
+        }
+    }
+
+    // Close any list that might still be open at the end
+    if (inList) {
+        htmlOutput += '</ul>\n';
+    }
+
+    return htmlOutput;
+};
+
+
 export const AnalysisSections: React.FC<AnalysisSectionsProps> = ({
     plan,
     results,
@@ -69,7 +130,7 @@ export const AnalysisSections: React.FC<AnalysisSectionsProps> = ({
                 </button>
                 {aiInsights && (
                     <div className="mt-4 p-4 border rounded-md bg-purple-50">
-                        <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{__html: aiInsights.replace(/\n/g, '<br />')}}></div>
+                        <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{__html: markdownToHtml(aiInsights)}}></div>
                     </div>
                 )}
                 </div>
