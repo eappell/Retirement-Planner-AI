@@ -1,6 +1,4 @@
-
-
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { RetirementPlan, CalculationResult, PlanType, RetirementAccount, InvestmentAccount, Pension, OtherIncome, ExpensePeriod, Person, YearlyProjection, MonteCarloResult } from './types';
 import { STATES } from './constants';
 import { getRetirementInsights } from './services/geminiService';
@@ -16,6 +14,11 @@ import { ScrollToTopButton } from './components/ScrollToTopButton';
 import { PrintableReport } from './components/PrintableReport';
 import { DynamicCharts } from './components/DynamicCharts';
 import { MonteCarloSimulator } from './components/MonteCarloSimulator';
+import { useAuth } from './contexts/AuthContext';
+import { Auth } from './components/Auth';
+import { loadScenarios, saveScenarios } from './services/firestoreService';
+import { auth } from './services/firebase';
+import { signOut } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 
 const initialPlanState: RetirementPlan = {
   planType: PlanType.INDIVIDUAL,
@@ -42,13 +45,13 @@ const initialPlanState: RetirementPlan = {
 };
 
 // --- Scenario Management Types ---
-interface Scenario {
+export interface Scenario {
   id: string;
   name: string;
   plan: RetirementPlan;
 }
 
-interface ScenariosState {
+export interface ScenariosState {
   activeScenarioId: string | null;
   scenarios: Record<string, Scenario>;
 }
@@ -58,9 +61,10 @@ type DynamicListKey = {
   [K in keyof RetirementPlan]: RetirementPlan[K] extends Array<{ id: string }> ? K : never
 }[keyof RetirementPlan];
 
-const STORAGE_KEY = 'retirementScenarios';
 
 const App: React.FC = () => {
+    const { user, loading: authLoading } = useAuth();
+
     const getDefaultScenario = (): Scenario => ({
         id: `scenario-${Date.now()}`,
         name: 'Default Plan',
@@ -68,28 +72,59 @@ const App: React.FC = () => {
     });
     
     const [scenariosState, setScenariosState] = useState<ScenariosState>(() => {
-        try {
-            const savedData = localStorage.getItem(STORAGE_KEY);
-            if (savedData) {
-                const parsed = JSON.parse(savedData);
-                if (parsed && parsed.scenarios && parsed.activeScenarioId && parsed.scenarios[parsed.activeScenarioId]) {
-                    return parsed;
-                }
-            }
-        } catch (error) {
-            console.error("Failed to load scenarios from local storage", error);
-        }
         const defaultScenario = getDefaultScenario();
         return {
             activeScenarioId: defaultScenario.id,
             scenarios: { [defaultScenario.id]: defaultScenario },
         };
     });
+    
+    const [isDataLoaded, setIsDataLoaded] = useState(false);
+    
+    // Debounce timer for saving to Firestore
+    const saveTimeout = useRef<number | null>(null);
+
+    // --- Firestore Data Loading ---
+    useEffect(() => {
+        if (user) {
+            loadScenarios(user.uid).then(savedData => {
+                if (savedData) {
+                    setScenariosState(savedData);
+                } else {
+                    // First time user, set default state
+                    const defaultScenario = getDefaultScenario();
+                     setScenariosState({
+                        activeScenarioId: defaultScenario.id,
+                        scenarios: { [defaultScenario.id]: defaultScenario },
+                    });
+                }
+                setIsDataLoaded(true);
+            });
+        }
+    }, [user]);
+
+    // --- Firestore Data Persistence ---
+    useEffect(() => {
+        if (user && isDataLoaded) {
+            if (saveTimeout.current) {
+                clearTimeout(saveTimeout.current);
+            }
+            saveTimeout.current = window.setTimeout(() => {
+                 saveScenarios(user.uid, scenariosState);
+            }, 1500); // Debounce saving by 1.5 seconds
+        }
+        
+        return () => {
+             if (saveTimeout.current) {
+                clearTimeout(saveTimeout.current);
+            }
+        }
+
+    }, [scenariosState, user, isDataLoaded]);
 
     const { activeScenarioId, scenarios } = scenariosState;
     const activeScenario = activeScenarioId ? scenarios[activeScenarioId] : null;
 
-    // The plan is now derived from the active scenario
     const plan = activeScenario?.plan;
 
     const [results, setResults] = useState<CalculationResult | null>(null);
@@ -101,15 +136,6 @@ const App: React.FC = () => {
     const [isManualOpen, setIsManualOpen] = useState(false);
     const [monteCarloResults, setMonteCarloResults] = useState<MonteCarloResult | null>(null);
     const [isMcLoading, setIsMcLoading] = useState(false);
-
-    // --- Local Storage Persistence ---
-    useEffect(() => {
-        try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(scenariosState));
-        } catch (error) {
-            console.error("Failed to save scenarios to local storage", error);
-        }
-    }, [scenariosState]);
 
     // --- Update Browser Title ---
     useEffect(() => {
@@ -362,7 +388,6 @@ const App: React.FC = () => {
     
     const handleResetPlan = () => {
         if (window.confirm('Are you sure you want to reset all your data? This will delete ALL saved scenarios and cannot be undone.')) {
-            localStorage.removeItem(STORAGE_KEY);
             const defaultScenario = getDefaultScenario();
             setScenariosState({
                 activeScenarioId: defaultScenario.id,
@@ -374,6 +399,10 @@ const App: React.FC = () => {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     };
+    
+    const handleLogout = () => {
+        signOut(auth).catch(error => console.error("Logout Error:", error));
+    };
 
     // --- Real-time Calculation ---
     useEffect(() => {
@@ -383,9 +412,17 @@ const App: React.FC = () => {
         }, 1000); // Debounce requests
         return () => clearTimeout(handler);
     }, [plan, calculatePlan]);
+
+    if (authLoading) {
+        return <div className="flex justify-center items-center h-screen"><div className="text-xl">Loading...</div></div>;
+    }
+
+    if (!user) {
+        return <Auth />;
+    }
     
-    if (!plan || !activeScenario) {
-        return <div className="p-8 text-center">Loading scenarios...</div>;
+    if (!plan || !activeScenario || !isDataLoaded) {
+        return <div className="flex justify-center items-center h-screen"><div className="text-xl">Loading Your Scenarios...</div></div>;
     }
 
     // --- UI Components ---
@@ -449,6 +486,14 @@ const App: React.FC = () => {
                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                             <span>Reset Plan</span>
                         </button>
+                         <button 
+                            type="button" 
+                            onClick={handleLogout} 
+                            className="flex items-center space-x-2 text-sm text-gray-600 hover:text-brand-primary transition-colors font-medium p-2 rounded-md hover:bg-gray-100"
+                        >
+                           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                            <span>Logout</span>
+                        </button>
                     </div>
                 </header>
 
@@ -483,7 +528,7 @@ const App: React.FC = () => {
                     </div>
                     
                     <div className="mt-4 space-y-6">
-                        <InputSection title="Scenario Manager" subtitle="Save and load different retirement plans to compare strategies.">
+                        <InputSection title="Scenario Manager" subtitle="Your scenarios are saved to your account and accessible from any browser.">
                             <div className="col-span-full grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
                                 <div className="md:col-span-2">
                                     <SelectInput label="Current Scenario" value={activeScenarioId || ''} onChange={e => handleSelectScenario(e.target.value)}>
@@ -497,9 +542,6 @@ const App: React.FC = () => {
                                     <button onClick={handleDeleteScenario} disabled={Object.keys(scenarios).length <= 1} className="w-full px-3 py-1.5 text-sm bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-400 transition-colors">Delete</button>
                                 </div>
                             </div>
-                            <p className="col-span-full text-xs text-brand-text-secondary mt-2">
-                                Note: This data is stored in your browser. If you clear your browser cache, you <span className="font-bold text-red-600">WILL LOSE</span> your scenarios.
-                            </p>
                         </InputSection>
 
                         <InputSection 
