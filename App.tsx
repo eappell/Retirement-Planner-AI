@@ -637,39 +637,41 @@ const App: React.FC = () => {
                             </div>
                         </InputSection>
                         
-                        <InputSection 
-                            title="Die With Zero"
-                            titleColorClass="text-blue-600"
-                            gridCols={1}
-                        >
-                            <div className="col-span-full bg-blue-50 p-4 rounded-lg border border-blue-200">
-                                <div className="space-y-3">
-                                    <div className="flex items-end space-x-4">
-                                        <div className="flex items-center space-x-2 pb-1">
-                                            <input
-                                                type="checkbox"
-                                                id="dieWithZero"
-                                                checked={plan.dieWithZero}
-                                                onChange={e => handlePlanChange('dieWithZero', e.target.checked)}
-                                                className="h-4 w-4 rounded text-brand-primary focus:ring-brand-primary"
-                                            />
-                                            <label htmlFor="dieWithZero" className="text-sm font-medium text-blue-800">Enable</label>
-                                        </div>
-                                        <NumberInput
-                                            label="Leave Behind"
-                                            prefix="$"
-                                            value={plan.legacyAmount}
-                                            onChange={e => handlePlanChange('legacyAmount', Number(e.target.value))}
-                                            disabled={!plan.dieWithZero}
-                                        />
-                                    </div>
-                                    <p className="text-sm text-blue-700 italic">
-                                        The "Die with Zero" strategy calculates the maximum amount you can withdraw each year to end with your target "Leave Behind" amount. 
-                                        This creates a dynamic withdrawal rate that adjusts annually based on your balance and life expectancy, overriding the fixed "Withdrawal Rate" above.
-                                    </p>
+                        <div className="bg-brand-surface p-3 rounded-lg shadow-sm flex items-center space-x-4">
+                            <div className="flex items-center space-x-2 flex-shrink-0">
+                                <input
+                                    type="checkbox"
+                                    id="dieWithZeroCheck"
+                                    checked={plan.dieWithZero}
+                                    onChange={e => handlePlanChange('dieWithZero', e.target.checked)}
+                                    className="h-5 w-5 rounded text-brand-primary focus:ring-brand-primary"
+                                />
+                                <label htmlFor="dieWithZeroCheck" className="font-bold text-lg text-brand-primary cursor-pointer whitespace-nowrap">
+                                    Die With Zero
+                                </label>
+                            </div>
+
+                            <div className="flex items-center space-x-2 flex-shrink-0">
+                                <label htmlFor="legacyAmountInput" className="text-sm font-medium text-brand-text-secondary">Leave Behind:</label>
+                                <div className="relative">
+                                    <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500 text-sm">
+                                        $
+                                    </span>
+                                    <input
+                                        id="legacyAmountInput"
+                                        type="number"
+                                        value={plan.legacyAmount}
+                                        onChange={e => handlePlanChange('legacyAmount', Number(e.target.value))}
+                                        disabled={!plan.dieWithZero}
+                                        className="w-32 pl-7 pr-2 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-brand-primary focus:border-transparent bg-white text-sm"
+                                    />
                                 </div>
                             </div>
-                        </InputSection>
+                            
+                            <p className="text-sm text-brand-text-secondary italic flex-1 min-w-0">
+                                Calculates the maximum withdrawal to end with your target legacy, overriding the fixed rate.
+                            </p>
+                        </div>
                         
                         <div className={`grid grid-cols-1 ${isCouple ? 'md:grid-cols-2' : ''} gap-6`}>
                             <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
