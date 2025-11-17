@@ -62,17 +62,20 @@ export const Header: React.FC<HeaderProps> = ({
     }
     
     return (
-        <header className="bg-brand-surface shadow-md h-14 flex items-center justify-between px-4 sm:px-6 lg:px-8 sticky top-0 z-20">
-            <div className="flex items-baseline space-x-3 overflow-hidden">
-                <h1 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-brand-primary to-brand-secondary flex-shrink-0">
-                    Retirement Monthly Income Planner
-                </h1>
-                <span 
-                    className="text-sm font-medium text-brand-text-secondary whitespace-nowrap overflow-hidden text-ellipsis"
-                    title={activeScenario.name}
-                >
-                    ({activeScenario.name})
-                </span>
+        <header className="bg-brand-surface shadow-md h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 sticky top-0 z-20">
+            <div className="flex flex-col">
+                <div className="flex items-baseline space-x-3 overflow-hidden">
+                    <h1 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-brand-primary to-brand-secondary flex-shrink-0">
+                        Retirement Monthly Income Planner
+                    </h1>
+                    <span 
+                        className="text-sm font-medium text-brand-text-secondary whitespace-nowrap overflow-hidden text-ellipsis"
+                        title={activeScenario.name}
+                    >
+                        ({activeScenario.name})
+                    </span>
+                </div>
+                <p className="text-xs text-brand-text-secondary mt-0.5">Estimate your retirement income, taxes, and net worth.</p>
             </div>
             <div className="flex items-center space-x-2">
                 <button type="button" onClick={() => setIsManualOpen(true)} className="flex items-center space-x-2 text-sm text-gray-600 hover:text-brand-primary transition-colors font-medium p-2 rounded-md hover:bg-gray-100">
