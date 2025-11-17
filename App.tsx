@@ -683,8 +683,8 @@ const App: React.FC = () => {
                                 </label>
                             </div>
 
-                            <div className="flex items-center space-x-2 flex-shrink-0">
-                                <label htmlFor="legacyAmountInput" className="text-sm font-medium text-brand-text-secondary">Leave Behind:</label>
+                            <div className={`flex items-center space-x-2 flex-shrink-0 transition-opacity ${!plan.dieWithZero ? 'opacity-60' : ''}`}>
+                                <label htmlFor="legacyAmountInput" className={`text-sm font-medium ${!plan.dieWithZero ? 'text-gray-500' : 'text-brand-text-secondary'}`}>Leave Behind:</label>
                                 <div className="relative">
                                     <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500 text-sm">
                                         $
@@ -695,7 +695,11 @@ const App: React.FC = () => {
                                         value={plan.legacyAmount}
                                         onChange={e => handlePlanChange('legacyAmount', Number(e.target.value))}
                                         disabled={!plan.dieWithZero}
-                                        className="w-32 pl-7 pr-2 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-brand-primary focus:border-transparent bg-white text-sm"
+                                        className={`w-32 pl-7 pr-2 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-brand-primary focus:border-transparent text-sm ${
+                                            !plan.dieWithZero 
+                                            ? 'bg-gray-100 text-gray-500 cursor-not-allowed' 
+                                            : 'bg-white text-brand-text-primary'
+                                        }`}
                                     />
                                 </div>
                             </div>
