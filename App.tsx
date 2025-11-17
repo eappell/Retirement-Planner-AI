@@ -669,7 +669,7 @@ const App: React.FC = () => {
                             </div>
                             
                             <p className="text-sm text-brand-text-secondary italic flex-1 min-w-0">
-                                Calculates the maximum withdrawal to end with your target legacy, overriding the fixed rate.
+                                Calculates the maximum withdrawal to end with your target legacy, overriding the fixed withdrawal rate.
                             </p>
                         </div>
                         
