@@ -110,6 +110,56 @@ const manualContent = [
                 <p className="mt-3 p-2 bg-red-50 border-l-4 border-red-400 rounded-r-md"><strong>Warning:</strong> Uploading a scenarios file will completely overwrite all scenarios currently in the application. This action cannot be undone.</p>
             </>
         )
+    },
+    {
+        id: 'adsenseSetup',
+        title: 'AdSense Setup Guide',
+        icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>,
+        content: (
+            <>
+                <p>Use this guide when you are ready to add Google AdSense ads to your live application.</p>
+                
+                <h4 className="font-bold mt-4 mb-2">1. Sign Up & Approval</h4>
+                <ul className="list-disc list-inside ml-2 space-y-1">
+                    <li>Go to Google AdSense and sign up.</li>
+                    <li>Add your site (must be a live domain like <code>www.myapp.com</code>, not localhost).</li>
+                    <li>Wait for approval (can take a few days).</li>
+                </ul>
+
+                <h4 className="font-bold mt-4 mb-2">2. Add Global Script</h4>
+                <p>Once approved, get the script code from AdSense and paste it into the <code>&lt;head&gt;</code> of your <code>index.html</code> file:</p>
+                <pre className="bg-gray-100 p-2 rounded text-xs mt-2 overflow-x-auto">
+{`<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_ID" crossorigin="anonymous"></script>`}
+                </pre>
+
+                <h4 className="font-bold mt-4 mb-2">3. Create Ad Unit</h4>
+                <ul className="list-disc list-inside ml-2 space-y-1">
+                    <li>In AdSense, go to <strong>Ads &gt; By ad unit</strong>.</li>
+                    <li>Create a new "Display ad" (Vertical or Square).</li>
+                    <li>Copy the <code>data-ad-client</code> and <code>data-ad-slot</code> numbers.</li>
+                </ul>
+
+                <h4 className="font-bold mt-4 mb-2">4. React Implementation</h4>
+                <p>In <code>App.tsx</code>, use the following pattern to display the ad. Do not just paste the script tag directly.</p>
+                <pre className="bg-gray-100 p-2 rounded text-xs mt-2 overflow-x-auto">
+{`// Inside App.tsx component:
+useEffect(() => {
+  try {
+    (window.adsbygoogle = window.adsbygoogle || []).push({});
+  } catch (e) { console.error(e); }
+}, []);
+
+// Inside your JSX layout where you want the ad:
+<ins className="adsbygoogle"
+     style={{ display: 'block' }}
+     data-ad-client="ca-pub-YOUR_CLIENT_ID"
+     data-ad-slot="YOUR_SLOT_ID"
+     data-ad-format="auto"
+     data-full-width-responsive="true">
+</ins>`}
+                </pre>
+            </>
+        )
     }
 ];
 
