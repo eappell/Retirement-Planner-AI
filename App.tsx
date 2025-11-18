@@ -456,33 +456,64 @@ const App: React.FC = () => {
                     setIsManualOpen={setIsManualOpen}
                 />
 
-                <main className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
-                    <ResultsPanel results={results} isLoading={isLoading} />
+                {/* Main Layout with Sidebar */}
+                <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 flex flex-col lg:flex-row gap-6 relative">
                     
-                    <div className="mt-4 space-y-6">
-                        <InputForm
-                            plan={plan}
-                            handlePlanChange={handlePlanChange}
-                            handlePersonChange={handlePersonChange}
-                            handleDynamicListChange={handleDynamicListChange}
-                            addToList={addToList}
-                            removeFromList={removeFromList}
-                        />
-                        <AnalysisSections
-                            plan={plan}
-                            results={results}
-                            isLoading={isLoading}
-                            error={error}
-                            isAiLoading={isAiLoading}
-                            aiInsights={aiInsights}
-                            handleGetInsights={handleGetInsights}
-                            projectionData={projectionData}
-                            isMcLoading={isMcLoading}
-                            monteCarloResults={monteCarloResults}
-                            handleRunSimulation={handleRunSimulation}
-                        />
-                    </div>
-                </main>
+                    {/* Main Content Column */}
+                    <main className="flex-1 min-w-0">
+                        <ResultsPanel results={results} isLoading={isLoading} />
+                        
+                        <div className="mt-4 space-y-6">
+                            <InputForm
+                                plan={plan}
+                                handlePlanChange={handlePlanChange}
+                                handlePersonChange={handlePersonChange}
+                                handleDynamicListChange={handleDynamicListChange}
+                                addToList={addToList}
+                                removeFromList={removeFromList}
+                            />
+                            <AnalysisSections
+                                plan={plan}
+                                results={results}
+                                isLoading={isLoading}
+                                error={error}
+                                isAiLoading={isAiLoading}
+                                aiInsights={aiInsights}
+                                handleGetInsights={handleGetInsights}
+                                projectionData={projectionData}
+                                isMcLoading={isMcLoading}
+                                monteCarloResults={monteCarloResults}
+                                handleRunSimulation={handleRunSimulation}
+                            />
+                        </div>
+                    </main>
+
+                    {/* Ad Sidebar Column */}
+                    <aside className="hidden lg:block w-[300px] flex-shrink-0">
+                         <div className="sticky top-24 space-y-6">
+                            {/* Placeholder for Vertical Ad */}
+                            <div className="bg-gray-100 border border-gray-200 rounded-lg h-[600px] flex flex-col items-center justify-center text-gray-400">
+                                <span className="font-semibold text-sm">Advertisement</span>
+                                <span className="text-xs mt-1">300 x 600</span>
+                                {/* 
+                                    GOOGLE ADSENSE: 
+                                    Replace this placeholder div with your actual ad code.
+                                    Example:
+                                    <ins className="adsbygoogle"
+                                         style={{ display: 'block' }}
+                                         data-ad-client="ca-pub-YOUR_PUBLISHER_ID"
+                                         data-ad-slot="YOUR_AD_SLOT_ID"
+                                         data-ad-format="auto"
+                                         data-full-width-responsive="true"></ins>
+                                    <script>
+                                         (adsbygoogle = window.adsbygoogle || []).push({});
+                                    </script>
+                                */}
+                            </div>
+                        </div>
+                    </aside>
+                </div>
+                
                 <UserManualModal isOpen={isManualOpen} onClose={() => setIsManualOpen(false)} />
                 <ScrollToTopButton />
             </div>
