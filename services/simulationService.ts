@@ -146,8 +146,11 @@ export const runSimulation = (plan: RetirementPlan, volatility?: number): Calcul
         const inRetirement = isP1Retired || isP2Retired;
 
         if (inRetirement && (p1Alive || p2Alive)) {
-            const p1Benefit = plan.socialSecurity.person1EstimatedBenefit * 12;
-            const p2Benefit = isCouple ? plan.socialSecurity.person2EstimatedBenefit * 12 : 0;
+            // Apply inflation to Social Security benefits (COLA)
+            const ssInflationFactor = Math.pow(1 + inflation, year);
+            const p1Benefit = plan.socialSecurity.person1EstimatedBenefit * 12 * ssInflationFactor;
+            const p2Benefit = isCouple ? plan.socialSecurity.person2EstimatedBenefit * 12 * ssInflationFactor : 0;
+            
             const p1Receiving = currentAge1 >= plan.person1.claimingAge;
             const p2Receiving = isCouple && currentAge2 >= plan.person2.claimingAge;
 
@@ -289,7 +292,7 @@ export const runSimulation = (plan: RetirementPlan, volatility?: number): Calcul
             
             let iterationWithdrawal = calculatedWithdrawal;
             let iterations = 0;
-            const maxIterations = 10;
+            const maxIterations = 20; // Increased iterations for better convergence
             
             while (iterations < maxIterations && iterationWithdrawal < totalAssets) {
                 const totalTaxableIncome = taxableFixedIncome + iterationWithdrawal;
@@ -307,7 +310,8 @@ export const runSimulation = (plan: RetirementPlan, volatility?: number): Calcul
                 const testIncome = totalTaxableIncome + 1000;
                 const testTaxes = calculateTaxes(testIncome, plan.state, filingStatus);
                 const marginalTax = (testTaxes.federalTax + testTaxes.stateTax) - (projectedTaxes.federalTax + projectedTaxes.stateTax);
-                const marginalRate = Math.max(0.15, Math.min(0.45, marginalTax / 1000)); // Clamp between 15-45%
+                // Allow for higher marginal rates (up to 90%) to handle tax torpedoes or high tax states
+                const marginalRate = Math.max(0.15, Math.min(0.90, marginalTax / 1000)); 
                 
                 // Increase withdrawal by the shortfall adjusted for taxes
                 const additionalGross = shortfall / (1 - marginalRate);
