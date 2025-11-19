@@ -210,10 +210,11 @@ const IncomeBreakdownChart: React.FC<{ projectionData: YearlyProjection[] }> = (
     if (!firstRetirementYearData) return <p>No retirement income to display.</p>;
     
     const incomeSources = [
-        { label: 'Withdrawals', value: firstRetirementYearData.withdrawal, color: 'bg-indigo-500' },
-        { label: 'Social Security', value: firstRetirementYearData.socialSecurityIncome, color: 'bg-blue-500' },
-        { label: 'Pensions', value: firstRetirementYearData.pensionIncome, color: 'bg-sky-500' },
-        { label: 'Other Income', value: firstRetirementYearData.otherIncome, color: 'bg-teal-500' },
+        { label: 'Withdrawals', value: firstRetirementYearData.withdrawal || 0, color: 'bg-indigo-500' },
+        { label: 'Social Security', value: firstRetirementYearData.socialSecurityIncome || 0, color: 'bg-blue-500' },
+        { label: 'Pensions', value: firstRetirementYearData.pensionIncome || 0, color: 'bg-sky-500' },
+        { label: 'Other Income', value: firstRetirementYearData.otherIncome || 0, color: 'bg-teal-500' },
+        { label: 'Gifts', value: firstRetirementYearData.gifts || 0, color: 'bg-yellow-400' },
     ].filter(s => s.value > 0);
 
     const totalIncome = incomeSources.reduce((sum, s) => sum + s.value, 0);
