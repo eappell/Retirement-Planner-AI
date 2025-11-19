@@ -272,15 +272,34 @@ export const runSimulation = (plan: RetirementPlan, volatility?: number): Calcul
                     const incomeForMarginalRateCheck = taxableFixedIncome + 1000;
                     const taxesAtHigherIncome = calculateTaxes(incomeForMarginalRateCheck, plan.state, filingStatus);
                     const taxOnExtraAmount = (taxesAtHigherIncome.federalTax + taxesAtHigherIncome.stateTax) - (taxesOnFixedIncome.federalTax + taxesOnFixedIncome.stateTax);
-                    const marginalTaxRate = Math.max(0, taxOnExtraAmount / 1000);
-                    neededForExpenses = (marginalTaxRate < 1) ? netShortfall / (1 - marginalTaxRate) : netShortfall * 2;
+                    const marginalTaxRate = Math.max(0, Math.min(0.99, taxOnExtraAmount / 1000));
+                    neededForExpenses = netShortfall / (1 - marginalTaxRate);
                 }
                 plannedAnnualWithdrawal = Math.max(neededForExpenses, fixedRateWithdrawal);
             }
 
-            annualWithdrawal = Math.max(plannedAnnualWithdrawal, totalRmd);
-            annualWithdrawal = Math.min(annualWithdrawal, totalAssets);
-            annualWithdrawal = isNaN(annualWithdrawal) ? 0 : annualWithdrawal;
+            // Ensure RMD requirements are met
+            let initialWithdrawal = Math.max(plannedAnnualWithdrawal, totalRmd);
+            initialWithdrawal = Math.min(initialWithdrawal, totalAssets);
+            
+            // Final check: verify expenses will be covered after all taxes
+            // This is critical for couple scenarios where filing status changes
+            const fixedIncome = incomeFromPensions + incomeFromSS + incomeFromOther;
+            const taxableFixedIncome = taxableIncomeFromPensions + taxableIncomeFromOther + incomeFromSS;
+            const totalTaxableIncome = taxableFixedIncome + initialWithdrawal;
+            const projectedTaxes = calculateTaxes(totalTaxableIncome, plan.state, filingStatus);
+            const projectedNetIncome = fixedIncome + initialWithdrawal - projectedTaxes.federalTax - projectedTaxes.stateTax;
+            
+            if (projectedNetIncome < inflatedExpenses && initialWithdrawal < totalAssets) {
+                // We're still short - need to withdraw more to cover the gap
+                const additionalNetNeeded = inflatedExpenses - projectedNetIncome;
+                // Use a more conservative estimate for additional withdrawal needed
+                const conservativeMarginalRate = 0.3; // Assume 30% combined marginal rate
+                const additionalGrossNeeded = additionalNetNeeded / (1 - conservativeMarginalRate);
+                initialWithdrawal = Math.min(initialWithdrawal + additionalGrossNeeded, totalAssets);
+            }
+            
+            annualWithdrawal = isNaN(initialWithdrawal) ? 0 : initialWithdrawal;
 
             if (annualWithdrawal > 0) {
                 let remainingToWithdraw = annualWithdrawal;
