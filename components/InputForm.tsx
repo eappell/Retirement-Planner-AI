@@ -303,21 +303,25 @@ export const InputForm: React.FC<InputFormProps> = ({
                                                 </>
                                             )}
                                             {item.isAnnual && (
-                                                <>
-                                                    <div className="w-32">
-                                                        <NumberInput label="Yr Amt" prefix="$" value={item.annualAmount || 0} onChange={e => handleDynamicListChange(listName, item.id, 'annualAmount', e.target.value)} />
+                                            <>
+                                                <div className="w-32">
+                                                    <NumberInput label="Yr Amt" prefix="$" value={item.annualAmount || 0} onChange={e => handleDynamicListChange(listName, item.id, 'annualAmount', e.target.value)} />
+                                                </div>
+                                                <div className="w-28">
+                                                    <div className="flex space-x-1">
+                                                        <div className="w-1/2">
+                                                            <NumberInput value={item.startAge || plan.person1.retirementAge} onChange={e => handleDynamicListChange(listName, item.id, 'startAge', e.target.value)} />
+                                                        </div>
+                                                        <div className="w-1/2">
+                                                            <NumberInput value={item.endAge || plan.person1.lifeExpectancy} onChange={e => handleDynamicListChange(listName, item.id, 'endAge', e.target.value)} />
+                                                        </div>
                                                     </div>
-                                                    <div className="w-20">
-                                                        <NumberInput label="Start" value={item.startAge || plan.person1.retirementAge} onChange={e => handleDynamicListChange(listName, item.id, 'startAge', e.target.value)} />
-                                                    </div>
-                                                    <div className="w-20">
-                                                        <NumberInput label="End" value={item.endAge || plan.person1.lifeExpectancy} onChange={e => handleDynamicListChange(listName, item.id, 'endAge', e.target.value)} />
-                                                    </div>
-                                                </>
-                                            )}
-                                            <div className="flex items-end">
-                                                <ActionIcons onAdd={addGift} onRemove={() => removeFromList('gifts', item.id)} canRemove={items.length > 0} />
-                                            </div>
+                                                </div>
+                                            </>
+                                        )}
+                                        <div className="flex items-end">
+                                            <ActionIcons onAdd={addGift} onRemove={() => removeFromList('gifts', item.id)} canRemove={items.length > 0} />
+                                        </div>
                                         </>}
                                     {listName === 'expensePeriods' && <>
                                             <TextInput label="Name" value={item.name} onChange={e => handleDynamicListChange(listName, item.id, 'name', e.target.value)} data-list={listName} data-id={item.id} />
