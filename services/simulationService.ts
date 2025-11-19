@@ -210,18 +210,9 @@ export const runSimulation = (plan: RetirementPlan, volatility?: number): Calcul
             if (plan.dieWithZero) {
                  // Calculate years remaining based on the longest-living person still alive
                  let yearsRemaining = 1;
-                 if (p1Alive && p2Alive) {
-                     // Both alive: use the maximum life expectancy
-                     const finalLifeExpectancy = Math.max(plan.person1.lifeExpectancy, plan.person2.lifeExpectancy);
-                     const oldestCurrentAge = Math.max(currentAge1, currentAge2);
-                     yearsRemaining = Math.max(1, finalLifeExpectancy - oldestCurrentAge);
-                 } else if (p1Alive) {
-                     // Only person1 alive
-                     yearsRemaining = Math.max(1, plan.person1.lifeExpectancy - currentAge1);
-                 } else if (p2Alive) {
-                     // Only person2 alive
-                     yearsRemaining = Math.max(1, plan.person2.lifeExpectancy - currentAge2);
-                 }
+                 const y1 = p1Alive ? plan.person1.lifeExpectancy - currentAge1 : 0;
+                 const y2 = p2Alive ? plan.person2.lifeExpectancy - currentAge2 : 0;
+                 yearsRemaining = Math.max(1, y1, y2);
 
                  // Calculate minimum withdrawal needed to cover expenses
                  const fixedIncome = incomeFromPensions + incomeFromSS + incomeFromOther;
