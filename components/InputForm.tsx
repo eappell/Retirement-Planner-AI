@@ -195,7 +195,18 @@ export const InputForm: React.FC<InputFormProps> = ({
                 
                 const addPension = () => addToList('pensions', { id: Date.now().toString(), owner: 'person1', name: 'New Pension', monthlyBenefit: 0, startAge: Math.min(plan.person1.retirementAge, isCouple ? plan.person2.retirementAge : Infinity), cola: 0, survivorBenefit: 0, taxable: true });
                 const addOtherIncome = () => addToList('otherIncomes', { id: Date.now().toString(), owner: 'person1', name: 'New Income', monthlyAmount: 0, startAge: plan.person1.retirementAge, endAge: plan.person1.lifeExpectancy, cola: 0, taxable: true });
-                const addGift = () => addToList('gifts', { id: Date.now().toString(), beneficiary: '', owner: 'person1', isAnnual: false, amount: 0, annualAmount: 0, age: plan.person1.currentAge, startAge: plan.person1.retirementAge, endAge: plan.person1.lifeExpectancy });
+                const addGift = () => {
+                    const id = Date.now().toString();
+                    addToList('gifts', { id, beneficiary: '', owner: 'person1', isAnnual: false, amount: 0, annualAmount: 0, age: plan.person1.currentAge, startAge: plan.person1.retirementAge, endAge: plan.person1.lifeExpectancy });
+                    // focus the beneficiary text input after render
+                    setTimeout(() => {
+                        const el = document.getElementById(`gift-beneficiary-${id}`) as HTMLInputElement | null;
+                        if (el) {
+                            el.focus();
+                            el.select?.();
+                        }
+                    }, 0);
+                };
 
                 return (
                     <InputSection key={section} title={section} subtitle={subtitles[section]} titleColorClass={colors[section]} gridCols={1}>
@@ -284,7 +295,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                                             </SelectInput>
                                         </div>
                                         <div className="w-48">
-                                            <TextInput label="Beneficiary" value={item.beneficiary} onChange={e => handleDynamicListChange(listName, item.id, 'beneficiary', e.target.value)} />
+                                            <TextInput id={`gift-beneficiary-${item.id}`} label="Beneficiary" value={item.beneficiary} onChange={e => handleDynamicListChange(listName, item.id, 'beneficiary', e.target.value)} />
                                         </div>
                                             <div className="w-full">
                                                 <SelectInput label="Type" value={item.isAnnual ? 'annual' : 'one-time'} onChange={e => handleDynamicListChange(listName, item.id, 'isAnnual', e.target.value === 'annual')}>
@@ -355,10 +366,10 @@ export const InputForm: React.FC<InputFormProps> = ({
             {/* Legacy Disbursements - separate section from Gifts */}
             <InputSection title="Legacy Disbursements" subtitle="Allocate percentages of the final estate to beneficiaries. Disabled when Die With Zero is enabled.">
                 <div className="col-span-full space-y-2">
-                    {(plan.legacyDisbursements || []).map((ld) => (
+                        {(plan.legacyDisbursements || []).map((ld) => (
                         <div key={ld.id} className="grid grid-cols-6 gap-x-4 items-end p-2 rounded-md bg-amber-50/50">
                             <div className="col-span-2">
-                                <TextInput label="Beneficiary" value={ld.beneficiary} disabled={plan.dieWithZero} onChange={e => handleDynamicListChange('legacyDisbursements', ld.id, 'beneficiary', e.target.value)} />
+                                <TextInput id={`legacy-beneficiary-${ld.id}`} label="Beneficiary" value={ld.beneficiary} disabled={plan.dieWithZero} onChange={e => handleDynamicListChange('legacyDisbursements', ld.id, 'beneficiary', e.target.value)} />
                             </div>
                             <div>
                                 <SelectInput label="Type" value={ld.beneficiaryType} disabled={plan.dieWithZero} onChange={e => handleDynamicListChange('legacyDisbursements', ld.id, 'beneficiaryType', e.target.value)}>
@@ -377,7 +388,21 @@ export const InputForm: React.FC<InputFormProps> = ({
 
                     {(plan.legacyDisbursements || []).length === 0 && (
                         <div className="text-center py-2">
-                            <button disabled={plan.dieWithZero} onClick={() => addToList('legacyDisbursements', { id: Date.now().toString(), beneficiary: '', beneficiaryType: 'person', percentage: 0 })} className={`text-sm font-semibold ${plan.dieWithZero ? 'text-gray-400' : 'text-brand-primary hover:underline'}`}>
+                            <button
+                                disabled={plan.dieWithZero}
+                                onClick={() => {
+                                    const id = Date.now().toString();
+                                    addToList('legacyDisbursements', { id, beneficiary: '', beneficiaryType: 'person', percentage: 0 });
+                                    setTimeout(() => {
+                                        const el = document.getElementById(`legacy-beneficiary-${id}`) as HTMLInputElement | null;
+                                        if (el) {
+                                            el.focus();
+                                            el.select?.();
+                                        }
+                                    }, 0);
+                                }}
+                                className={`text-sm font-semibold ${plan.dieWithZero ? 'text-gray-400' : 'text-brand-primary hover:underline'}`}
+                            >
                                 + Add Legacy Disbursement
                             </button>
                         </div>
