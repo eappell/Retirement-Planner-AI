@@ -40,6 +40,7 @@ export const PrintableReport: React.FC<{ plan: RetirementPlan; results: Calculat
         plan.retirementAccounts.reduce((sum, acc) => sum + acc.balance, 0) +
         plan.investmentAccounts.reduce((sum, acc) => sum + acc.balance, 0);
     const totalPlannedGifts = filteredProjections.reduce((s, p) => s + (p.gifts || 0), 0);
+    const totalLegacyDistributed = filteredProjections.reduce((s, p) => s + (p.legacyOutflow || 0), 0);
 
     return (
         <div className="hidden print:block font-sans p-4">
@@ -59,6 +60,7 @@ export const PrintableReport: React.FC<{ plan: RetirementPlan; results: Calculat
                             <InfoRow label="Avg. Federal Tax Rate" value={`${results.federalTaxRate.toFixed(1)}%`} />
                             <InfoRow label="Avg. State Tax Rate" value={`${results.stateTaxRate.toFixed(1)}%`} />
                             {totalPlannedGifts > 0 && <InfoRow label="Total Planned Gifts" value={`${formatCurrency(totalPlannedGifts)}`} />}
+                            {totalLegacyDistributed > 0 && <InfoRow label="Total Legacy Distributed" value={`${formatCurrency(totalLegacyDistributed)}`} />}
                         </ReportSection>
                     </div>
                      <div className="col-span-1">
@@ -161,6 +163,7 @@ export const PrintableReport: React.FC<{ plan: RetirementPlan; results: Calculat
                                     <th className="p-1 border border-gray-300">RMD</th>
                                     <th className="p-1 border border-gray-300 bg-yellow-100">Gifts</th>
                                     <th className="p-1 border border-gray-300 bg-green-100">Net Inc.</th>
+                                    <th className="p-1 border border-gray-300 bg-purple-100">Legacy</th>
                                     <th className="p-1 border border-gray-300">Surplus</th>
                                 </tr>
                         </thead>
@@ -175,6 +178,7 @@ export const PrintableReport: React.FC<{ plan: RetirementPlan; results: Calculat
                                     <td className="p-1 border border-gray-300 text-right bg-red-100">{formatCurrency(row.federalTax + row.stateTax)}</td>
                                     <td className="p-1 border border-gray-300 text-right">{formatCurrency(row.rmd)}</td>
                                     <td className="p-1 border border-gray-300 text-right">{formatCurrency(row.gifts || 0)}</td>
+                                    <td className="p-1 border border-gray-300 text-right bg-purple-100">{formatCurrency(row.legacyOutflow || 0)}</td>
                                     <td className="p-1 border border-gray-300 text-right bg-green-100 font-semibold">{formatCurrency(row.netIncome)}</td>
                                     <td className={`p-1 border border-gray-300 text-right ${row.surplus >= 0 ? 'text-green-700' : 'text-red-700'}`}>{formatCurrency(row.surplus)}</td>
                                 </tr>
@@ -182,6 +186,15 @@ export const PrintableReport: React.FC<{ plan: RetirementPlan; results: Calculat
                         </tbody>
                     </table>
                 </div>
+
+                {results.legacySummary && results.legacySummary.length > 0 && (
+                    <ReportSection title="Legacy Disbursements Summary" color="bg-purple-600">
+                        {results.legacySummary.map((d, i) => (
+                            <InfoRow key={i} label={d.beneficiary} value={formatCurrency(d.amount)} />
+                        ))}
+                        {results.remainingEstate !== undefined && <InfoRow label="Remaining Estate" value={formatCurrency(results.remainingEstate)} />}
+                    </ReportSection>
+                )}
             </main>
         </div>
     );

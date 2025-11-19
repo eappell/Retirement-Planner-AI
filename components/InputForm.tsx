@@ -4,7 +4,7 @@ import { InputSection } from './InputSection';
 import { NumberInput, SelectInput, TextInput } from './FormControls';
 import { STATES } from '../constants';
 
-type DynamicListKey = 'retirementAccounts' | 'investmentAccounts' | 'pensions' | 'otherIncomes' | 'expensePeriods' | 'gifts';
+type DynamicListKey = 'retirementAccounts' | 'investmentAccounts' | 'pensions' | 'otherIncomes' | 'expensePeriods' | 'gifts' | 'legacyDisbursements';
 
 interface InputFormProps {
     plan: RetirementPlan;
@@ -351,6 +351,52 @@ export const InputForm: React.FC<InputFormProps> = ({
                     </InputSection>
                 )
             })}
+
+            {/* Legacy Disbursements - separate section from Gifts */}
+            <InputSection title="Legacy Disbursements" subtitle="Allocate percentages of the final estate to beneficiaries. Disabled when Die With Zero is enabled.">
+                <div className="col-span-full space-y-2">
+                    {(plan.legacyDisbursements || []).map((ld) => (
+                        <div key={ld.id} className="grid grid-cols-6 gap-x-4 items-end p-2 rounded-md bg-amber-50/50">
+                            <div className="col-span-2">
+                                <TextInput label="Beneficiary" value={ld.beneficiary} disabled={plan.dieWithZero} onChange={e => handleDynamicListChange('legacyDisbursements', ld.id, 'beneficiary', e.target.value)} />
+                            </div>
+                            <div>
+                                <SelectInput label="Type" value={ld.beneficiaryType} disabled={plan.dieWithZero} onChange={e => handleDynamicListChange('legacyDisbursements', ld.id, 'beneficiaryType', e.target.value)}>
+                                    <option value="person">Person</option>
+                                    <option value="organization">Organization</option>
+                                </SelectInput>
+                            </div>
+                            <div className="w-28">
+                                <NumberInput label="Percentage" suffix="%" value={ld.percentage} disabled={plan.dieWithZero} onChange={e => handleDynamicListChange('legacyDisbursements', ld.id, 'percentage', e.target.value)} />
+                            </div>
+                            <div className="flex items-end">
+                                <ActionIcons onAdd={() => addToList('legacyDisbursements', { ...ld, id: Date.now().toString(), beneficiary: '', beneficiaryType: 'person', percentage: 0 })} onRemove={() => removeFromList('legacyDisbursements', ld.id)} canRemove={(plan.legacyDisbursements || []).length > 0} />
+                            </div>
+                        </div>
+                    ))}
+
+                    {(plan.legacyDisbursements || []).length === 0 && (
+                        <div className="text-center py-2">
+                            <button disabled={plan.dieWithZero} onClick={() => addToList('legacyDisbursements', { id: Date.now().toString(), beneficiary: '', beneficiaryType: 'person', percentage: 0 })} className={`text-sm font-semibold ${plan.dieWithZero ? 'text-gray-400' : 'text-brand-primary hover:underline'}`}>
+                                + Add Legacy Disbursement
+                            </button>
+                        </div>
+                    )}
+
+                    {/* Validation: ensure percentages do not exceed 100 */}
+                    {(() => {
+                        const totalPct = (plan.legacyDisbursements || []).reduce((s, x) => s + (x.percentage || 0), 0);
+                        if (totalPct > 100) {
+                            return <p className="text-sm text-red-600">Total legacy percentages exceed 100% ({totalPct}%). Please adjust.</p>;
+                        }
+                        if (totalPct > 0 && totalPct < 100) {
+                            return <p className="text-sm text-gray-600">Total allocated: {totalPct}%. Remaining estate will be {100 - totalPct}%.</p>;
+                        }
+                        return null;
+                    })()}
+                    {plan.dieWithZero && <p className="text-sm text-gray-500 italic">Legacy disbursements are disabled while Die With Zero is enabled.</p>}
+                </div>
+            </InputSection>
         </>
     );
 };

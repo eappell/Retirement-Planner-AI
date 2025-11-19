@@ -71,6 +71,13 @@ export interface Gift {
   age?: number; // for one-time gifts: age of the owner when the gift is given
 }
 
+export interface LegacyDisbursement {
+  id: string;
+  beneficiary: string;
+  beneficiaryType: 'person' | 'organization';
+  percentage: number; // percentage of the final estate to distribute to this beneficiary
+}
+
 export interface ExpensePeriod {
     id: string;
     name: string;
@@ -91,6 +98,7 @@ export interface RetirementPlan {
   pensions: Pension[];
   otherIncomes: OtherIncome[];
   gifts?: Gift[];
+  legacyDisbursements?: LegacyDisbursement[];
   expensePeriods: ExpensePeriod[];
   socialSecurity: {
       person1EstimatedBenefit: number;
@@ -121,6 +129,8 @@ export interface YearlyProjection {
   netIncome: number;
   surplus: number;
   gifts?: number;
+  legacyOutflow?: number; // total legacy distributed this year (typically final year)
+  legacyDistributions?: { beneficiary: string; amount: number }[];
   netWorth: number;
   rmd: number;
 }
@@ -134,6 +144,8 @@ export interface CalculationResult {
   stateTaxRate: number;
   yearsInRetirement: number;
   yearlyProjections: YearlyProjection[];
+  legacySummary?: { beneficiary: string; amount: number }[];
+  remainingEstate?: number;
 }
 
 export interface TaxBracket {

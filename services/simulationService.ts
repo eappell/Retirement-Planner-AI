@@ -64,6 +64,8 @@ const calculateSummary = (projections: YearlyProjection[], plan: RetirementPlan)
         stateTaxRate: avgGrossIncome > 0 ? (avgStateTax / avgGrossIncome) * 100 : 0,
         yearsInRetirement,
         yearlyProjections: projections,
+        legacySummary: projections.length > 0 ? (projections[projections.length - 1].legacyDistributions || []) : [],
+        remainingEstate: projections.length > 0 ? Math.max(0, projections[projections.length - 1].netWorth - (projections[projections.length - 1].legacyOutflow || 0)) : 0,
     };
 };
 
@@ -404,6 +406,23 @@ export const runSimulation = (plan: RetirementPlan, volatility?: number): Calcul
         }
 
         const finalNetWorth = yearlyProjections.length > 0 ? yearlyProjections[yearlyProjections.length - 1].netWorth : 0;
+        // Apply legacy disbursements at final year (simple approach)
+        if (plan.legacyDisbursements && plan.legacyDisbursements.length > 0) {
+            const distributions: { beneficiary: string; amount: number }[] = [];
+            let totalDistributed = 0;
+            plan.legacyDisbursements.forEach(ld => {
+                const amt = Math.round(finalNetWorth * (ld.percentage / 100));
+                distributions.push({ beneficiary: ld.beneficiary, amount: amt });
+                totalDistributed += amt;
+            });
+            const lastIdx = yearlyProjections.length - 1;
+            if (lastIdx >= 0) {
+                yearlyProjections[lastIdx].legacyOutflow = totalDistributed;
+                yearlyProjections[lastIdx].legacyDistributions = distributions;
+                yearlyProjections[lastIdx].netWorth = Math.max(0, yearlyProjections[lastIdx].netWorth - totalDistributed);
+            }
+        }
+
         return { yearlyProjections, finalNetWorth };
     };
 
