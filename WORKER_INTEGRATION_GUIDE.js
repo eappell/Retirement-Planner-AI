@@ -22,7 +22,7 @@ const {
 } = useMonteCarloWorker();
 
 // Update the run handler:
-const handleRunSimulation = (numSimulations: number, volatility: number) => {
+const handleRunSimulation = (numSimulations, volatility) => {
     if (!plan) return;
     runWorkerSimulation(plan, numSimulations, volatility);
 };
