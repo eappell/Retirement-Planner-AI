@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { RetirementPlan, Person, PlanType, RetirementAccount, InvestmentAccount, Pension, OtherIncome, ExpensePeriod } from '../types';
 import { InputSection } from './InputSection';
 import { NumberInput, SelectInput, TextInput } from './FormControls';
@@ -30,14 +30,9 @@ export const InputForm: React.FC<InputFormProps> = ({
 }) => {
     const isCouple = plan.planType === PlanType.COUPLE;
     const [focusTargetId, setFocusTargetId] = useState<string | null>(null);
-    const inputRefs = useRef<Record<string, HTMLInputElement | null>>({});
-    const registerRef = (key: string) => (el: HTMLInputElement | null) => {
-        inputRefs.current[key] = el;
-    };
-
     useEffect(() => {
         if (!focusTargetId) return;
-        const el = inputRefs.current[focusTargetId];
+        const el = document.getElementById(focusTargetId) as HTMLInputElement | null;
         if (el) {
             el.focus();
             el.select?.();
@@ -332,7 +327,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                                             </SelectInput>
                                         </div>
                                         <div className="w-48">
-                                            <TextInput id={`gift-beneficiary-${item.id}`} ref={registerRef(`gift-beneficiary-${item.id}`)} label="Beneficiary" value={item.beneficiary} onChange={e => handleDynamicListChange(listName, item.id, 'beneficiary', e.target.value)} />
+                                            <TextInput id={`gift-beneficiary-${item.id}`} label="Beneficiary" value={item.beneficiary} onChange={e => handleDynamicListChange(listName, item.id, 'beneficiary', e.target.value)} />
                                         </div>
                                             <div className="w-full">
                                                 <SelectInput label="Type" value={item.isAnnual ? 'annual' : 'one-time'} onChange={e => handleDynamicListChange(listName, item.id, 'isAnnual', e.target.value === 'annual')}>
@@ -410,7 +405,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                         {(plan.legacyDisbursements || []).map((ld) => (
                         <div key={ld.id} className="grid grid-cols-6 gap-x-4 items-end p-2 rounded-md bg-amber-50/50">
                             <div className="col-span-2">
-                                <TextInput id={`legacy-beneficiary-${ld.id}`} ref={registerRef(`legacy-beneficiary-${ld.id}`)} label="Beneficiary" value={ld.beneficiary} disabled={plan.dieWithZero} onChange={e => handleDynamicListChange('legacyDisbursements', ld.id, 'beneficiary', e.target.value)} />
+                                <TextInput id={`legacy-beneficiary-${ld.id}`} label="Beneficiary" value={ld.beneficiary} disabled={plan.dieWithZero} onChange={e => handleDynamicListChange('legacyDisbursements', ld.id, 'beneficiary', e.target.value)} />
                             </div>
                             <div>
                                 <SelectInput label="Type" value={ld.beneficiaryType} disabled={plan.dieWithZero} onChange={e => handleDynamicListChange('legacyDisbursements', ld.id, 'beneficiaryType', e.target.value)}>

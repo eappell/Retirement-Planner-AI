@@ -57,7 +57,7 @@ interface TextInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
 }
 
-export const TextInput = React.forwardRef<HTMLInputElement, TextInputProps>(({ label, className, ...props }, ref) => {
+export const TextInput: React.FC<TextInputProps> = ({ label, className, ...props }) => {
   const isDisabled = props.disabled;
   const baseClasses = `w-full px-2 py-1.5 border rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-brand-primary focus:border-transparent text-sm ${
     isDisabled 
@@ -69,12 +69,10 @@ export const TextInput = React.forwardRef<HTMLInputElement, TextInputProps>(({ l
     <div className={`flex flex-col w-full transition-all duration-300 ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}>
       {label && <label className={`mb-1 text-sm font-medium ${isDisabled ? 'text-gray-400' : 'text-brand-text-secondary'}`}>{label}</label>}
       <input
-        ref={ref}
         type="text"
         className={`${baseClasses} ${className || ''}`}
         {...props}
       />
     </div>
   );
-});
-TextInput.displayName = 'TextInput';
+};
