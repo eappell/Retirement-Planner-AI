@@ -134,7 +134,7 @@ const App: React.FC = () => {
         value: string | boolean
     ) => {
         updateActivePlan(prev => {
-            const list = prev[listName] as ({ id: string } & object)[];
+            const list = (prev[listName] as ({ id: string } & object)[]) || [];
             const updatedList = list.map(item => {
                 if (item.id !== id) return item;
                 const originalValue = item[field as keyof typeof item];
@@ -151,12 +151,18 @@ const App: React.FC = () => {
     };
 
     const addToList = <K extends DynamicListKey>(listName: K, newItem: RetirementPlan[K][number]) => {
-        updateActivePlan(prev => ({ ...prev, [listName]: [...prev[listName], newItem] }));
-        setLastAddedInfo({ list: listName, id: newItem.id });
+        updateActivePlan(prev => {
+            const existing = (prev[listName] as any[]) || [];
+            return { ...prev, [listName]: [...existing, newItem] };
+        });
+        if (newItem && (newItem as any).id) setLastAddedInfo({ list: listName, id: (newItem as any).id });
     };
 
     const removeFromList = (listName: DynamicListKey, id: string) => {
-        updateActivePlan(prev => ({ ...prev, [listName]: (prev[listName] as { id: string }[]).filter(item => item.id !== id) }));
+        updateActivePlan(prev => {
+            const existing = (prev[listName] as { id: string }[]) || [];
+            return { ...prev, [listName]: existing.filter(item => item.id !== id) };
+        });
     };
 
     // --- Scenario Management Handlers (using hooks) ---
