@@ -13,7 +13,7 @@ interface InputFormProps {
     handleDynamicListChange: <K extends DynamicListKey>(
         listName: K,
         id: string,
-        field: keyof RetirementPlan[K][number],
+        field: any,
         value: string | boolean
     ) => void;
     addToList: <K extends DynamicListKey>(listName: K, newItem: RetirementPlan[K][number]) => void;
