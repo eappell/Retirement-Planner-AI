@@ -209,9 +209,10 @@ export const runSimulation = (plan: RetirementPlan, volatility?: number): Calcul
 
             if (plan.dieWithZero) {
                  // Calculate years remaining based on the longest-living person still alive
+                 // We add 1 because if you are 90 and live to 90, that is 1 year of expenses (the current year)
                  let yearsRemaining = 1;
-                 const y1 = p1Alive ? plan.person1.lifeExpectancy - currentAge1 : 0;
-                 const y2 = p2Alive ? plan.person2.lifeExpectancy - currentAge2 : 0;
+                 const y1 = p1Alive ? (plan.person1.lifeExpectancy - currentAge1 + 1) : 0;
+                 const y2 = p2Alive ? (plan.person2.lifeExpectancy - currentAge2 + 1) : 0;
                  yearsRemaining = Math.max(1, y1, y2);
 
                  // Calculate minimum withdrawal needed to cover expenses
