@@ -204,24 +204,45 @@ export const runSimulation = (plan: RetirementPlan, volatility?: number): Calcul
                  const finalCurrentAge = Math.max(p1Alive ? currentAge1 : -1, p2Alive ? currentAge2 : -1);
                  const yearsRemaining = Math.max(1, finalLifeExpectancy - finalCurrentAge);
 
-                 if (totalAssets > plan.legacyAmount && yearsRemaining > 0) {
-                     const rate = currentYearReturn; 
-                     // Present value of the legacy amount
-                     const pvLegacy = plan.legacyAmount / Math.pow(1 + rate, yearsRemaining);
-                     const spendableAssets = totalAssets - pvLegacy;
-                     
-                     if (rate !== 0) {
-                         // Annuity Due Formula: C = P * r / (1 - (1+r)^-n) / (1+r)
-                         // This calculates the payment (C) from a present value (P)
-                         const pmt = spendableAssets * (rate / (1 - Math.pow(1 + rate, -yearsRemaining))) / (1 + rate);
-                         plannedAnnualWithdrawal = pmt;
-                     } else {
-                         // Simplified case if rate is zero (to avoid division by zero)
-                         plannedAnnualWithdrawal = spendableAssets / yearsRemaining;
-                     }
-                 } else {
-                    plannedAnnualWithdrawal = 0;
+                 // Calculate minimum withdrawal needed to cover expenses
+                 const fixedIncome = incomeFromPensions + incomeFromSS + incomeFromOther;
+                 const taxableFixedIncome = taxableIncomeFromPensions + taxableIncomeFromOther + incomeFromSS;
+                 const taxesOnFixedIncome = calculateTaxes(taxableFixedIncome, plan.state, filingStatus);
+                 const netFixedIncome = fixedIncome - (taxesOnFixedIncome.federalTax + taxesOnFixedIncome.stateTax);
+
+                 let minNeededForExpenses = 0;
+                 if (netFixedIncome < inflatedExpenses) {
+                     const netShortfall = inflatedExpenses - netFixedIncome;
+                     const incomeForMarginalRateCheck = taxableFixedIncome + 1000;
+                     const taxesAtHigherIncome = calculateTaxes(incomeForMarginalRateCheck, plan.state, filingStatus);
+                     const taxOnExtraAmount = (taxesAtHigherIncome.federalTax + taxesAtHigherIncome.stateTax) - (taxesOnFixedIncome.federalTax + taxesOnFixedIncome.stateTax);
+                     const marginalTaxRate = Math.max(0, Math.min(0.99, taxOnExtraAmount / 1000));
+                     minNeededForExpenses = netShortfall / (1 - marginalTaxRate);
                  }
+
+                 // Calculate "die with zero" withdrawal to deplete assets evenly
+                 let dieWithZeroWithdrawal = 0;
+                 if (totalAssets > plan.legacyAmount && yearsRemaining > 0) {
+                     // Use the plan's average return, not the current year's volatile return
+                     const rate = avgReturn; 
+                     
+                     // Present value of the legacy amount we want to leave behind
+                     const pvLegacy = plan.legacyAmount / Math.pow(1 + rate, yearsRemaining);
+                     const spendableAssets = Math.max(0, totalAssets - pvLegacy);
+                     
+                     if (rate !== 0 && spendableAssets > 0) {
+                         // PMT formula for ordinary annuity: PMT = PV * [r(1+r)^n] / [(1+r)^n - 1]
+                         const numerator = rate * Math.pow(1 + rate, yearsRemaining);
+                         const denominator = Math.pow(1 + rate, yearsRemaining) - 1;
+                         dieWithZeroWithdrawal = spendableAssets * (numerator / denominator);
+                     } else if (spendableAssets > 0) {
+                         dieWithZeroWithdrawal = spendableAssets / yearsRemaining;
+                     }
+                 }
+
+                 // Use the maximum to ensure expenses are always covered
+                 // while still depleting assets by life expectancy
+                 plannedAnnualWithdrawal = Math.max(minNeededForExpenses, dieWithZeroWithdrawal);
             } else {
                 const fixedRateWithdrawal = totalAssets * withdrawalRate;
                 const fixedIncome = incomeFromPensions + incomeFromSS + incomeFromOther;
