@@ -195,7 +195,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                 
                 const addPension = () => addToList('pensions', { id: Date.now().toString(), owner: 'person1', name: 'New Pension', monthlyBenefit: 0, startAge: Math.min(plan.person1.retirementAge, isCouple ? plan.person2.retirementAge : Infinity), cola: 0, survivorBenefit: 0, taxable: true });
                 const addOtherIncome = () => addToList('otherIncomes', { id: Date.now().toString(), owner: 'person1', name: 'New Income', monthlyAmount: 0, startAge: plan.person1.retirementAge, endAge: plan.person1.lifeExpectancy, cola: 0, taxable: true });
-                const addGift = () => addToList('gifts', { id: Date.now().toString(), beneficiary: '', isAnnual: false, amount: 0, annualAmount: 0, startAge: plan.person1.retirementAge, endAge: plan.person1.lifeExpectancy });
+                const addGift = () => addToList('gifts', { id: Date.now().toString(), beneficiary: '', owner: 'person1', isAnnual: false, amount: 0, annualAmount: 0, age: plan.person1.currentAge, startAge: plan.person1.retirementAge, endAge: plan.person1.lifeExpectancy });
 
                 return (
                     <InputSection key={section} title={section} subtitle={subtitles[section]} titleColorClass={colors[section]} gridCols={1}>
@@ -277,13 +277,20 @@ export const InputForm: React.FC<InputFormProps> = ({
                                         </div>
                                     </>}
                                         {listName === 'gifts' && <>
+                                            <SelectInput label="Owner" value={item.owner || 'person1'} onChange={e => handleDynamicListChange(listName, item.id, 'owner', e.target.value)}>
+                                                <option value="person1">{plan.person1.name}</option>
+                                                {isCouple && <option value="person2">{plan.person2.name}</option>}
+                                            </SelectInput>
                                             <TextInput label="Beneficiary" value={item.beneficiary} onChange={e => handleDynamicListChange(listName, item.id, 'beneficiary', e.target.value)} />
                                             <SelectInput label="Type" value={item.isAnnual ? 'annual' : 'one-time'} onChange={e => handleDynamicListChange(listName, item.id, 'isAnnual', e.target.value === 'annual')}>
                                                 <option value="one-time">One-time</option>
                                                 <option value="annual">Annual</option>
                                             </SelectInput>
                                             {!item.isAnnual && (
-                                                <NumberInput label="Amount" prefix="$" value={item.amount || 0} onChange={e => handleDynamicListChange(listName, item.id, 'amount', e.target.value)} />
+                                                <>
+                                                    <NumberInput label="Amount" prefix="$" value={item.amount || 0} onChange={e => handleDynamicListChange(listName, item.id, 'amount', e.target.value)} />
+                                                    <NumberInput label="Owner Age" value={item.age || plan.person1.currentAge} onChange={e => handleDynamicListChange(listName, item.id, 'age', e.target.value)} />
+                                                </>
                                             )}
                                             {item.isAnnual && (
                                                 <>

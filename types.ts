@@ -62,11 +62,13 @@ export interface OtherIncome {
 export interface Gift {
   id: string;
   beneficiary: string; // name or description of beneficiary
+  owner?: 'person1' | 'person2'; // who gives the gift (used to compute owner age)
   isAnnual?: boolean; // true = recurring annual gift, false = one-time
   amount?: number; // one-time amount
   annualAmount?: number; // annual amount when isAnnual=true
   startAge?: number; // for annual gifts
   endAge?: number;   // for annual gifts
+  age?: number; // for one-time gifts: age of the owner when the gift is given
 }
 
 export interface ExpensePeriod {

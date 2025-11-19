@@ -201,6 +201,48 @@ export const runSimulation = (plan: RetirementPlan, volatility?: number): Calcul
                 });
                 inflatedExpenses = annualExpenses * Math.pow(1 + inflation, year);
 
+                // Apply gifts scheduled for this year before computing withdrawals
+                const gifts = (plan.gifts || []);
+                let totalGiftThisYear = 0;
+                gifts.forEach(g => {
+                    if (!g) return;
+                    const ownerAge = g.owner === 'person2' ? currentAge2 : currentAge1;
+                    const ownerAlive = g.owner === 'person2' ? p2Alive : p1Alive;
+                    if (!ownerAlive) return;
+                    if (g.isAnnual) {
+                        if (typeof g.startAge !== 'number' || typeof g.endAge !== 'number') return;
+                        if (ownerAge >= g.startAge && ownerAge <= g.endAge) {
+                            totalGiftThisYear += (g.annualAmount || 0);
+                        }
+                    } else {
+                        if (typeof g.age !== 'number') return;
+                        if (ownerAge === g.age) {
+                            totalGiftThisYear += (g.amount || 0);
+                        }
+                    }
+                });
+
+                if (totalGiftThisYear > 0) {
+                    let remainingGift = totalGiftThisYear;
+                    const investmentBalance = investmentAccounts.reduce((sum, acc) => sum + acc.balance, 0);
+                    if (investmentBalance > 0) {
+                        const take = Math.min(remainingGift, investmentBalance);
+                        const rate = take / investmentBalance;
+                        investmentAccounts.forEach(acc => acc.balance *= (1 - rate));
+                        remainingGift -= take;
+                    }
+                    if (remainingGift > 0) {
+                        const retirementBalance = retirementAccounts.reduce((sum, acc) => sum + acc.balance, 0);
+                        if (retirementBalance > 0) {
+                            const take = Math.min(remainingGift, retirementBalance);
+                            const rate = take / retirementBalance;
+                            retirementAccounts.forEach(acc => acc.balance *= (1 - rate));
+                            remainingGift -= take;
+                        }
+                    }
+                    // If remainingGift still > 0, accounts are already zeroed as much as possible
+                }
+
                 const totalAssets = [...investmentAccounts, ...retirementAccounts].reduce((sum, acc) => sum + acc.balance, 0);
 
                 let plannedAnnualWithdrawal = 0;
