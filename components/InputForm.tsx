@@ -277,26 +277,42 @@ export const InputForm: React.FC<InputFormProps> = ({
                                         </div>
                                     </>}
                                         {listName === 'gifts' && <>
-                                            <SelectInput label="Owner" value={item.owner || 'person1'} onChange={e => handleDynamicListChange(listName, item.id, 'owner', e.target.value)}>
-                                                <option value="person1">{plan.person1.name}</option>
-                                                {isCouple && <option value="person2">{plan.person2.name}</option>}
-                                            </SelectInput>
-                                            <TextInput label="Beneficiary" value={item.beneficiary} onChange={e => handleDynamicListChange(listName, item.id, 'beneficiary', e.target.value)} />
-                                            <SelectInput label="Type" value={item.isAnnual ? 'annual' : 'one-time'} onChange={e => handleDynamicListChange(listName, item.id, 'isAnnual', e.target.value === 'annual')}>
-                                                <option value="one-time">One-time</option>
-                                                <option value="annual">Annual</option>
-                                            </SelectInput>
+                                            <div className="w-28">
+                                                <SelectInput label="Owner" value={item.owner || 'person1'} onChange={e => handleDynamicListChange(listName, item.id, 'owner', e.target.value)}>
+                                                    <option value="person1">{plan.person1.name}</option>
+                                                    {isCouple && <option value="person2">{plan.person2.name}</option>}
+                                                </SelectInput>
+                                            </div>
+                                            <div className="w-48">
+                                                <TextInput label="To" value={item.beneficiary} onChange={e => handleDynamicListChange(listName, item.id, 'beneficiary', e.target.value)} />
+                                            </div>
+                                            <div className="w-28">
+                                                <SelectInput label="Type" value={item.isAnnual ? 'annual' : 'one-time'} onChange={e => handleDynamicListChange(listName, item.id, 'isAnnual', e.target.value === 'annual')}>
+                                                    <option value="one-time">One-time</option>
+                                                    <option value="annual">Annual</option>
+                                                </SelectInput>
+                                            </div>
                                             {!item.isAnnual && (
                                                 <>
-                                                    <NumberInput label="Amount" prefix="$" value={item.amount || 0} onChange={e => handleDynamicListChange(listName, item.id, 'amount', e.target.value)} />
-                                                    <NumberInput label="Owner Age" value={item.age || plan.person1.currentAge} onChange={e => handleDynamicListChange(listName, item.id, 'age', e.target.value)} />
+                                                    <div className="w-32">
+                                                        <NumberInput label="Amt" prefix="$" value={item.amount || 0} onChange={e => handleDynamicListChange(listName, item.id, 'amount', e.target.value)} />
+                                                    </div>
+                                                    <div className="w-20">
+                                                        <NumberInput label="Age" value={item.age || plan.person1.currentAge} onChange={e => handleDynamicListChange(listName, item.id, 'age', e.target.value)} />
+                                                    </div>
                                                 </>
                                             )}
                                             {item.isAnnual && (
                                                 <>
-                                                    <NumberInput label="Annual Amount" prefix="$" value={item.annualAmount || 0} onChange={e => handleDynamicListChange(listName, item.id, 'annualAmount', e.target.value)} />
-                                                    <NumberInput label="Start Age" value={item.startAge || plan.person1.retirementAge} onChange={e => handleDynamicListChange(listName, item.id, 'startAge', e.target.value)} />
-                                                    <NumberInput label="End Age" value={item.endAge || plan.person1.lifeExpectancy} onChange={e => handleDynamicListChange(listName, item.id, 'endAge', e.target.value)} />
+                                                    <div className="w-32">
+                                                        <NumberInput label="Yr Amt" prefix="$" value={item.annualAmount || 0} onChange={e => handleDynamicListChange(listName, item.id, 'annualAmount', e.target.value)} />
+                                                    </div>
+                                                    <div className="w-20">
+                                                        <NumberInput label="Start" value={item.startAge || plan.person1.retirementAge} onChange={e => handleDynamicListChange(listName, item.id, 'startAge', e.target.value)} />
+                                                    </div>
+                                                    <div className="w-20">
+                                                        <NumberInput label="End" value={item.endAge || plan.person1.lifeExpectancy} onChange={e => handleDynamicListChange(listName, item.id, 'endAge', e.target.value)} />
+                                                    </div>
                                                 </>
                                             )}
                                             <div className="flex items-end">
