@@ -29,6 +29,7 @@ const formatCurrencyShort = (value: number) => {
 export const ProjectionTable: React.FC<ProjectionTableProps> = React.memo(({ data, plan }) => {
     const isCouple = plan.planType === PlanType.COUPLE;
     const { person1, person2 } = plan;
+    const hasGifts = !!(plan.gifts && plan.gifts.length > 0);
 
     const renderHeader = () => (
         <thead className="text-gray-600 sticky top-0 z-10">
@@ -38,6 +39,7 @@ export const ProjectionTable: React.FC<ProjectionTableProps> = React.memo(({ dat
                 <th className="p-2 text-sm text-right bg-gray-100">Inv Bal.</th>
                 <th className="p-2 text-sm text-right bg-gray-100">Retire Bal.</th>
                 <th className="p-2 text-sm text-right bg-gray-100">RMD</th>
+                {hasGifts && <th className="p-2 text-sm text-right bg-yellow-50">Gifts</th>}
                 <th className="p-2 text-sm text-right bg-blue-50">Gross Inc.</th>
                 <th className="p-2 text-sm text-right bg-gray-100">Expenses</th>
                 <th className="p-2 text-sm text-right bg-red-50">Fed Tax</th>
@@ -68,6 +70,7 @@ export const ProjectionTable: React.FC<ProjectionTableProps> = React.memo(({ dat
                 <td className="p-2 text-right">{formatCurrency(row.investmentBalance)}</td>
                 <td className="p-2 text-right">{formatCurrency(row.retirementBalance)}</td>
                 <td className="p-2 text-right">{formatCurrency(row.rmd / 12)}</td>
+                {hasGifts && <td className="p-2 text-right bg-yellow-50 text-yellow-800">{formatCurrency((row.gifts || 0) / 12)}</td>}
                 <td className="p-2 text-right bg-blue-50 text-blue-800">{formatCurrency(row.grossIncome / 12)}</td>
                 <td className="p-2 text-right">{formatCurrency(row.expenses / 12)}</td>
                 <td className="p-2 text-right bg-red-50 text-red-800">{formatCurrency(row.federalTax / 12)}</td>

@@ -67,6 +67,25 @@ const manualContent = [
             </>
         )
     },
+    {
+        id: 'gifts',
+        title: 'Gifts & Legacy',
+        icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12v7a2 2 0 01-2 2H6a2 2 0 01-2-2v-7"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 12V3"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h10"/></svg>,
+        content: (
+            <>
+                <p>The <strong>Gifts</strong> section lets you plan one-time or recurring annual gifts to beneficiaries. Gifts are treated as cash outflows and will reduce your account balances in the year they occur.</p>
+                <ul>
+                    <li><strong>Owner:</strong> Choose who will be making the gift (Person 1 or Person 2). The owner's age is used to schedule the gift.</li>
+                    <li><strong>Beneficiary:</strong> A short description or name for who receives the gift.</li>
+                    <li><strong>One-time gift:</strong> Enter an <em>Amount</em> and the <em>Age</em> (owner's age) when the gift will be given.</li>
+                    <li><strong>Annual gift:</strong> Enter the <em>Amount</em> and the <em>Start</em> and <em>End</em> ages (owner's ages) for the recurring payments.
+                        The planner will deduct the specified annual amount in each year the owner's age falls between Start and End, inclusive.</li>
+                    <li><strong>Impact on Legacy:</strong> Gifts reduce your assets and therefore can affect the final legacy/leave-behind amount when using "Die with Zero". The planner reserves legacy amounts first and then computes spendable assets; large gifts may reduce available spending.</li>
+                </ul>
+                <p className="mt-3 p-2 bg-indigo-50 border-l-4 border-indigo-400 rounded-r-md"><strong>Tip:</strong> Use one-time gifts for planned bequests (e.g., a child's wedding) and annual gifts for ongoing support (e.g., college tuition or annual donations). Review the Projection table to see yearly gift outflows when any gifts are present.</p>
+            </>
+        )
+    },
      {
         id: 'aiInsights',
         title: 'AI Powered Insights',

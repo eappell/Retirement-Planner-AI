@@ -120,6 +120,7 @@ export interface YearlyProjection {
   stateTax: number;
   netIncome: number;
   surplus: number;
+  gifts?: number;
   netWorth: number;
   rmd: number;
 }

@@ -110,6 +110,7 @@ export const runSimulation = (plan: RetirementPlan, volatility?: number): Calcul
             let stateTax = 0;
             let netAnnualIncome = 0;
             let totalRmd = 0;
+            let totalGiftThisYear = 0;
 
             const currentYearReturn = volatility ? randomNormal(avgReturn, stdDev) : avgReturn;
 
@@ -203,7 +204,7 @@ export const runSimulation = (plan: RetirementPlan, volatility?: number): Calcul
 
                 // Apply gifts scheduled for this year before computing withdrawals
                 const gifts = (plan.gifts || []);
-                let totalGiftThisYear = 0;
+                totalGiftThisYear = 0;
                 gifts.forEach(g => {
                     if (!g) return;
                     const ownerAge = g.owner === 'person2' ? currentAge2 : currentAge1;
@@ -387,6 +388,7 @@ export const runSimulation = (plan: RetirementPlan, volatility?: number): Calcul
                 stateTax: stateTax,
                 netIncome: netAnnualIncome,
                 surplus: netAnnualIncome - inflatedExpenses,
+                gifts: totalGiftThisYear || 0,
                 netWorth: [...investmentAccounts, ...retirementAccounts].reduce((sum, acc) => sum + acc.balance, 0),
                 rmd: totalRmd,
             });
