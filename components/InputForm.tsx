@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { RetirementPlan, Person, PlanType, RetirementAccount, InvestmentAccount, Pension, OtherIncome, ExpensePeriod } from '../types';
 import { InputSection } from './InputSection';
 import { NumberInput, SelectInput, TextInput } from './FormControls';
@@ -29,6 +29,16 @@ export const InputForm: React.FC<InputFormProps> = ({
     removeFromList
 }) => {
     const isCouple = plan.planType === PlanType.COUPLE;
+    const [focusTargetId, setFocusTargetId] = useState<string | null>(null);
+    useEffect(() => {
+        if (!focusTargetId) return;
+        const el = document.getElementById(focusTargetId) as HTMLInputElement | null;
+        if (el) {
+            el.focus();
+            el.select?.();
+        }
+        setFocusTargetId(null);
+    }, [focusTargetId]);
     const formatCurrency = (value: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
 
     const ActionIcons = ({ onAdd, onRemove, canRemove }: { onAdd: () => void; onRemove: () => void; canRemove: boolean }) => (
@@ -50,6 +60,10 @@ export const InputForm: React.FC<InputFormProps> = ({
     
     return (
         <>
+            {/* local focus target for newly-added dynamic list items */}
+            {/* when set, effect will focus the element with that id after render */}
+            
+            
             <InputSection 
                 title="Plan Information"
                 subtitle="Set the high-level assumptions for your retirement plan."
@@ -59,7 +73,12 @@ export const InputForm: React.FC<InputFormProps> = ({
                         {(Object.values(PlanType) as PlanType[]).map(type => (
                             <button
                                 key={type}
-                                onClick={() => handlePlanChange('planType', type)}
+                                onClick={() => {
+                                    handlePlanChange('planType', type);
+                                    // focus appropriate field after switching plan type
+                                    if (type === PlanType.COUPLE) setFocusTargetId('person2-name');
+                                    else setFocusTargetId('person1-name');
+                                }}
                                 className={`px-3 py-1.5 text-sm rounded-md w-full flex-1 ${plan.planType === type ? 'bg-brand-primary text-white' : 'bg-gray-200 text-gray-700'}`}
                             >
                                 {type}
@@ -76,12 +95,15 @@ export const InputForm: React.FC<InputFormProps> = ({
             </InputSection>
             
             <div className="bg-brand-surface p-3 rounded-lg shadow-sm flex items-center space-x-4">
-                <div className="flex items-center space-x-2 flex-shrink-0">
+                    <div className="flex items-center space-x-2 flex-shrink-0">
                     <input
                         type="checkbox"
                         id="dieWithZeroCheck"
                         checked={plan.dieWithZero}
-                        onChange={e => handlePlanChange('dieWithZero', e.target.checked)}
+                        onChange={e => {
+                            handlePlanChange('dieWithZero', e.target.checked);
+                            if (e.target.checked) setFocusTargetId('legacyAmountInput');
+                        }}
                         className="h-5 w-5 rounded text-brand-primary focus:ring-brand-primary"
                     />
                     <label htmlFor="dieWithZeroCheck" className="font-bold text-lg text-brand-primary cursor-pointer whitespace-nowrap">
@@ -122,7 +144,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                         Person 1
                     </h3>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-2 items-end">
-                        <TextInput label="Name" value={plan.person1.name} onChange={e => handlePersonChange('person1', 'name', e.target.value)} />
+                        <TextInput id="person1-name" label="Name" value={plan.person1.name} onChange={e => handlePersonChange('person1', 'name', e.target.value)} />
                         <NumberInput label="Current Age" value={plan.person1.currentAge} onChange={e => handlePersonChange('person1', 'currentAge', e.target.value)} />
                         <NumberInput label="Retirement Age" value={plan.person1.retirementAge} onChange={e => handlePersonChange('person1', 'retirementAge', e.target.value)} />
                         <NumberInput label="Life Expectancy" value={plan.person1.lifeExpectancy} onChange={e => handlePersonChange('person1', 'lifeExpectancy', e.target.value)} />
@@ -135,7 +157,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                             Person 2
                         </h3>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-2 items-end">
-                            <TextInput label="Name" value={plan.person2.name} onChange={e => handlePersonChange('person2', 'name', e.target.value)} />
+                            <TextInput id="person2-name" label="Name" value={plan.person2.name} onChange={e => handlePersonChange('person2', 'name', e.target.value)} />
                             <NumberInput label="Current Age" value={plan.person2.currentAge} onChange={e => handlePersonChange('person2', 'currentAge', e.target.value)} />
                             <NumberInput label="Retirement Age" value={plan.person2.retirementAge} onChange={e => handlePersonChange('person2', 'retirementAge', e.target.value)} />
                             <NumberInput label="Life Expectancy" value={plan.person2.lifeExpectancy} onChange={e => handlePersonChange('person2', 'lifeExpectancy', e.target.value)} />
@@ -193,19 +215,21 @@ export const InputForm: React.FC<InputFormProps> = ({
                     'Gifts': 'text-purple-600'
                 };
                 
-                const addPension = () => addToList('pensions', { id: Date.now().toString(), owner: 'person1', name: 'New Pension', monthlyBenefit: 0, startAge: Math.min(plan.person1.retirementAge, isCouple ? plan.person2.retirementAge : Infinity), cola: 0, survivorBenefit: 0, taxable: true });
-                const addOtherIncome = () => addToList('otherIncomes', { id: Date.now().toString(), owner: 'person1', name: 'New Income', monthlyAmount: 0, startAge: plan.person1.retirementAge, endAge: plan.person1.lifeExpectancy, cola: 0, taxable: true });
+                const addPension = () => {
+                    const id = Date.now().toString();
+                    addToList('pensions', { id, owner: 'person1', name: 'New Pension', monthlyBenefit: 0, startAge: Math.min(plan.person1.retirementAge, isCouple ? plan.person2.retirementAge : Infinity), cola: 0, survivorBenefit: 0, taxable: true });
+                    setFocusTargetId(`pensions-name-${id}`);
+                };
+                const addOtherIncome = () => {
+                    const id = Date.now().toString();
+                    addToList('otherIncomes', { id, owner: 'person1', name: 'New Income', monthlyAmount: 0, startAge: plan.person1.retirementAge, endAge: plan.person1.lifeExpectancy, cola: 0, taxable: true });
+                    setFocusTargetId(`otherIncomes-name-${id}`);
+                };
                 const addGift = () => {
                     const id = Date.now().toString();
                     addToList('gifts', { id, beneficiary: '', owner: 'person1', isAnnual: false, amount: 0, annualAmount: 0, age: plan.person1.currentAge, startAge: plan.person1.retirementAge, endAge: plan.person1.lifeExpectancy });
-                    // focus the beneficiary text input after render
-                    setTimeout(() => {
-                        const el = document.getElementById(`gift-beneficiary-${id}`) as HTMLInputElement | null;
-                        if (el) {
-                            el.focus();
-                            el.select?.();
-                        }
-                    }, 0);
+                    // request focus for the newly-created beneficiary input
+                    setFocusTargetId(`gift-beneficiary-${id}`);
                 };
 
                 return (
@@ -222,7 +246,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                                                 <option value="person1">{plan.person1.name}</option>
                                                 {isCouple && <option value="person2">{plan.person2.name}</option>}
                                             </SelectInput>
-                                            <TextInput label="Name" value={item.name} onChange={e => handleDynamicListChange(listName, item.id, 'name', e.target.value)} />
+                                            <TextInput id={`${listName}-name-${item.id}`} label="Name" value={item.name} onChange={e => handleDynamicListChange(listName, item.id, 'name', e.target.value)} />
                                         </>
                                     )}
                                     
@@ -239,14 +263,22 @@ export const InputForm: React.FC<InputFormProps> = ({
                                         <NumberInput label="Annual Contrib." prefix="$" value={item.annualContribution} onChange={e => handleDynamicListChange(listName, item.id, 'annualContribution', e.target.value)}/>
                                         <NumberInput label="Match" suffix="%" value={item.match} onChange={e => handleDynamicListChange(listName, item.id, 'match', e.target.value)}/>
                                         <div className="flex items-end">
-                                            <ActionIcons onAdd={() => addToList('retirementAccounts', { ...item, id: Date.now().toString(), balance: 0, annualContribution: 0, match: 0 })} onRemove={() => removeFromList('retirementAccounts', item.id)} canRemove={items.length > 1} />
+                                            <ActionIcons onAdd={() => {
+                                                const id = Date.now().toString();
+                                                addToList('retirementAccounts', { ...item, id, balance: 0, annualContribution: 0, match: 0 });
+                                                setFocusTargetId(`retirementAccounts-name-${id}`);
+                                            }} onRemove={() => removeFromList('retirementAccounts', item.id)} canRemove={items.length > 1} />
                                         </div>
                                     </>}
                                     {listName === 'investmentAccounts' && <>
                                         <NumberInput label="Balance" prefix="$" value={item.balance} onChange={e => handleDynamicListChange(listName, item.id, 'balance', e.target.value)}/>
                                         <NumberInput label="Annual Contrib." prefix="$" value={item.annualContribution} onChange={e => handleDynamicListChange(listName, item.id, 'annualContribution', e.target.value)}/>
                                         <div className="flex items-end">
-                                            <ActionIcons onAdd={() => addToList('investmentAccounts', { ...item, id: Date.now().toString(), balance: 0, annualContribution: 0 })} onRemove={() => removeFromList('investmentAccounts', item.id)} canRemove={items.length > 1} />
+                                            <ActionIcons onAdd={() => {
+                                                const id = Date.now().toString();
+                                                addToList('investmentAccounts', { ...item, id, balance: 0, annualContribution: 0 });
+                                                setFocusTargetId(`investmentAccounts-name-${id}`);
+                                            }} onRemove={() => removeFromList('investmentAccounts', item.id)} canRemove={items.length > 1} />
                                         </div>
                                     </>}
                                     {listName === 'pensions' && <>
@@ -346,7 +378,11 @@ export const InputForm: React.FC<InputFormProps> = ({
                                             <NumberInput label="End Age" value={item.endAge} onChange={e => handleDynamicListChange(listName, item.id, 'endAge', e.target.value)}/>
                                         </div>
                                         <div className="flex items-end">
-                                            <ActionIcons onAdd={() => addToList('expensePeriods', { ...item, id: Date.now().toString(), monthlyAmount: 0, name: `Phase ${items.length + 1}`, startAge: items.length > 0 ? items[items.length - 1].endAge + 1 : plan.person1.retirementAge, startAgeRef: items[items.length - 1]?.startAgeRef || 'person1', endAge: plan.person1.lifeExpectancy, endAgeRef: items[items.length - 1]?.endAgeRef || 'person1' })} onRemove={() => removeFromList('expensePeriods', item.id)} canRemove={items.length > 1} />
+                                            <ActionIcons onAdd={() => {
+                                                const id = Date.now().toString();
+                                                addToList('expensePeriods', { ...item, id, monthlyAmount: 0, name: `Phase ${items.length + 1}`, startAge: items.length > 0 ? items[items.length - 1].endAge + 1 : plan.person1.retirementAge, startAgeRef: items[items.length - 1]?.startAgeRef || 'person1', endAge: plan.person1.lifeExpectancy, endAgeRef: items[items.length - 1]?.endAgeRef || 'person1' });
+                                                setFocusTargetId(`expensePeriods-name-${id}`);
+                                            }} onRemove={() => removeFromList('expensePeriods', item.id)} canRemove={items.length > 1} />
                                         </div>
                                     </>}
                                 </div>
@@ -381,7 +417,11 @@ export const InputForm: React.FC<InputFormProps> = ({
                                 <NumberInput label="Percentage" suffix="%" value={ld.percentage} disabled={plan.dieWithZero} onChange={e => handleDynamicListChange('legacyDisbursements', ld.id, 'percentage', e.target.value)} />
                             </div>
                             <div className="flex items-end">
-                                <ActionIcons onAdd={() => addToList('legacyDisbursements', { ...ld, id: Date.now().toString(), beneficiary: '', beneficiaryType: 'person', percentage: 0 })} onRemove={() => removeFromList('legacyDisbursements', ld.id)} canRemove={(plan.legacyDisbursements || []).length > 0} />
+                                <ActionIcons onAdd={() => {
+                                        const id = Date.now().toString();
+                                        addToList('legacyDisbursements', { ...ld, id, beneficiary: '', beneficiaryType: 'person', percentage: 0 });
+                                        setFocusTargetId(`legacy-beneficiary-${id}`);
+                                    }} onRemove={() => removeFromList('legacyDisbursements', ld.id)} canRemove={(plan.legacyDisbursements || []).length > 0} />
                             </div>
                         </div>
                     ))}
@@ -393,13 +433,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                                 onClick={() => {
                                     const id = Date.now().toString();
                                     addToList('legacyDisbursements', { id, beneficiary: '', beneficiaryType: 'person', percentage: 0 });
-                                    setTimeout(() => {
-                                        const el = document.getElementById(`legacy-beneficiary-${id}`) as HTMLInputElement | null;
-                                        if (el) {
-                                            el.focus();
-                                            el.select?.();
-                                        }
-                                    }, 0);
+                                    setFocusTargetId(`legacy-beneficiary-${id}`);
                                 }}
                                 className={`text-sm font-semibold ${plan.dieWithZero ? 'text-gray-400' : 'text-brand-primary hover:underline'}`}
                             >
