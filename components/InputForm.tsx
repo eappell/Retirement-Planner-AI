@@ -205,7 +205,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                                     {'Retirement Accounts': 'bg-cyan-50/50 grid-cols-7', 'Investment Accounts': 'bg-teal-50/50 grid-cols-5', 'Pensions': 'bg-sky-50/50 grid-cols-8', 'Other Incomes': 'bg-lime-50/50 grid-cols-8', 'Expense Periods': 'bg-red-50/50 grid-cols-5', 'Gifts': 'bg-purple-50/50 grid-cols-6'}[section]
                                 }`}> 
                                     {/* Common fields */}
-                                    {listName !== 'expensePeriods' && (
+                                    {listName !== 'expensePeriods' && listName !== 'gifts' && (
                                         <>
                                             <SelectInput label="Owner" value={item.owner} onChange={e => handleDynamicListChange(listName, item.id, 'owner', e.target.value)} data-list={listName} data-id={item.id}>
                                                 <option value="person1">{plan.person1.name}</option>
