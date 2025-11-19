@@ -5,6 +5,8 @@
  * into the MonteCarloSimulator component.
  */
 
+// @ts-nocheck
+
 // STEP 1: Update MonteCarloSimulator component
 // Replace the existing useMonteCarloSimulation logic with:
 
