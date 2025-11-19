@@ -262,6 +262,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                             </div>
                         ))}
                     </div>
+                    )}
 
                     <hr className="my-4" />
 
