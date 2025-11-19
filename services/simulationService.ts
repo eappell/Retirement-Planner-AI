@@ -241,21 +241,30 @@ export const runSimulation = (plan: RetirementPlan, volatility?: number): Calcul
 
                  // Calculate "die with zero" withdrawal to deplete assets evenly
                  let dieWithZeroWithdrawal = 0;
-                 if (totalAssets > plan.legacyAmount && yearsRemaining > 0) {
-                     // Use the plan's average return, not the current year's volatile return
-                     const rate = avgReturn; 
+                 if (totalAssets > 0 && yearsRemaining > 0) {
+                     // Use the plan's average return for legacy PV calculation
+                     const nominalRate = avgReturn;
                      
                      // Present value of the legacy amount we want to leave behind
-                     const pvLegacy = plan.legacyAmount / Math.pow(1 + rate, yearsRemaining);
+                     // We use nominal rate here because the legacy amount is a fixed future value target
+                     const pvLegacy = plan.legacyAmount / Math.pow(1 + nominalRate, yearsRemaining);
                      const spendableAssets = Math.max(0, totalAssets - pvLegacy);
                      
-                     if (rate !== 0 && spendableAssets > 0) {
-                         // PMT formula for ordinary annuity: PMT = PV * [r(1+r)^n] / [(1+r)^n - 1]
-                         const numerator = rate * Math.pow(1 + rate, yearsRemaining);
-                         const denominator = Math.pow(1 + rate, yearsRemaining) - 1;
-                         dieWithZeroWithdrawal = spendableAssets * (numerator / denominator);
-                     } else if (spendableAssets > 0) {
-                         dieWithZeroWithdrawal = spendableAssets / yearsRemaining;
+                     if (spendableAssets > 0) {
+                         // For the withdrawal calculation, we use the REAL rate of return (nominal - inflation)
+                         // This creates a "growing annuity" structure where the initial withdrawal is lower
+                         // but allows for annual increases to match inflation.
+                         // Real Rate formula: (1 + nominal) / (1 + inflation) - 1
+                         const realRate = (1 + nominalRate) / (1 + inflation) - 1;
+                         
+                         if (Math.abs(realRate) > 0.0001) { // Avoid division by zero
+                             // PMT formula using Real Rate
+                             const numerator = realRate * Math.pow(1 + realRate, yearsRemaining);
+                             const denominator = Math.pow(1 + realRate, yearsRemaining) - 1;
+                             dieWithZeroWithdrawal = spendableAssets * (numerator / denominator);
+                         } else {
+                             dieWithZeroWithdrawal = spendableAssets / yearsRemaining;
+                         }
                      }
                  }
 
