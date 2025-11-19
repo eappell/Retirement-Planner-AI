@@ -69,19 +69,22 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ onRunS
                                 <h4 className="font-semibold text-center mb-4 text-gray-700">Range of Final Net Worth Outcomes</h4>
                                 <div className="grid grid-cols-3 gap-4 text-center">
                                     <div>
-                                        <p className="text-sm font-medium text-red-600">Pessimistic (10%)</p>
+                                        <p className="text-sm font-medium text-red-600">10th Percentile</p>
+                                        <p className="text-xs text-gray-500 mb-1">Worst Case</p>
                                         <p className="font-bold text-xl text-red-800 mt-1">{formatCurrencyShort(pessimisticValue)}</p>
                                     </div>
                                     <div>
-                                        <p className="text-sm font-medium text-gray-600">Median (50%)</p>
+                                        <p className="text-sm font-medium text-gray-600">50th Percentile</p>
+                                        <p className="text-xs text-gray-500 mb-1">Median</p>
                                         <p className="font-bold text-xl text-gray-800 mt-1">{formatCurrencyShort(medianValue)}</p>
                                     </div>
                                     <div>
-                                        <p className="text-sm font-medium text-green-600">Optimistic (90%)</p>
+                                        <p className="text-sm font-medium text-green-600">90th Percentile</p>
+                                        <p className="text-xs text-gray-500 mb-1">Best Case</p>
                                         <p className="font-bold text-xl text-green-800 mt-1">{formatCurrencyShort(optimisticValue)}</p>
                                     </div>
                                 </div>
-                                <p className="text-xs text-gray-500 text-center mt-4">Shows the 10th, 50th, and 90th percentile outcomes from all simulations.</p>
+                                <p className="text-xs text-gray-500 text-center mt-4">Distribution of final net worth across {validOutcomes.length} simulations with {volatility}% market volatility.</p>
                             </div>
                         );
                     })()}

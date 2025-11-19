@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { YearlyProjection, RetirementPlan, PlanType } from '../types';
 
 interface ProjectionTableProps {
@@ -6,9 +6,15 @@ interface ProjectionTableProps {
   plan: RetirementPlan;
 }
 
-const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
-};
+// Create formatter outside component for reuse
+const currencyFormatter = new Intl.NumberFormat('en-US', { 
+    style: 'currency', 
+    currency: 'USD', 
+    minimumFractionDigits: 0, 
+    maximumFractionDigits: 0 
+});
+
+const formatCurrency = (value: number) => currencyFormatter.format(value);
 
 const formatCurrencyShort = (value: number) => {
     if (Math.abs(value) >= 1_000_000) {
@@ -20,7 +26,7 @@ const formatCurrencyShort = (value: number) => {
     return value.toFixed(0);
 }
 
-export const ProjectionTable: React.FC<ProjectionTableProps> = ({ data, plan }) => {
+export const ProjectionTable: React.FC<ProjectionTableProps> = React.memo(({ data, plan }) => {
     const isCouple = plan.planType === PlanType.COUPLE;
     const { person1, person2 } = plan;
 
@@ -83,4 +89,4 @@ export const ProjectionTable: React.FC<ProjectionTableProps> = ({ data, plan }) 
             </table>
         </div>
     );
-};
+});

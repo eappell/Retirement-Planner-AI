@@ -1,12 +1,15 @@
 import { RetirementPlan, CalculationResult, YearlyProjection, PlanType, FilingStatus, RetirementAccount, InvestmentAccount, Person } from '../types';
 import { RMD_START_AGE, RMD_UNIFORM_LIFETIME_TABLE } from '../constants';
 import { calculateTaxes } from './taxService';
+import { cloneArray } from '../utils/deepClone';
 
 // Helper function to get a random number from a normal distribution (Box-Muller transform)
 const randomNormal = (mean: number, stdDev: number): number => {
     let u1 = 0, u2 = 0;
+    // Generate random values, ensuring they're not zero
     while (u1 === 0) u1 = Math.random();
     while (u2 === 0) u2 = Math.random();
+    // Box-Muller transform to convert uniform random to normal distribution
     const z0 = Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(2.0 * Math.PI * u2);
     return z0 * stdDev + mean;
 };
@@ -77,8 +80,8 @@ export const runSimulation = (plan: RetirementPlan, volatility?: number): Calcul
     const endAge = Math.max(plan.person1.lifeExpectancy, isCouple ? plan.person2.lifeExpectancy : 0);
     const simulationYears = endAge - startAge;
 
-    let retirementAccounts = JSON.parse(JSON.stringify(plan.retirementAccounts)) as RetirementAccount[];
-    let investmentAccounts = JSON.parse(JSON.stringify(plan.investmentAccounts)) as InvestmentAccount[];
+    let retirementAccounts = cloneArray(plan.retirementAccounts);
+    let investmentAccounts = cloneArray(plan.investmentAccounts);
     
     const yearlyProjections: YearlyProjection[] = [];
     

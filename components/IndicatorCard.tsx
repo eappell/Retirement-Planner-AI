@@ -9,7 +9,7 @@ interface IndicatorCardProps {
   colorClass: string;
 }
 
-export const IndicatorCard: React.FC<IndicatorCardProps> = ({ title, value, subValue, icon, colorClass }) => {
+export const IndicatorCard: React.FC<IndicatorCardProps> = React.memo(({ title, value, subValue, icon, colorClass }) => {
   return (
     <div className="bg-brand-surface p-4 rounded-xl shadow-md flex items-center space-x-4 transition-transform hover:scale-105">
       <div className={`p-3 rounded-full ${colorClass}`}>
@@ -22,4 +22,4 @@ export const IndicatorCard: React.FC<IndicatorCardProps> = ({ title, value, subV
       </div>
     </div>
   );
-};
+});

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { CalculationResult } from '../types';
 import { IndicatorCard } from './IndicatorCard';
 
@@ -7,8 +7,11 @@ interface ResultsPanelProps {
     isLoading: boolean;
 }
 
-export const ResultsPanel: React.FC<ResultsPanelProps> = ({ results, isLoading }) => {
-    const formatCurrency = (value: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
+export const ResultsPanel: React.FC<ResultsPanelProps> = React.memo(({ results, isLoading }) => {
+    const formatCurrency = useMemo(
+        () => (value: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value),
+        []
+    );
     
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 sticky top-[64px] z-10 bg-brand-background py-4 shadow-sm -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8">
@@ -40,4 +43,4 @@ export const ResultsPanel: React.FC<ResultsPanelProps> = ({ results, isLoading }
             />
         </div>
     );
-};
+});

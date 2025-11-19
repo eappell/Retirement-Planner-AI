@@ -1,9 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { RetirementPlan, CalculationResult, PlanType, Person, YearlyProjection, MonteCarloResult, Scenario, ScenariosState } from './types';
-import { getRetirementInsights } from './services/geminiService';
-import { estimateSocialSecurityBenefit } from './services/socialSecurityService';
-import { runSimulation } from './services/simulationService';
-import { runMonteCarloSimulation } from './services/monteCarloService';
+import { RetirementPlan, PlanType, Person, MonteCarloResult } from './types';
 import { UserManualModal } from './components/UserManualModal';
 import { ScrollToTopButton } from './components/ScrollToTopButton';
 import { PrintableReport } from './components/PrintableReport';
@@ -11,6 +7,14 @@ import { Header } from './components/Header';
 import { ResultsPanel } from './components/ResultsPanel';
 import { InputForm } from './components/InputForm';
 import { AnalysisSections } from './components/AnalysisSections';
+import { 
+    useLocalStorage, 
+    useAutoSave, 
+    useScenarioManagement, 
+    usePlanCalculation, 
+    useAIInsights,
+    useSocialSecurityCalculation 
+} from './hooks';
 
 
 const initialPlanState: RetirementPlan = {
@@ -43,55 +47,45 @@ type DynamicListKey = {
 
 
 const App: React.FC = () => {
-    const getDefaultScenario = (): Scenario => ({
-        id: `scenario-${Date.now()}`,
-        name: 'Default Plan',
-        plan: initialPlanState,
-    });
-
-    const [scenariosState, setScenariosState] = useState<ScenariosState>(() => {
-        try {
-            const savedState = localStorage.getItem('retirementPlannerScenarios');
-            if (savedState) {
-                const parsed = JSON.parse(savedState);
-                if (parsed.scenarios && parsed.activeScenarioId) {
-                    return parsed;
-                }
-            }
-        } catch (error) {
-            console.error("Error loading from local storage", error);
-        }
-        const defaultScenario = getDefaultScenario();
-        return {
-            activeScenarioId: defaultScenario.id,
-            scenarios: { [defaultScenario.id]: defaultScenario },
-        };
-    });
-
-    // --- Local Storage Persistence ---
-    useEffect(() => {
-        try {
-            localStorage.setItem('retirementPlannerScenarios', JSON.stringify(scenariosState));
-        } catch (error) {
-            console.error("Error saving to local storage:", error);
-        }
-    }, [scenariosState]);
-
-    const { activeScenarioId, scenarios } = scenariosState;
-    const activeScenario = activeScenarioId ? scenarios[activeScenarioId] : null;
-
+    // --- Custom Hooks for State Management ---
+    const { loadFromStorage, clearStorage } = useLocalStorage();
+    
+    const {
+        scenariosState,
+        activeScenario,
+        activeScenarioId,
+        scenarios,
+        updateActivePlan,
+        selectScenario,
+        createNewScenario,
+        deleteScenario,
+        copyScenario,
+        updateScenarioName,
+        resetAllScenarios,
+        uploadScenarios,
+    } = useScenarioManagement(loadFromStorage() || undefined);
+    
+    // Auto-save scenarios to localStorage
+    useAutoSave(scenariosState);
+    
     const plan = activeScenario?.plan;
-
-    const [results, setResults] = useState<CalculationResult | null>(null);
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const [isAiLoading, setIsAiLoading] = useState(false);
-    const [aiInsights, setAiInsights] = useState<string>('');
-    const [projectionData, setProjectionData] = useState<YearlyProjection[]>([]);
-    const [lastAddedInfo, setLastAddedInfo] = useState<{list: DynamicListKey, id: string} | null>(null);
-    const [isManualOpen, setIsManualOpen] = useState(false);
+    
+    // Calculation and results management
+    const { results, isLoading, error, projectionData, calculatePlan, setResults, setError } = usePlanCalculation(plan);
+    
+    // AI insights management
+    const { isAiLoading, aiInsights, getInsights, clearInsights } = useAIInsights();
+    
+    // Social Security auto-calculation
+    useSocialSecurityCalculation(plan, updateActivePlan);
+    
+    // Monte Carlo simulation state
     const [monteCarloResults, setMonteCarloResults] = useState<MonteCarloResult | null>(null);
     const [isMcLoading, setIsMcLoading] = useState(false);
+    
+    // UI state
+    const [lastAddedInfo, setLastAddedInfo] = useState<{list: DynamicListKey, id: string} | null>(null);
+    const [isManualOpen, setIsManualOpen] = useState(false);
     
     // --- Update Browser Title ---
     useEffect(() => {
@@ -113,25 +107,7 @@ const App: React.FC = () => {
         }
     }, [lastAddedInfo]);
     
-    // Helper to update the plan within the active scenario
-    const updateActivePlan = (updater: (prevPlan: RetirementPlan) => RetirementPlan) => {
-        if (!activeScenarioId) return;
-        setScenariosState(prev => {
-            const currentPlan = prev.scenarios[activeScenarioId].plan;
-            const updatedPlan = updater(currentPlan);
-            if (updatedPlan === currentPlan) return prev; // No change
-            return {
-                ...prev,
-                scenarios: {
-                    ...prev.scenarios,
-                    [activeScenarioId]: {
-                        ...prev.scenarios[activeScenarioId],
-                        plan: updatedPlan,
-                    },
-                },
-            };
-        });
-    };
+    // Note: updateActivePlan is now provided by useScenarioManagement hook
 
     // --- State Management ---
     const handlePlanChange = <T extends keyof RetirementPlan>(field: T, value: RetirementPlan[T]) => {
@@ -183,83 +159,46 @@ const App: React.FC = () => {
         updateActivePlan(prev => ({ ...prev, [listName]: (prev[listName] as { id: string }[]).filter(item => item.id !== id) }));
     };
 
-    // --- Scenario Management Handlers ---
-    const handleSelectScenario = (id: string) => {
-        setScenariosState(prev => ({ ...prev, activeScenarioId: id }));
+    // --- Scenario Management Handlers (using hooks) ---
+    const clearCalculationResults = useCallback(() => {
         setResults(null);
         setError(null);
-        setAiInsights('');
+        clearInsights();
         setMonteCarloResults(null);
-    };
+    }, [setResults, setError, clearInsights]);
 
-    const handleNewScenario = () => {
-        const newId = `scenario-${Date.now()}`;
-        const newScenario: Scenario = {
-            id: newId,
-            name: `New Scenario ${Object.keys(scenarios).length + 1}`,
-            plan: initialPlanState,
-        };
-        setScenariosState(prev => ({
-            activeScenarioId: newId,
-            scenarios: { ...prev.scenarios, [newId]: newScenario },
-        }));
-        setResults(null);
-        setError(null);
-        setAiInsights('');
-        setMonteCarloResults(null);
-    };
+    const handleSelectScenario = useCallback((id: string) => {
+        selectScenario(id);
+        clearCalculationResults();
+    }, [selectScenario, clearCalculationResults]);
 
-    const handleDeleteScenario = () => {
+    const handleNewScenario = useCallback(() => {
+        createNewScenario();
+        clearCalculationResults();
+    }, [createNewScenario, clearCalculationResults]);
+
+    const handleDeleteScenario = useCallback(() => {
         if (!activeScenarioId || !activeScenario || Object.keys(scenarios).length <= 1) {
             alert("You cannot delete the last scenario.");
             return;
         }
 
         if (window.confirm(`Are you sure you want to delete the "${activeScenario.name}" scenario?`)) {
-            setScenariosState(prev => {
-                const newScenarios = { ...prev.scenarios };
-                delete newScenarios[activeScenarioId];
-                const newActiveId = Object.keys(newScenarios)[0] || null;
-                return { scenarios: newScenarios, activeScenarioId: newActiveId };
-            });
-            setResults(null);
-            setError(null);
-            setAiInsights('');
-            setMonteCarloResults(null);
+            const success = deleteScenario();
+            if (success) {
+                clearCalculationResults();
+            }
         }
-    };
+    }, [activeScenarioId, activeScenario, scenarios, deleteScenario, clearCalculationResults]);
     
-    const handleCopyScenario = () => {
-        if (!activeScenarioId || !activeScenario) return;
-
-        const newId = `scenario-${Date.now()}`;
-        const newScenario: Scenario = {
-            id: newId,
-            name: `${activeScenario.name} Copy`,
-            plan: JSON.parse(JSON.stringify(activeScenario.plan)),
-        };
-
-        setScenariosState(prev => ({
-            activeScenarioId: newId,
-            scenarios: { ...prev.scenarios, [newId]: newScenario },
-        }));
-
-        setResults(null);
-        setError(null);
-        setAiInsights('');
-        setMonteCarloResults(null);
-    };
+    const handleCopyScenario = useCallback(() => {
+        copyScenario();
+        clearCalculationResults();
+    }, [copyScenario, clearCalculationResults]);
     
-    const handleUpdateScenarioName = (newName: string) => {
-        if (!activeScenarioId) return;
-        setScenariosState(prev => ({
-            ...prev,
-            scenarios: {
-                ...prev.scenarios,
-                [activeScenarioId]: { ...prev.scenarios[activeScenarioId], name: newName },
-            },
-        }));
-    };
+    const handleUpdateScenarioName = useCallback((newName: string) => {
+        updateScenarioName(newName);
+    }, [updateScenarioName]);
     
     // --- Backup & Restore Handlers ---
     const handleDownloadScenarios = () => {
@@ -280,7 +219,7 @@ const App: React.FC = () => {
         }
     };
 
-    const handleUploadScenarios = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleUploadScenarios = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (!file) return;
 
@@ -296,11 +235,8 @@ const App: React.FC = () => {
                 // Basic validation
                 if (uploadedState && uploadedState.scenarios && typeof uploadedState.activeScenarioId !== 'undefined') {
                      if (window.confirm('Are you sure you want to upload this file? This will overwrite all your current scenarios.')) {
-                        setScenariosState(uploadedState);
-                        setResults(null);
-                        setError(null);
-                        setAiInsights('');
-                        setMonteCarloResults(null);
+                        uploadScenarios(uploadedState);
+                        clearCalculationResults();
                         alert("Scenarios loaded successfully!");
                      }
                 } else {
@@ -316,19 +252,9 @@ const App: React.FC = () => {
             }
         };
         reader.readAsText(file);
-    };
+    }, [uploadScenarios, clearCalculationResults]);
 
-    // --- Social Security Calculation ---
-    useEffect(() => {
-        if (!plan) return;
-        const p1Benefit = estimateSocialSecurityBenefit(plan.person1.currentSalary, plan.person1.claimingAge);
-        const p2Benefit = estimateSocialSecurityBenefit(plan.person2.currentSalary, plan.person2.claimingAge);
-        updateActivePlan(prev => ({
-            ...prev,
-            socialSecurity: { person1EstimatedBenefit: p1Benefit, person2EstimatedBenefit: p2Benefit }
-        }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [plan?.person1.currentSalary, plan?.person1.claimingAge, plan?.person2.currentSalary, plan?.person2.claimingAge]);
+    // Note: Social Security calculation is now handled by useSocialSecurityCalculation hook
 
     // --- Expense Age Sync ---
     useEffect(() => {
@@ -365,71 +291,46 @@ const App: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [plan?.person1.retirementAge, plan?.person2.retirementAge, plan?.planType]);
 
-    // --- Main Calculation Trigger ---
-    const calculatePlan = useCallback(() => {
-        if (!plan) return;
-        setIsLoading(true);
-        setError(null);
-        setResults(null);
-        setProjectionData([]);
-        
-        try {
-            const simulationResults = runSimulation(plan);
-            setResults(simulationResults);
-            setProjectionData(simulationResults.yearlyProjections);
-        } catch (err: any) {
-            console.error("Calculation failed:", err);
-            setError(err.message || "An unknown error occurred during calculation.");
-        } finally {
-            setIsLoading(false);
-        }
-    }, [plan]);
-
+    // --- Calculation and Analysis Handlers (using hooks) ---
+    // Note: calculatePlan is now provided by usePlanCalculation hook
+    
     const handleGetInsights = useCallback(async () => {
         if (!results || !plan) return;
-        setIsAiLoading(true);
-        setAiInsights('');
-        const insights = await getRetirementInsights(plan, results);
-        setAiInsights(insights);
-        setIsAiLoading(false);
-    }, [plan, results]);
+        await getInsights(plan, results);
+    }, [plan, results, getInsights]);
 
-     const handleRunSimulation = useCallback((numSimulations: number, volatility: number) => {
+    // Monte Carlo simulation handler (will be updated to use Web Worker in future)
+    const handleRunSimulation = useCallback((numSimulations: number, volatility: number) => {
         if (!plan) return;
         setIsMcLoading(true);
         setMonteCarloResults(null);
-        // Use a Promise to allow UI to update before blocking
-        setTimeout(() => {
-            const mcResults = runMonteCarloSimulation(plan, numSimulations, volatility);
-            setMonteCarloResults(mcResults);
-            setIsMcLoading(false);
-        }, 50);
+        // Import the service dynamically to avoid circular dependencies
+        import('./services/monteCarloService').then(({ runMonteCarloSimulation }) => {
+            setTimeout(() => {
+                const mcResults = runMonteCarloSimulation(plan, numSimulations, volatility);
+                setMonteCarloResults(mcResults);
+                setIsMcLoading(false);
+            }, 50);
+        });
     }, [plan]);
 
-    const handlePrint = () => window.print();
+    const handlePrint = useCallback(() => window.print(), []);
     
-    const handleResetPlan = () => {
+    const handleResetPlan = useCallback(() => {
         if (window.confirm('Are you sure you want to reset all your data? This will delete ALL saved scenarios and cannot be undone.')) {
-            localStorage.removeItem('retirementPlannerScenarios');
-            const defaultScenario = getDefaultScenario();
-            setScenariosState({
-                activeScenarioId: defaultScenario.id,
-                scenarios: { [defaultScenario.id]: defaultScenario },
-            });
-            setResults(null);
-            setError(null);
-            setAiInsights('');
-            setMonteCarloResults(null);
+            clearStorage();
+            resetAllScenarios();
+            clearCalculationResults();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-    };
+    }, [clearStorage, resetAllScenarios, clearCalculationResults]);
 
-    // --- Real-time Calculation ---
+    // --- Real-time Calculation with Debounce ---
     useEffect(() => {
         if (!plan) return;
         const handler = setTimeout(() => {
             calculatePlan();
-        }, 1000); // Debounce requests
+        }, 1500); // Debounce requests - increased from 1000ms for better performance
         return () => clearTimeout(handler);
     }, [plan, calculatePlan]);
 

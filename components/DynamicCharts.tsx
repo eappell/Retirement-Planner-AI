@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { YearlyProjection, RetirementPlan, Person } from '../types';
+import { cloneArray } from '../utils/deepClone';
 
 interface DynamicChartsProps {
   projectionData: YearlyProjection[];
@@ -31,8 +32,8 @@ const generateScenarioData = (plan: RetirementPlan): ScenarioData[] => {
     const simulationYears = endAge - startAge;
 
     scenarios.forEach((adjustment, index) => {
-        let retirementAccounts = JSON.parse(JSON.stringify(plan.retirementAccounts));
-        let investmentAccounts = JSON.parse(JSON.stringify(plan.investmentAccounts));
+        let retirementAccounts = cloneArray(plan.retirementAccounts);
+        let investmentAccounts = cloneArray(plan.investmentAccounts);
         
         for (let year = 0; year <= simulationYears; year++) {
             const currentAge1 = plan.person1.currentAge + year;
