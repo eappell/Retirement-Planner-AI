@@ -4,7 +4,7 @@ import { InputSection } from './InputSection';
 import { NumberInput, SelectInput, TextInput } from './FormControls';
 import { STATES } from '../constants';
 
-type DynamicListKey = 'retirementAccounts' | 'investmentAccounts' | 'pensions' | 'otherIncomes' | 'expensePeriods';
+type DynamicListKey = 'retirementAccounts' | 'investmentAccounts' | 'pensions' | 'otherIncomes' | 'expensePeriods' | 'gifts';
 
 interface InputFormProps {
     plan: RetirementPlan;
@@ -173,34 +173,37 @@ export const InputForm: React.FC<InputFormProps> = ({
             </InputSection>
 
 
-            {['Retirement Accounts', 'Investment Accounts', 'Pensions', 'Other Incomes', 'Expense Periods'].map(section => {
+            {['Retirement Accounts', 'Investment Accounts', 'Pensions', 'Other Incomes', 'Expense Periods', 'Gifts'].map(section => {
                 const listName = section.replace(' ', '').charAt(0).toLowerCase() + section.replace(' ', '').slice(1) as DynamicListKey;
-                const items = plan[listName] as any[];
+                const items = (plan[listName] as any[]) || [];
                 const subtitles: { [key: string]: string } = {
                     'Retirement Accounts': 'Add 401(k)s, IRAs, and other tax-advantaged accounts.',
                     'Investment Accounts': 'Add taxable brokerage and other investment accounts.',
                     'Pensions': 'Add any defined-benefit pension plans.',
                     'Other Incomes': 'Add any other sources of income, like rental properties or part-time work.',
-                    'Expense Periods': 'Model different spending levels for different phases of retirement.'
+                    'Expense Periods': 'Model different spending levels for different phases of retirement.',
+                    'Gifts': 'Add one-time or annual gifts to beneficiaries; affects cashflow and legacy.'
                 };
                     const colors: { [key: string]: string } = {
                     'Retirement Accounts': 'text-cyan-600',
                     'Investment Accounts': 'text-teal-600',
                     'Pensions': 'text-sky-600',
                     'Other Incomes': 'text-lime-600',
-                    'Expense Periods': 'text-red-600'
+                    'Expense Periods': 'text-red-600',
+                    'Gifts': 'text-purple-600'
                 };
                 
                 const addPension = () => addToList('pensions', { id: Date.now().toString(), owner: 'person1', name: 'New Pension', monthlyBenefit: 0, startAge: Math.min(plan.person1.retirementAge, isCouple ? plan.person2.retirementAge : Infinity), cola: 0, survivorBenefit: 0, taxable: true });
                 const addOtherIncome = () => addToList('otherIncomes', { id: Date.now().toString(), owner: 'person1', name: 'New Income', monthlyAmount: 0, startAge: plan.person1.retirementAge, endAge: plan.person1.lifeExpectancy, cola: 0, taxable: true });
+                const addGift = () => addToList('gifts', { id: Date.now().toString(), beneficiary: '', isAnnual: false, amount: 0, annualAmount: 0, startAge: plan.person1.retirementAge, endAge: plan.person1.lifeExpectancy });
 
                 return (
                     <InputSection key={section} title={section} subtitle={subtitles[section]} titleColorClass={colors[section]} gridCols={1}>
                         <div className="col-span-full space-y-2">
                             {items.map((item) => (
                                 <div key={item.id} className={`grid gap-x-4 items-end p-2 rounded-md ${
-                                    {'Retirement Accounts': 'bg-cyan-50/50 grid-cols-7', 'Investment Accounts': 'bg-teal-50/50 grid-cols-5', 'Pensions': 'bg-sky-50/50 grid-cols-8', 'Other Incomes': 'bg-lime-50/50 grid-cols-8', 'Expense Periods': 'bg-red-50/50 grid-cols-5'}[section]
-                                }`}>
+                                    {'Retirement Accounts': 'bg-cyan-50/50 grid-cols-7', 'Investment Accounts': 'bg-teal-50/50 grid-cols-5', 'Pensions': 'bg-sky-50/50 grid-cols-8', 'Other Incomes': 'bg-lime-50/50 grid-cols-8', 'Expense Periods': 'bg-red-50/50 grid-cols-5', 'Gifts': 'bg-purple-50/50 grid-cols-6'}[section]
+                                }`}> 
                                     {/* Common fields */}
                                     {listName !== 'expensePeriods' && (
                                         <>
@@ -273,6 +276,26 @@ export const InputForm: React.FC<InputFormProps> = ({
                                             <ActionIcons onAdd={addOtherIncome} onRemove={() => removeFromList('otherIncomes', item.id)} canRemove={items.length > 0} />
                                         </div>
                                     </>}
+                                        {listName === 'gifts' && <>
+                                            <TextInput label="Beneficiary" value={item.beneficiary} onChange={e => handleDynamicListChange(listName, item.id, 'beneficiary', e.target.value)} />
+                                            <SelectInput label="Type" value={item.isAnnual ? 'annual' : 'one-time'} onChange={e => handleDynamicListChange(listName, item.id, 'isAnnual', e.target.value === 'annual')}>
+                                                <option value="one-time">One-time</option>
+                                                <option value="annual">Annual</option>
+                                            </SelectInput>
+                                            {!item.isAnnual && (
+                                                <NumberInput label="Amount" prefix="$" value={item.amount || 0} onChange={e => handleDynamicListChange(listName, item.id, 'amount', e.target.value)} />
+                                            )}
+                                            {item.isAnnual && (
+                                                <>
+                                                    <NumberInput label="Annual Amount" prefix="$" value={item.annualAmount || 0} onChange={e => handleDynamicListChange(listName, item.id, 'annualAmount', e.target.value)} />
+                                                    <NumberInput label="Start Age" value={item.startAge || plan.person1.retirementAge} onChange={e => handleDynamicListChange(listName, item.id, 'startAge', e.target.value)} />
+                                                    <NumberInput label="End Age" value={item.endAge || plan.person1.lifeExpectancy} onChange={e => handleDynamicListChange(listName, item.id, 'endAge', e.target.value)} />
+                                                </>
+                                            )}
+                                            <div className="flex items-end">
+                                                <ActionIcons onAdd={addGift} onRemove={() => removeFromList('gifts', item.id)} canRemove={items.length > 0} />
+                                            </div>
+                                        </>}
                                     {listName === 'expensePeriods' && <>
                                             <TextInput label="Name" value={item.name} onChange={e => handleDynamicListChange(listName, item.id, 'name', e.target.value)} data-list={listName} data-id={item.id} />
                                             <NumberInput label="Total Monthly Expenses" prefix="$" value={item.monthlyAmount} onChange={e => handleDynamicListChange(listName, item.id, 'monthlyAmount', e.target.value)}/>
@@ -290,9 +313,9 @@ export const InputForm: React.FC<InputFormProps> = ({
                                     </>}
                                 </div>
                             ))}
-                            {(listName === 'pensions' || listName === 'otherIncomes') && items.length === 0 && (
+                            {(listName === 'pensions' || listName === 'otherIncomes' || listName === 'gifts') && items.length === 0 && (
                                 <div className="text-center py-2">
-                                    <button onClick={listName === 'pensions' ? addPension : addOtherIncome} className="text-sm text-brand-primary font-semibold hover:underline">
+                                    <button onClick={listName === 'pensions' ? addPension : listName === 'otherIncomes' ? addOtherIncome : addGift} className="text-sm text-brand-primary font-semibold hover:underline">
                                         + Add {section.slice(0, -1)}
                                     </button>
                                 </div>

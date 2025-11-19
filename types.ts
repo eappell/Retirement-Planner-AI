@@ -59,6 +59,16 @@ export interface OtherIncome {
     taxable: boolean;
 }
 
+export interface Gift {
+  id: string;
+  beneficiary: string; // name or description of beneficiary
+  isAnnual?: boolean; // true = recurring annual gift, false = one-time
+  amount?: number; // one-time amount
+  annualAmount?: number; // annual amount when isAnnual=true
+  startAge?: number; // for annual gifts
+  endAge?: number;   // for annual gifts
+}
+
 export interface ExpensePeriod {
     id: string;
     name: string;
@@ -78,6 +88,7 @@ export interface RetirementPlan {
   investmentAccounts: InvestmentAccount[];
   pensions: Pension[];
   otherIncomes: OtherIncome[];
+  gifts?: Gift[];
   expensePeriods: ExpensePeriod[];
   socialSecurity: {
       person1EstimatedBenefit: number;
