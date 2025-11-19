@@ -295,7 +295,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                                             {!item.isAnnual && (
                                                 <>
                                                     <div className="w-full">
-                                                        <NumberInput label="Amt" prefix="$" value={item.amount || 0} onChange={e => handleDynamicListChange(listName, item.id, 'amount', e.target.value)} />
+                                                        <NumberInput label="Amount" prefix="$" value={item.amount || 0} onChange={e => handleDynamicListChange(listName, item.id, 'amount', e.target.value)} />
                                                     </div>
                                                     <div className="w-20">
                                                         <NumberInput label="Age" value={item.age || plan.person1.currentAge} onChange={e => handleDynamicListChange(listName, item.id, 'age', e.target.value)} />

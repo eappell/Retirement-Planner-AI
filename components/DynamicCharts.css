@@ -1,0 +1,22 @@
+.tooltip-popup {
+  position: absolute;
+  padding: 0.5rem;
+  font-size: 0.75rem;
+  background: white;
+  border-radius: 0.375rem;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  pointer-events: none;
+  border: 1px solid #e5e7eb;
+  min-width: 150px;
+  z-index: 40;
+}
+
+/* small legend dot for gifts */
+.legend-gift {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+  background-color: #f59e0b; /* amber-500 */
+  display: inline-block;
+  margin-right: 0.375rem;
+}

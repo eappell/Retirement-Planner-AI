@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { YearlyProjection, RetirementPlan, Person } from '../types';
 import { cloneArray } from '../utils/deepClone';
+import './DynamicCharts.css';
 
 interface DynamicChartsProps {
   projectionData: YearlyProjection[];
@@ -87,7 +88,7 @@ const generateScenarioData = (plan: RetirementPlan): ScenarioData[] => {
 
 // --- The Components ---
 
-const NetWorthScenarioChart: React.FC<{ scenarioData: ScenarioData[] }> = ({ scenarioData }) => {
+const NetWorthScenarioChart: React.FC<{ scenarioData: ScenarioData[]; giftsByYear?: Record<number, number> }> = ({ scenarioData, giftsByYear }) => {
     const [tooltip, setTooltip] = useState<{ x: number; y: number; data: ScenarioData } | null>(null);
 
     if (scenarioData.length < 2) return null;
@@ -186,11 +187,14 @@ const NetWorthScenarioChart: React.FC<{ scenarioData: ScenarioData[] }> = ({ sce
                     )}
                 </svg>
                  {tooltip && (
-                    <div className="absolute p-2 text-xs bg-white rounded-md shadow-lg pointer-events-none border" style={{ left: `${tooltip.x + 10}px`, top: `${tooltip.y - 40}px`, minWidth: '150px' }}>
+                    <div className="tooltip-popup" style={{ left: `${tooltip.x + 10}px`, top: `${tooltip.y - 40}px` }}>
                         <p className="font-bold mb-1">{tooltip.data.year}</p>
                         <p className="flex items-center"><span className="inline-block w-2 h-2 rounded-full bg-green-500 mr-2"></span>Optimistic: {formatCurrencyShort(tooltip.data.optimistic)}</p>
                         <p className="flex items-center"><span className="inline-block w-2 h-2 rounded-full bg-indigo-500 mr-2"></span>Average: {formatCurrencyShort(tooltip.data.average)}</p>
                         <p className="flex items-center"><span className="inline-block w-2 h-2 rounded-full bg-red-400 mr-2"></span>Pessimistic: {formatCurrencyShort(tooltip.data.pessimistic)}</p>
+                        {giftsByYear && (giftsByYear[tooltip.data.year] || 0) > 0 && (
+                            <p className="flex items-center"><span className="inline-block w-2 h-2 rounded-full bg-amber-400 mr-2"></span>Gifts: {formatCurrencyShort(giftsByYear[tooltip.data.year] || 0)}</p>
+                        )}
                     </div>
                 )}
             </div>
@@ -214,7 +218,7 @@ const IncomeBreakdownChart: React.FC<{ projectionData: YearlyProjection[] }> = (
         { label: 'Social Security', value: firstRetirementYearData.socialSecurityIncome || 0, color: 'bg-blue-500' },
         { label: 'Pensions', value: firstRetirementYearData.pensionIncome || 0, color: 'bg-sky-500' },
         { label: 'Other Income', value: firstRetirementYearData.otherIncome || 0, color: 'bg-teal-500' },
-        { label: 'Gifts', value: firstRetirementYearData.gifts || 0, color: 'bg-yellow-400' },
+        { label: 'Gifts', value: firstRetirementYearData.gifts || 0, color: 'bg-amber-400' },
     ].filter(s => s.value > 0);
 
     const totalIncome = incomeSources.reduce((sum, s) => sum + s.value, 0);
@@ -249,6 +253,12 @@ const IncomeBreakdownChart: React.FC<{ projectionData: YearlyProjection[] }> = (
 // --- Main Component ---
 export const DynamicCharts: React.FC<DynamicChartsProps> = ({ projectionData, plan }) => {
     const scenarioData = useMemo(() => generateScenarioData(plan), [plan]);
+    const giftsByYear = useMemo(() => {
+        return projectionData.reduce((map: Record<number, number>, p) => {
+            if (p.year !== undefined) map[p.year] = (map[p.year] || 0) + (p.gifts || 0);
+            return map;
+        }, {} as Record<number, number>);
+    }, [projectionData]);
     
     const retirementProjections = projectionData.filter(p => {
         if (plan.planType === 'Couple') {
@@ -259,7 +269,7 @@ export const DynamicCharts: React.FC<DynamicChartsProps> = ({ projectionData, pl
 
     return (
         <div className="space-y-8">
-            <NetWorthScenarioChart scenarioData={scenarioData} />
+            <NetWorthScenarioChart scenarioData={scenarioData} giftsByYear={giftsByYear} />
             <IncomeBreakdownChart projectionData={retirementProjections} />
         </div>
     );
