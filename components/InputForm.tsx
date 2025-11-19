@@ -45,28 +45,6 @@ export const InputForm: React.FC<InputFormProps> = ({
         setFocusTargetId(null);
     }, [focusTargetId]);
     const formatCurrency = (value: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
-    // Tab state for grouped sections
-    const [accountsTab, setAccountsTab] = useState<'retirement' | 'investment'>('retirement');
-    const [incomeTab, setIncomeTab] = useState<'pensions' | 'other' | 'gifts'>('pensions');
-
-    // keyboard handlers for tab groups (Left/Right/Home/End)
-    const handleAccountsKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
-        const tabs: Array<'retirement' | 'investment'> = ['retirement', 'investment'];
-        const idx = tabs.indexOf(accountsTab);
-        if (e.key === 'ArrowRight') setAccountsTab(tabs[(idx + 1) % tabs.length]);
-        if (e.key === 'ArrowLeft') setAccountsTab(tabs[(idx - 1 + tabs.length) % tabs.length]);
-        if (e.key === 'Home') setAccountsTab(tabs[0]);
-        if (e.key === 'End') setAccountsTab(tabs[tabs.length - 1]);
-    };
-
-    const handleIncomeKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
-        const tabs: Array<'pensions' | 'other' | 'gifts'> = ['pensions', 'other', 'gifts'];
-        const idx = tabs.indexOf(incomeTab as any);
-        if (e.key === 'ArrowRight') setIncomeTab(tabs[(idx + 1) % tabs.length]);
-        if (e.key === 'ArrowLeft') setIncomeTab(tabs[(idx - 1 + tabs.length) % tabs.length]);
-        if (e.key === 'Home') setIncomeTab(tabs[0]);
-        if (e.key === 'End') setIncomeTab(tabs[tabs.length - 1]);
-    };
 
     const ActionIcons = ({ onAdd, onRemove, canRemove }: { onAdd: () => void; onRemove: () => void; canRemove: boolean }) => (
         <div className="flex items-center space-x-1 pl-2">
@@ -222,254 +200,209 @@ export const InputForm: React.FC<InputFormProps> = ({
             </InputSection>
 
 
-            {/* Grouped Tabs: Accounts */}
-            <InputSection title="Accounts" subtitle="Manage your retirement and investment accounts in one place." titleColorClass="text-cyan-600">
-                <div className="col-span-full">
-                    <div className="mb-3">
-                        <div className="inline-flex rounded-md bg-gray-100 p-1">
-                            <button type="button" className={`px-3 py-1 text-sm rounded ${accountsTab === 'retirement' ? 'bg-white shadow-sm' : 'bg-transparent'} focus:outline-none focus:ring-2 focus:ring-brand-primary`} onClick={() => setAccountsTab('retirement')} onKeyDown={handleAccountsKeyDown} aria-pressed={accountsTab === 'retirement'} role="tab" tabIndex={0}>Retirement</button>
-                            <button type="button" className={`px-3 py-1 text-sm rounded ml-1 ${accountsTab === 'investment' ? 'bg-white shadow-sm' : 'bg-transparent'} focus:outline-none focus:ring-2 focus:ring-brand-primary`} onClick={() => setAccountsTab('investment')} onKeyDown={handleAccountsKeyDown} aria-pressed={accountsTab === 'investment'} role="tab" tabIndex={0}>Investment</button>
-                        </div>
-                    </div>
+            {['Retirement Accounts', 'Investment Accounts', 'Pensions', 'Other Incomes', 'Expense Periods', 'Gifts'].map(section => {
+                const listName = section.replace(' ', '').charAt(0).toLowerCase() + section.replace(' ', '').slice(1) as DynamicListKey;
+                const items = (plan[listName] as any[]) || [];
+                const subtitles: { [key: string]: string } = {
+                    'Retirement Accounts': 'Add 401(k)s, IRAs, and other tax-advantaged accounts.',
+                    'Investment Accounts': 'Add taxable brokerage and other investment accounts.',
+                    'Pensions': 'Add any defined-benefit pension plans.',
+                    'Other Incomes': 'Add any other sources of income, like rental properties or part-time work.',
+                    'Expense Periods': 'Model different spending levels for different phases of retirement.',
+                    'Gifts': 'Add one-time or annual gifts to beneficiaries; affects cashflow and legacy.'
+                };
+                    const colors: { [key: string]: string } = {
+                    'Retirement Accounts': 'text-cyan-600',
+                    'Investment Accounts': 'text-teal-600',
+                    'Pensions': 'text-sky-600',
+                    'Other Incomes': 'text-lime-600',
+                    'Expense Periods': 'text-red-600',
+                    'Gifts': 'text-purple-600'
+                };
+                
+                const addPension = () => {
+                    const id = Date.now().toString();
+                    addToList('pensions', { id, owner: 'person1', name: 'New Pension', monthlyBenefit: 0, startAge: Math.min(plan.person1.retirementAge, isCouple ? plan.person2.retirementAge : Infinity), cola: 0, survivorBenefit: 0, taxable: true });
+                    setFocusTargetId(`pensions-name-${id}`);
+                };
+                const addOtherIncome = () => {
+                    const id = Date.now().toString();
+                    addToList('otherIncomes', { id, owner: 'person1', name: 'New Income', monthlyAmount: 0, startAge: plan.person1.retirementAge, endAge: plan.person1.lifeExpectancy, cola: 0, taxable: true });
+                    setFocusTargetId(`otherIncomes-name-${id}`);
+                };
+                const addGift = () => {
+                    const id = Date.now().toString();
+                    addToList('gifts', { id, beneficiary: '', owner: 'person1', isAnnual: false, amount: 0, annualAmount: 0, age: plan.person1.currentAge, startAge: plan.person1.retirementAge, endAge: plan.person1.lifeExpectancy });
+                    // request focus for the newly-created beneficiary input
+                    setFocusTargetId(`gift-beneficiary-${id}`);
+                };
 
-                    {/* Retirement Accounts List */}
-                    {accountsTab === 'retirement' && (
-                        <div className="space-y-2">
-                            {(plan.retirementAccounts || []).map((item: RetirementAccount) => (
-                            <div key={item.id} className="grid gap-x-4 items-end p-2 rounded-md bg-cyan-50/50 grid-cols-7">
-                                <SelectInput label="Owner" value={item.owner} onChange={e => handleDynamicListChange('retirementAccounts', item.id, 'owner', e.target.value)}>
-                                    <option value="person1">{plan.person1.name}</option>
-                                    {isCouple && <option value="person2">{plan.person2.name}</option>}
-                                </SelectInput>
-                                <TextInput id={`retirementAccounts-name-${item.id}`} label="Name" value={item.name} onChange={e => handleDynamicListChange('retirementAccounts', item.id, 'name', e.target.value)} />
-                                <SelectInput label="Type" value={item.type} onChange={e => handleDynamicListChange('retirementAccounts', item.id, 'type', e.target.value)}>
-                                    <option>401k</option>
-                                    <option>457b</option>
-                                    <option>IRA</option>
-                                    <option>Roth IRA</option>
-                                    <option>Other</option>
-                                </SelectInput>
-                                <NumberInput label="Balance" prefix="$" value={item.balance} onChange={e => handleDynamicListChange('retirementAccounts', item.id, 'balance', e.target.value)}/>
-                                <NumberInput label="Annual Contrib." prefix="$" value={item.annualContribution} onChange={e => handleDynamicListChange('retirementAccounts', item.id, 'annualContribution', e.target.value)}/>
-                                <NumberInput label="Match" suffix="%" value={item.match} onChange={e => handleDynamicListChange('retirementAccounts', item.id, 'match', e.target.value)}/>
-                                <div className="flex items-end">
-                                    <ActionIcons onAdd={() => {
-                                        const id = Date.now().toString();
-                                        addToList('retirementAccounts', { ...item, id, balance: 0, annualContribution: 0, match: 0 });
-                                        setFocusTargetId(`retirementAccounts-name-${id}`);
-                                    }} onRemove={() => removeFromList('retirementAccounts', item.id)} canRemove={(plan.retirementAccounts || []).length > 1} />
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                    )}
-
-                    <hr className="my-4" />
-
-                    {/* Investment Accounts List */}
-                    {accountsTab === 'investment' && (
-                        <div className="space-y-2">
-                            {(plan.investmentAccounts || []).map((item: InvestmentAccount) => (
-                            <div key={item.id} className="grid gap-x-4 items-end p-2 rounded-md bg-teal-50/50 grid-cols-5">
-                                <SelectInput label="Owner" value={item.owner} onChange={e => handleDynamicListChange('investmentAccounts', item.id, 'owner', e.target.value)}>
-                                    <option value="person1">{plan.person1.name}</option>
-                                    {isCouple && <option value="person2">{plan.person2.name}</option>}
-                                </SelectInput>
-                                <TextInput id={`investmentAccounts-name-${item.id}`} label="Name" value={item.name} onChange={e => handleDynamicListChange('investmentAccounts', item.id, 'name', e.target.value)} />
-                                <NumberInput label="Balance" prefix="$" value={item.balance} onChange={e => handleDynamicListChange('investmentAccounts', item.id, 'balance', e.target.value)}/>
-                                <NumberInput label="Annual Contrib." prefix="$" value={item.annualContribution} onChange={e => handleDynamicListChange('investmentAccounts', item.id, 'annualContribution', e.target.value)}/>
-                                <div className="flex items-end">
-                                    <ActionIcons onAdd={() => {
-                                        const id = Date.now().toString();
-                                        addToList('investmentAccounts', { ...item, id, balance: 0, annualContribution: 0 });
-                                        setFocusTargetId(`investmentAccounts-name-${id}`);
-                                    }} onRemove={() => removeFromList('investmentAccounts', item.id)} canRemove={(plan.investmentAccounts || []).length > 1} />
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </InputSection>
-
-            {/* Grouped Tabs: Income */}
-            <InputSection title="Income" subtitle="Pensions and other income sources." titleColorClass="text-sky-600">
-                <div className="col-span-full">
-                    <div className="mb-3">
-                        <div className="inline-flex rounded-md bg-gray-100 p-1">
-                            <button type="button" className={`px-3 py-1 text-sm rounded ${incomeTab === 'pensions' ? 'bg-white shadow-sm' : 'bg-transparent'} focus:outline-none focus:ring-2 focus:ring-brand-primary`} onClick={() => setIncomeTab('pensions')} onKeyDown={handleIncomeKeyDown} aria-pressed={incomeTab === 'pensions'} role="tab" tabIndex={0}>Pensions</button>
-                            <button type="button" className={`px-3 py-1 text-sm rounded ml-1 ${incomeTab === 'other' ? 'bg-white shadow-sm' : 'bg-transparent'} focus:outline-none focus:ring-2 focus:ring-brand-primary`} onClick={() => setIncomeTab('other')} onKeyDown={handleIncomeKeyDown} aria-pressed={incomeTab === 'other'} role="tab" tabIndex={0}>Other</button>
-                            <button type="button" className={`px-3 py-1 text-sm rounded ml-1 ${incomeTab === 'gifts' ? 'bg-white shadow-sm' : 'bg-transparent'} focus:outline-none focus:ring-2 focus:ring-brand-primary`} onClick={() => setIncomeTab('gifts')} onKeyDown={handleIncomeKeyDown} aria-pressed={incomeTab === 'gifts'} role="tab" tabIndex={0}>Gifts & Expenses</button>
-                        </div>
-                    </div>
-
-                    {/* Pensions */}
-                    {incomeTab === 'pensions' && (
-                        <div className="space-y-2">
-                            {(plan.pensions || []).map((item: Pension) => (
-                            <div key={item.id} className="grid gap-x-4 items-end p-2 rounded-md bg-sky-50/50 grid-cols-8">
-                                <SelectInput label="Owner" value={item.owner} onChange={e => handleDynamicListChange('pensions', item.id, 'owner', e.target.value)}>
-                                    <option value="person1">{plan.person1.name}</option>
-                                    {isCouple && <option value="person2">{plan.person2.name}</option>}
-                                </SelectInput>
-                                <TextInput id={`pensions-name-${item.id}`} label="Name" value={item.name} onChange={e => handleDynamicListChange('pensions', item.id, 'name', e.target.value)} />
-                                <NumberInput label="Monthly Benefit" prefix="$" value={item.monthlyBenefit} onChange={e => handleDynamicListChange('pensions', item.id, 'monthlyBenefit', e.target.value)}/>
-                                <NumberInput label="Start Age" value={item.startAge} onChange={e => handleDynamicListChange('pensions', item.id, 'startAge', e.target.value)}/>
-                                <NumberInput label="COLA" suffix="%" value={item.cola} onChange={e => handleDynamicListChange('pensions', item.id, 'cola', e.target.value)}/>
-                                <NumberInput label="Survivor" suffix="%" value={item.survivorBenefit} onChange={e => handleDynamicListChange('pensions', item.id, 'survivorBenefit', e.target.value)}/>
-                                <div className="flex flex-col items-center justify-end h-full pb-1">
-                                    <label htmlFor={`taxable-${item.id}`} className="mb-1 text-sm font-medium text-brand-text-secondary">Taxable</label>
-                                    <input
-                                        type="checkbox"
-                                        id={`taxable-${item.id}`}
-                                        checked={item.taxable !== false}
-                                        onChange={e => handleDynamicListChange('pensions', item.id, 'taxable', e.target.checked)}
-                                        className="h-5 w-5 rounded text-brand-primary focus:ring-brand-primary"
-                                    />
-                                </div>
-                                <div className="flex items-end">
-                                    <ActionIcons onAdd={() => {
-                                        const id = Date.now().toString();
-                                        addToList('pensions', { id, owner: 'person1', name: 'New Pension', monthlyBenefit: 0, startAge: Math.min(plan.person1.retirementAge, isCouple ? plan.person2.retirementAge : Infinity), cola: 0, survivorBenefit: 0, taxable: true });
-                                        setFocusTargetId(`pensions-name-${id}`);
-                                    }} onRemove={() => removeFromList('pensions', item.id)} canRemove={(plan.pensions || []).length > 0} />
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-
-                    <hr className="my-4" />
-
-                    {/* Other Incomes */}
-                    {incomeTab === 'other' && (
-                        <div className="space-y-2">
-                            {(plan.otherIncomes || []).map((item: OtherIncome) => (
-                            <div key={item.id} className="grid gap-x-4 items-end p-2 rounded-md bg-lime-50/50 grid-cols-8">
-                                <SelectInput label="Owner" value={item.owner} onChange={e => handleDynamicListChange('otherIncomes', item.id, 'owner', e.target.value)}>
-                                    <option value="person1">{plan.person1.name}</option>
-                                    {isCouple && <option value="person2">{plan.person2.name}</option>}
-                                </SelectInput>
-                                <TextInput id={`otherIncomes-name-${item.id}`} label="Name" value={item.name} onChange={e => handleDynamicListChange('otherIncomes', item.id, 'name', e.target.value)} />
-                                <NumberInput label="Monthly Amount" prefix="$" value={item.monthlyAmount} onChange={e => handleDynamicListChange('otherIncomes', item.id, 'monthlyAmount', e.target.value)}/>
-                                <NumberInput label="Start Age" value={item.startAge} onChange={e => handleDynamicListChange('otherIncomes', item.id, 'startAge', e.target.value)}/>
-                                <NumberInput label="End Age" value={item.endAge} onChange={e => handleDynamicListChange('otherIncomes', item.id, 'endAge', e.target.value)}/>
-                                <NumberInput label="COLA" suffix="%" value={item.cola} onChange={e => handleDynamicListChange('otherIncomes', item.id, 'cola', e.target.value)}/>
-                                <div className="flex flex-col items-center justify-end h-full pb-1">
-                                    <label htmlFor={`taxable-${item.id}`} className="mb-1 text-sm font-medium text-brand-text-secondary">Taxable</label>
-                                    <input
-                                        type="checkbox"
-                                        id={`taxable-${item.id}`}
-                                        checked={item.taxable !== false}
-                                        onChange={e => handleDynamicListChange('otherIncomes', item.id, 'taxable', e.target.checked)}
-                                        className="h-5 w-5 rounded text-brand-primary focus:ring-brand-primary"
-                                    />
-                                </div>
-                                <div className="flex items-end">
-                                    <ActionIcons onAdd={() => {
-                                        const id = Date.now().toString();
-                                        addToList('otherIncomes', { id, owner: 'person1', name: 'New Income', monthlyAmount: 0, startAge: plan.person1.retirementAge, endAge: plan.person1.lifeExpectancy, cola: 0, taxable: true });
-                                        setFocusTargetId(`otherIncomes-name-${id}`);
-                                    }} onRemove={() => removeFromList('otherIncomes', item.id)} canRemove={(plan.otherIncomes || []).length > 0} />
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                    {/* Gifts & ExpensePeriods tab content */}
-                    {incomeTab === 'gifts' && (
-                        <div className="space-y-2">
-                            {/* Gifts */}
-                            {(plan.gifts || []).map((item) => (
-                                <div key={item.id} className="grid gap-x-4 items-end p-2 rounded-md bg-purple-50/50 grid-cols-6">
-                                    <div className="w-full">
-                                        <SelectInput label="Owner" value={item.owner || 'person1'} onChange={e => handleDynamicListChange('gifts', item.id, 'owner', e.target.value)}>
-                                            <option value="person1">{plan.person1.name}</option>
-                                            {isCouple && <option value="person2">{plan.person2.name}</option>}
-                                        </SelectInput>
-                                    </div>
-                                    <div className="w-48">
-                                        <TextInput id={`gift-beneficiary-${item.id}`} ref={registerRef(`gift-beneficiary-${item.id}`)} label="Beneficiary" value={item.beneficiary} onChange={e => handleDynamicListChange('gifts', item.id, 'beneficiary', e.target.value)} />
-                                    </div>
-                                    <div className="w-full">
-                                        <SelectInput label="Type" value={item.isAnnual ? 'annual' : 'one-time'} onChange={e => handleDynamicListChange('gifts', item.id, 'isAnnual', e.target.value === 'annual')}>
-                                            <option value="one-time">One-time</option>
-                                            <option value="annual">Annual</option>
-                                        </SelectInput>
-                                    </div>
-                                    {!item.isAnnual && (
+                return (
+                    <InputSection key={section} title={section} subtitle={subtitles[section]} titleColorClass={colors[section]} gridCols={1}>
+                        <div className="col-span-full space-y-2">
+                            {items.map((item) => (
+                                <div key={item.id} className={`grid gap-x-4 items-end p-2 rounded-md ${
+                                    {'Retirement Accounts': 'bg-cyan-50/50 grid-cols-7', 'Investment Accounts': 'bg-teal-50/50 grid-cols-5', 'Pensions': 'bg-sky-50/50 grid-cols-8', 'Other Incomes': 'bg-lime-50/50 grid-cols-8', 'Expense Periods': 'bg-red-50/50 grid-cols-5', 'Gifts': 'bg-purple-50/50 grid-cols-6'}[section]
+                                }`}> 
+                                    {/* Common fields */}
+                                    {listName !== 'expensePeriods' && listName !== 'gifts' && (
                                         <>
-                                            <div className="w-full">
-                                                <NumberInput label="Amount" prefix="$" value={item.amount || 0} onChange={e => handleDynamicListChange('gifts', item.id, 'amount', e.target.value)} />
-                                            </div>
-                                            <div className="w-20">
-                                                <NumberInput label="Age" value={item.age || plan.person1.currentAge} onChange={e => handleDynamicListChange('gifts', item.id, 'age', e.target.value)} />
-                                            </div>
+                                            <SelectInput label="Owner" value={item.owner} onChange={e => handleDynamicListChange(listName, item.id, 'owner', e.target.value)} data-list={listName} data-id={item.id}>
+                                                <option value="person1">{plan.person1.name}</option>
+                                                {isCouple && <option value="person2">{plan.person2.name}</option>}
+                                            </SelectInput>
+                                            <TextInput id={`${listName}-name-${item.id}`} label="Name" value={item.name} onChange={e => handleDynamicListChange(listName, item.id, 'name', e.target.value)} />
                                         </>
                                     )}
-                                    {item.isAnnual && (
-                                        <>
+                                    
+                                    {/* Specific fields */}
+                                    {listName === 'retirementAccounts' && <>
+                                        <SelectInput label="Type" value={item.type} onChange={e => handleDynamicListChange(listName, item.id, 'type', e.target.value)}>
+                                            <option>401k</option>
+                                            <option>457b</option>
+                                            <option>IRA</option>
+                                            <option>Roth IRA</option>
+                                            <option>Other</option>
+                                        </SelectInput>
+                                        <NumberInput label="Balance" prefix="$" value={item.balance} onChange={e => handleDynamicListChange(listName, item.id, 'balance', e.target.value)}/>
+                                        <NumberInput label="Annual Contrib." prefix="$" value={item.annualContribution} onChange={e => handleDynamicListChange(listName, item.id, 'annualContribution', e.target.value)}/>
+                                        <NumberInput label="Match" suffix="%" value={item.match} onChange={e => handleDynamicListChange(listName, item.id, 'match', e.target.value)}/>
+                                        <div className="flex items-end">
+                                            <ActionIcons onAdd={() => {
+                                                const id = Date.now().toString();
+                                                addToList('retirementAccounts', { ...item, id, balance: 0, annualContribution: 0, match: 0 });
+                                                setFocusTargetId(`retirementAccounts-name-${id}`);
+                                            }} onRemove={() => removeFromList('retirementAccounts', item.id)} canRemove={items.length > 1} />
+                                        </div>
+                                    </>}
+                                    {listName === 'investmentAccounts' && <>
+                                        <NumberInput label="Balance" prefix="$" value={item.balance} onChange={e => handleDynamicListChange(listName, item.id, 'balance', e.target.value)}/>
+                                        <NumberInput label="Annual Contrib." prefix="$" value={item.annualContribution} onChange={e => handleDynamicListChange(listName, item.id, 'annualContribution', e.target.value)}/>
+                                        <div className="flex items-end">
+                                            <ActionIcons onAdd={() => {
+                                                const id = Date.now().toString();
+                                                addToList('investmentAccounts', { ...item, id, balance: 0, annualContribution: 0 });
+                                                setFocusTargetId(`investmentAccounts-name-${id}`);
+                                            }} onRemove={() => removeFromList('investmentAccounts', item.id)} canRemove={items.length > 1} />
+                                        </div>
+                                    </>}
+                                    {listName === 'pensions' && <>
+                                        <NumberInput label="Monthly Benefit" prefix="$" value={item.monthlyBenefit} onChange={e => handleDynamicListChange(listName, item.id, 'monthlyBenefit', e.target.value)}/>
+                                        <NumberInput label="Start Age" value={item.startAge} onChange={e => handleDynamicListChange(listName, item.id, 'startAge', e.target.value)}/>
+                                        <NumberInput label="COLA" suffix="%" value={item.cola} onChange={e => handleDynamicListChange(listName, item.id, 'cola', e.target.value)}/>
+                                        <NumberInput label="Survivor" suffix="%" value={item.survivorBenefit} onChange={e => handleDynamicListChange(listName, item.id, 'survivorBenefit', e.target.value)}/>
+                                        <div className="flex flex-col items-center justify-end h-full pb-1">
+                                            <label htmlFor={`taxable-${item.id}`} className="mb-1 text-sm font-medium text-brand-text-secondary">Taxable</label>
+                                            <input
+                                                type="checkbox"
+                                                id={`taxable-${item.id}`}
+                                                checked={item.taxable !== false}
+                                                onChange={e => handleDynamicListChange(listName, item.id, 'taxable', e.target.checked)}
+                                                className="h-5 w-5 rounded text-brand-primary focus:ring-brand-primary"
+                                            />
+                                        </div>
+                                        <div className="flex items-end">
+                                            <ActionIcons onAdd={addPension} onRemove={() => removeFromList('pensions', item.id)} canRemove={items.length > 0} />
+                                        </div>
+                                    </>}
+                                        {listName === 'otherIncomes' && <>
+                                        <NumberInput label="Monthly Amount" prefix="$" value={item.monthlyAmount} onChange={e => handleDynamicListChange(listName, item.id, 'monthlyAmount', e.target.value)}/>
+                                        <NumberInput label="Start Age" value={item.startAge} onChange={e => handleDynamicListChange(listName, item.id, 'startAge', e.target.value)}/>
+                                        <NumberInput label="End Age" value={item.endAge} onChange={e => handleDynamicListChange(listName, item.id, 'endAge', e.target.value)}/>
+                                        <NumberInput label="COLA" suffix="%" value={item.cola} onChange={e => handleDynamicListChange(listName, item.id, 'cola', e.target.value)}/>
+                                            <div className="flex flex-col items-center justify-end h-full pb-1">
+                                            <label htmlFor={`taxable-${item.id}`} className="mb-1 text-sm font-medium text-brand-text-secondary">Taxable</label>
+                                            <input
+                                                type="checkbox"
+                                                id={`taxable-${item.id}`}
+                                                checked={item.taxable !== false}
+                                                onChange={e => handleDynamicListChange(listName, item.id, 'taxable', e.target.checked)}
+                                                className="h-5 w-5 rounded text-brand-primary focus:ring-brand-primary"
+                                            />
+                                        </div>
+                                            <div className="flex items-end">
+                                            <ActionIcons onAdd={addOtherIncome} onRemove={() => removeFromList('otherIncomes', item.id)} canRemove={items.length > 0} />
+                                        </div>
+                                    </>}
+                                        {listName === 'gifts' && <>
                                             <div className="w-full">
-                                                <NumberInput label="Amount" prefix="$" value={item.annualAmount || 0} onChange={e => handleDynamicListChange('gifts', item.id, 'annualAmount', e.target.value)} />
+                                            <SelectInput label="Owner" value={item.owner || 'person1'} onChange={e => handleDynamicListChange(listName, item.id, 'owner', e.target.value)}>
+                                                <option value="person1">{plan.person1.name}</option>
+                                                {isCouple && <option value="person2">{plan.person2.name}</option>}
+                                            </SelectInput>
+                                        </div>
+                                        <div className="w-48">
+                                            <TextInput id={`gift-beneficiary-${item.id}`} ref={registerRef(`gift-beneficiary-${item.id}`)} label="Beneficiary" value={item.beneficiary} onChange={e => handleDynamicListChange(listName, item.id, 'beneficiary', e.target.value)} />
+                                        </div>
+                                            <div className="w-full">
+                                                <SelectInput label="Type" value={item.isAnnual ? 'annual' : 'one-time'} onChange={e => handleDynamicListChange(listName, item.id, 'isAnnual', e.target.value === 'annual')}>
+                                                    <option value="one-time">One-time</option>
+                                                    <option value="annual">Annual</option>
+                                                </SelectInput>
                                             </div>
-                                            <div className="w-28">
-                                                <div className="flex space-x-1">
-                                                    <div className="w-1/2">
-                                                        <NumberInput label="Start" placeholder="e.g., 67" value={item.startAge || plan.person1.retirementAge} onChange={e => handleDynamicListChange('gifts', item.id, 'startAge', e.target.value)} />
+                                            {!item.isAnnual && (
+                                                <>
+                                                    <div className="w-full">
+                                                        <NumberInput label="Amount" prefix="$" value={item.amount || 0} onChange={e => handleDynamicListChange(listName, item.id, 'amount', e.target.value)} />
                                                     </div>
-                                                    <div className="w-1/2">
-                                                        <NumberInput label="End" placeholder="e.g., 90" value={item.endAge || plan.person1.lifeExpectancy} onChange={e => handleDynamicListChange('gifts', item.id, 'endAge', e.target.value)} />
+                                                    <div className="w-20">
+                                                        <NumberInput label="Age" value={item.age || plan.person1.currentAge} onChange={e => handleDynamicListChange(listName, item.id, 'age', e.target.value)} />
+                                                    </div>
+                                                </>
+                                            )}
+                                            {item.isAnnual && (
+                                            <>
+                                                <div className="w-full">
+                                                    <NumberInput label="Amount" prefix="$" value={item.annualAmount || 0} onChange={e => handleDynamicListChange(listName, item.id, 'annualAmount', e.target.value)} />
+                                                </div>
+                                                <div className="w-28">
+                                                    <div className="flex space-x-1">
+                                                        <div className="w-1/2">
+                                                            <NumberInput label="Start" placeholder="e.g., 67" value={item.startAge || plan.person1.retirementAge} onChange={e => handleDynamicListChange(listName, item.id, 'startAge', e.target.value)} />
+                                                        </div>
+                                                        <div className="w-1/2">
+                                                            <NumberInput label="End" placeholder="e.g., 90" value={item.endAge || plan.person1.lifeExpectancy} onChange={e => handleDynamicListChange(listName, item.id, 'endAge', e.target.value)} />
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        </>
-                                    )}
-                                    <div className="flex items-end">
-                                        <ActionIcons onAdd={() => {
-                                            const id = Date.now().toString();
-                                            addToList('gifts', { id, beneficiary: '', owner: 'person1', isAnnual: false, amount: 0, annualAmount: 0, age: plan.person1.currentAge, startAge: plan.person1.retirementAge, endAge: plan.person1.lifeExpectancy });
-                                            setFocusTargetId(`gift-beneficiary-${id}`);
-                                        }} onRemove={() => removeFromList('gifts', item.id)} canRemove={(plan.gifts || []).length > 0} />
-                                    </div>
+                                            </>
+                                        )}
+                                        <div className="flex items-end">
+                                            <ActionIcons onAdd={addGift} onRemove={() => removeFromList('gifts', item.id)} canRemove={items.length > 0} />
+                                        </div>
+                                        </>}
+                                    {listName === 'expensePeriods' && <>
+                                            <TextInput label="Name" value={item.name} onChange={e => handleDynamicListChange(listName, item.id, 'name', e.target.value)} data-list={listName} data-id={item.id} />
+                                            <NumberInput label="Total Monthly Expenses" prefix="$" value={item.monthlyAmount} onChange={e => handleDynamicListChange(listName, item.id, 'monthlyAmount', e.target.value)}/>
+                                            <div className="flex items-end space-x-2">
+                                            {isCouple && <SelectInput label=" " value={item.startAgeRef} onChange={e => handleDynamicListChange(listName, item.id, 'startAgeRef', e.target.value)}><option value="person1">{plan.person1.name}</option><option value="person2">{plan.person2.name}</option></SelectInput>}
+                                            <NumberInput label="Start Age" value={item.startAge} onChange={e => handleDynamicListChange(listName, item.id, 'startAge', e.target.value)} />
+                                        </div>
+                                            <div className="flex items-end space-x-2">
+                                            {isCouple && <SelectInput label=" " value={item.endAgeRef} onChange={e => handleDynamicListChange(listName, item.id, 'endAgeRef', e.target.value)}><option value="person1">{plan.person1.name}</option><option value="person2">{plan.person2.name}</option></SelectInput>}
+                                            <NumberInput label="End Age" value={item.endAge} onChange={e => handleDynamicListChange(listName, item.id, 'endAge', e.target.value)}/>
+                                        </div>
+                                        <div className="flex items-end">
+                                            <ActionIcons onAdd={() => {
+                                                const id = Date.now().toString();
+                                                addToList('expensePeriods', { ...item, id, monthlyAmount: 0, name: `Phase ${items.length + 1}`, startAge: items.length > 0 ? items[items.length - 1].endAge + 1 : plan.person1.retirementAge, startAgeRef: items[items.length - 1]?.startAgeRef || 'person1', endAge: plan.person1.lifeExpectancy, endAgeRef: items[items.length - 1]?.endAgeRef || 'person1' });
+                                                setFocusTargetId(`expensePeriods-name-${id}`);
+                                            }} onRemove={() => removeFromList('expensePeriods', item.id)} canRemove={items.length > 1} />
+                                        </div>
+                                    </>}
                                 </div>
                             ))}
-
-                            {/* If no gifts, quick add */}
-                            {(plan.gifts || []).length === 0 && (
+                            {(listName === 'pensions' || listName === 'otherIncomes' || listName === 'gifts') && items.length === 0 && (
                                 <div className="text-center py-2">
-                                    <button onClick={() => { const id = Date.now().toString(); addToList('gifts', { id, beneficiary: '', owner: 'person1', isAnnual: false, amount: 0, annualAmount: 0, age: plan.person1.currentAge, startAge: plan.person1.retirementAge, endAge: plan.person1.lifeExpectancy }); setFocusTargetId(`gift-beneficiary-${id}`); }} className="text-sm text-brand-primary font-semibold hover:underline">+ Add Gift</button>
-                                </div>
-                            )}
-
-                            {/* Expense Periods */}
-                            {(plan.expensePeriods || []).map((item) => (
-                                <div key={item.id} className="grid gap-x-4 items-end p-2 rounded-md bg-red-50/50 grid-cols-5">
-                                    <TextInput label="Name" value={item.name} onChange={e => handleDynamicListChange('expensePeriods', item.id, 'name', e.target.value)} data-list={'expensePeriods'} data-id={item.id} />
-                                    <NumberInput label="Total Monthly Expenses" prefix="$" value={item.monthlyAmount} onChange={e => handleDynamicListChange('expensePeriods', item.id, 'monthlyAmount', e.target.value)}/>
-                                    <div className="flex items-end space-x-2">
-                                        {isCouple && <SelectInput label=" " value={item.startAgeRef} onChange={e => handleDynamicListChange('expensePeriods', item.id, 'startAgeRef', e.target.value)}><option value="person1">{plan.person1.name}</option><option value="person2">{plan.person2.name}</option></SelectInput>}
-                                        <NumberInput label="Start Age" value={item.startAge} onChange={e => handleDynamicListChange('expensePeriods', item.id, 'startAge', e.target.value)} />
-                                    </div>
-                                    <div className="flex items-end space-x-2">
-                                        {isCouple && <SelectInput label=" " value={item.endAgeRef} onChange={e => handleDynamicListChange('expensePeriods', item.id, 'endAgeRef', e.target.value)}><option value="person1">{plan.person1.name}</option><option value="person2">{plan.person2.name}</option></SelectInput>}
-                                        <NumberInput label="End Age" value={item.endAge} onChange={e => handleDynamicListChange('expensePeriods', item.id, 'endAge', e.target.value)}/>
-                                    </div>
-                                    <div className="flex items-end">
-                                        <ActionIcons onAdd={() => {
-                                            const id = Date.now().toString();
-                                            addToList('expensePeriods', { ...item, id, monthlyAmount: 0, name: `Phase ${ (plan.expensePeriods || []).length + 1 }`, startAge: (plan.expensePeriods || []).length > 0 ? (plan.expensePeriods || [])[ (plan.expensePeriods || []).length - 1 ].endAge + 1 : plan.person1.retirementAge, startAgeRef: item.startAgeRef || 'person1', endAge: plan.person1.lifeExpectancy, endAgeRef: item.endAgeRef || 'person1' });
-                                            setFocusTargetId(`expensePeriods-name-${id}`);
-                                        }} onRemove={() => removeFromList('expensePeriods', item.id)} canRemove={(plan.expensePeriods || []).length > 1} />
-                                    </div>
-                                </div>
-                            ))}
-
-                            {(plan.expensePeriods || []).length === 0 && (
-                                <div className="text-center py-2">
-                                    <button onClick={() => { const id = Date.now().toString(); addToList('expensePeriods', { id, monthlyAmount: 0, name: `Phase 1`, startAge: plan.person1.retirementAge, startAgeRef: 'person1', endAge: plan.person1.lifeExpectancy, endAgeRef: 'person1' }); setFocusTargetId(`expensePeriods-name-${id}`); }} className="text-sm text-brand-primary font-semibold hover:underline">+ Add Expense Period</button>
+                                    <button onClick={listName === 'pensions' ? addPension : listName === 'otherIncomes' ? addOtherIncome : addGift} className="text-sm text-brand-primary font-semibold hover:underline">
+                                        + Add {section.slice(0, -1)}
+                                    </button>
                                 </div>
                             )}
                         </div>
-                    )}
-                </div>
-            </InputSection>
+                    </InputSection>
+                )
+            })}
 
             {/* Legacy Disbursements - separate section from Gifts */}
             <InputSection title="Legacy Disbursements" subtitle="Allocate percentages of the final estate to beneficiaries. Disabled when Die With Zero is enabled.">
