@@ -39,6 +39,7 @@ export const PrintableReport: React.FC<{ plan: RetirementPlan; results: Calculat
     const currentNetWorth =
         plan.retirementAccounts.reduce((sum, acc) => sum + acc.balance, 0) +
         plan.investmentAccounts.reduce((sum, acc) => sum + acc.balance, 0);
+    const totalPlannedGifts = filteredProjections.reduce((s, p) => s + (p.gifts || 0), 0);
 
     return (
         <div className="hidden print:block font-sans p-4">
@@ -57,6 +58,7 @@ export const PrintableReport: React.FC<{ plan: RetirementPlan; results: Calculat
                             <InfoRow label="Final Net Worth (Future $)" value={formatCurrency(results.netWorthAtEndFuture)} />
                             <InfoRow label="Avg. Federal Tax Rate" value={`${results.federalTaxRate.toFixed(1)}%`} />
                             <InfoRow label="Avg. State Tax Rate" value={`${results.stateTaxRate.toFixed(1)}%`} />
+                            {totalPlannedGifts > 0 && <InfoRow label="Total Planned Gifts" value={`${formatCurrency(totalPlannedGifts)}`} />}
                         </ReportSection>
                     </div>
                      <div className="col-span-1">
@@ -149,17 +151,18 @@ export const PrintableReport: React.FC<{ plan: RetirementPlan; results: Calculat
                     <h2 className="text-2xl font-bold mb-2 text-center text-indigo-600">Annual Projection Details</h2>
                      <table className="w-full text-xs border-collapse border border-gray-400">
                         <thead className="bg-gray-200">
-                            <tr>
-                                <th className="p-1 border border-gray-300">Year</th>
-                                <th className="p-1 border border-gray-300">{isCouple ? "Ages" : "Age"}</th>
-                                <th className="p-1 border border-gray-300">Net Worth</th>
-                                <th className="p-1 border border-gray-300 bg-blue-100">Gross Inc.</th>
-                                <th className="p-1 border border-gray-300">Expenses</th>
-                                <th className="p-1 border border-gray-300 bg-red-100">Taxes</th>
-                                <th className="p-1 border border-gray-300">RMD</th>
-                                <th className="p-1 border border-gray-300 bg-green-100">Net Inc.</th>
-                                <th className="p-1 border border-gray-300">Surplus</th>
-                            </tr>
+                                <tr>
+                                    <th className="p-1 border border-gray-300">Year</th>
+                                    <th className="p-1 border border-gray-300">{isCouple ? "Ages" : "Age"}</th>
+                                    <th className="p-1 border border-gray-300">Net Worth</th>
+                                    <th className="p-1 border border-gray-300 bg-blue-100">Gross Inc.</th>
+                                    <th className="p-1 border border-gray-300">Expenses</th>
+                                    <th className="p-1 border border-gray-300 bg-red-100">Taxes</th>
+                                    <th className="p-1 border border-gray-300">RMD</th>
+                                    <th className="p-1 border border-gray-300 bg-yellow-100">Gifts</th>
+                                    <th className="p-1 border border-gray-300 bg-green-100">Net Inc.</th>
+                                    <th className="p-1 border border-gray-300">Surplus</th>
+                                </tr>
                         </thead>
                         <tbody>
                             {filteredProjections.map((row: YearlyProjection) => (
@@ -171,6 +174,7 @@ export const PrintableReport: React.FC<{ plan: RetirementPlan; results: Calculat
                                     <td className="p-1 border border-gray-300 text-right">{formatCurrency(row.expenses)}</td>
                                     <td className="p-1 border border-gray-300 text-right bg-red-100">{formatCurrency(row.federalTax + row.stateTax)}</td>
                                     <td className="p-1 border border-gray-300 text-right">{formatCurrency(row.rmd)}</td>
+                                    <td className="p-1 border border-gray-300 text-right">{formatCurrency(row.gifts || 0)}</td>
                                     <td className="p-1 border border-gray-300 text-right bg-green-100 font-semibold">{formatCurrency(row.netIncome)}</td>
                                     <td className={`p-1 border border-gray-300 text-right ${row.surplus >= 0 ? 'text-green-700' : 'text-red-700'}`}>{formatCurrency(row.surplus)}</td>
                                 </tr>
