@@ -70,7 +70,7 @@ const calculateSummary = (projections: YearlyProjection[], plan: RetirementPlan)
 
 export const runSimulation = (plan: RetirementPlan, volatility?: number): CalculationResult => {
     const isCouple = plan.planType === PlanType.COUPLE;
-    const filingStatus = isCouple ? FilingStatus.MARRIED_FILING_JOINTLY : FilingStatus.SINGLE;
+    // Note: filingStatus will be determined per year based on who is alive
     const inflation = plan.inflationRate / 100;
     const withdrawalRate = plan.annualWithdrawalRate / 100;
     const avgReturn = plan.avgReturn / 100;
@@ -93,6 +93,11 @@ export const runSimulation = (plan: RetirementPlan, volatility?: number): Calcul
         const currentAge2 = isCouple ? plan.person2.currentAge + year : 0;
         const p1Alive = currentAge1 <= plan.person1.lifeExpectancy;
         const p2Alive = isCouple && currentAge2 <= plan.person2.lifeExpectancy;
+        
+        // Determine filing status based on who is alive this year
+        const filingStatus = (isCouple && p1Alive && p2Alive) 
+            ? FilingStatus.MARRIED_FILING_JOINTLY 
+            : FilingStatus.SINGLE;
         
         let incomeFromPensions = 0;
         let taxableIncomeFromPensions = 0;
@@ -200,9 +205,20 @@ export const runSimulation = (plan: RetirementPlan, volatility?: number): Calcul
             let plannedAnnualWithdrawal = 0;
 
             if (plan.dieWithZero) {
-                 const finalLifeExpectancy = Math.max(plan.person1.lifeExpectancy, isCouple ? plan.person2.lifeExpectancy : 0);
-                 const finalCurrentAge = Math.max(p1Alive ? currentAge1 : -1, p2Alive ? currentAge2 : -1);
-                 const yearsRemaining = Math.max(1, finalLifeExpectancy - finalCurrentAge);
+                 // Calculate years remaining based on the longest-living person still alive
+                 let yearsRemaining = 1;
+                 if (p1Alive && p2Alive) {
+                     // Both alive: use the maximum life expectancy
+                     const finalLifeExpectancy = Math.max(plan.person1.lifeExpectancy, plan.person2.lifeExpectancy);
+                     const oldestCurrentAge = Math.max(currentAge1, currentAge2);
+                     yearsRemaining = Math.max(1, finalLifeExpectancy - oldestCurrentAge);
+                 } else if (p1Alive) {
+                     // Only person1 alive
+                     yearsRemaining = Math.max(1, plan.person1.lifeExpectancy - currentAge1);
+                 } else if (p2Alive) {
+                     // Only person2 alive
+                     yearsRemaining = Math.max(1, plan.person2.lifeExpectancy - currentAge2);
+                 }
 
                  // Calculate minimum withdrawal needed to cover expenses
                  const fixedIncome = incomeFromPensions + incomeFromSS + incomeFromOther;
