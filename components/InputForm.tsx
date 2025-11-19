@@ -247,11 +247,11 @@ export const InputForm: React.FC<InputFormProps> = ({
                                     {/* Common fields */}
                                     {listName !== 'expensePeriods' && listName !== 'gifts' && (
                                         <>
-                                            <SelectInput label="Owner" value={item.owner} onChange={e => handleDynamicListChange(listName, item.id, 'owner', e.target.value)} data-list={listName} data-id={item.id}>
+                                            <SelectInput label="Owner" value={item.owner} onChange={e => handleDynamicListChange(listName as any, item.id, 'owner' as any, e.target.value)} data-list={listName} data-id={item.id}>
                                                 <option value="person1">{plan.person1.name}</option>
                                                 {isCouple && <option value="person2">{plan.person2.name}</option>}
                                             </SelectInput>
-                                            <TextInput id={`${listName}-name-${item.id}`} label="Name" value={item.name} onChange={e => handleDynamicListChange(listName, item.id, 'name', e.target.value)} />
+                                            <TextInput id={`${listName}-name-${item.id}`} label="Name" value={item.name} onChange={e => handleDynamicListChange(listName as any, item.id, 'name' as any, e.target.value)} />
                                         </>
                                     )}
                                     
@@ -326,7 +326,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                                     </>}
                                         {listName === 'gifts' && <>
                                             <div className="w-full">
-                                            <SelectInput label="Owner" value={item.owner || 'person1'} onChange={e => handleDynamicListChange(listName, item.id, 'owner', e.target.value)}>
+                                            <SelectInput label="Owner" value={item.owner || 'person1'} onChange={e => handleDynamicListChange(listName as any, item.id, 'owner' as any, e.target.value)}>
                                                 <option value="person1">{plan.person1.name}</option>
                                                 {isCouple && <option value="person2">{plan.person2.name}</option>}
                                             </SelectInput>
@@ -372,7 +372,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                                         </div>
                                         </>}
                                     {listName === 'expensePeriods' && <>
-                                            <TextInput label="Name" value={item.name} onChange={e => handleDynamicListChange(listName, item.id, 'name', e.target.value)} data-list={listName} data-id={item.id} />
+                                            <TextInput label="Name" value={item.name} onChange={e => handleDynamicListChange(listName as any, item.id, 'name' as any, e.target.value)} data-list={listName} data-id={item.id} />
                                             <NumberInput label="Total Monthly Expenses" prefix="$" value={item.monthlyAmount} onChange={e => handleDynamicListChange(listName, item.id, 'monthlyAmount', e.target.value)}/>
                                             <div className="flex items-end space-x-2">
                                             {isCouple && <SelectInput label=" " value={item.startAgeRef} onChange={e => handleDynamicListChange(listName, item.id, 'startAgeRef', e.target.value)}><option value="person1">{plan.person1.name}</option><option value="person2">{plan.person2.name}</option></SelectInput>}
