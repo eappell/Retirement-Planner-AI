@@ -197,7 +197,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                             onChange={e => handlePlanChange('legacyAmount', Number(e.target.value))}
                             disabled={!plan.dieWithZero}
                             className={`w-32 pl-7 pr-2 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-brand-primary focus:border-transparent text-sm ${
-                                !plan.dieWithZero 
+                                !plan.dieWithZero
                                 ? 'bg-gray-100 text-gray-500 cursor-not-allowed' 
                                 : 'bg-white text-brand-text-primary'
                             }`}
@@ -268,7 +268,32 @@ export const InputForm: React.FC<InputFormProps> = ({
             </InputSection>
 
                     {/* Accounts - combined tabs for Retirement / Investment accounts */}
-                    <InputSection title="Accounts" subtitle="Manage retirement and investment accounts in separate tabs." titleColorClass="text-cyan-600">
+                    <InputSection
+                        title="Accounts"
+                        subtitle="Manage retirement and investment accounts in separate tabs."
+                        titleColorClass="text-cyan-600"
+                        actions={(
+                            <div>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        if (accountsTab === 'retirement') {
+                                            const id = Date.now().toString();
+                                            addToList('retirementAccounts', { id, owner: 'person1', name: 'New Account', type: '401k', balance: 0, annualContribution: 0, match: 0 } as any);
+                                            setFocusTargetId(`retirementAccounts-name-${id}`);
+                                        } else {
+                                            const id = Date.now().toString();
+                                            addToList('investmentAccounts', { id, balance: 0, annualContribution: 0 } as any);
+                                            setFocusTargetId(`investmentAccounts-name-${id}`);
+                                        }
+                                    }}
+                                    className="inline-flex items-center px-3 py-1.5 rounded-full bg-brand-primary text-white text-sm shadow-sm hover:opacity-90"
+                                >
+                                    + Add
+                                </button>
+                            </div>
+                        )}
+                    >
                         <div className="col-span-full">
                             <div className="flex items-center space-x-6 mb-3" role="tablist" aria-label="Accounts Tabs" onKeyDown={handleAccountsKeyDown}>
                                 {accountsTab === 'retirement' ? (
@@ -350,15 +375,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                                             </div>
                                         </div>
                                     ))}
-                                    {(plan.retirementAccounts || []).length === 0 && (
-                                        <div className="absolute top-3 right-3">
-                                            <button onClick={() => {
-                                                const id = Date.now().toString();
-                                                addToList('retirementAccounts', { id, owner: 'person1', name: 'New Account', type: '401k', balance: 0, annualContribution: 0, match: 0 } as any);
-                                                setFocusTargetId(`retirementAccounts-name-${id}`);
-                                            }} className="inline-flex items-center px-3 py-1.5 rounded-full bg-brand-primary text-white text-sm shadow-sm hover:opacity-90">+ Add Retirement Account</button>
-                                        </div>
-                                    )}
+                                    {(plan.retirementAccounts || []).length === 0 && null}
                                 </div>
                             )}
 
@@ -378,22 +395,39 @@ export const InputForm: React.FC<InputFormProps> = ({
                                             </div>
                                         </div>
                                     ))}
-                                    {(plan.investmentAccounts || []).length === 0 && (
-                                        <div className="absolute top-3 right-3">
-                                            <button onClick={() => {
-                                                const id = Date.now().toString();
-                                                addToList('investmentAccounts', { id, balance: 0, annualContribution: 0 } as any);
-                                                setFocusTargetId(`investmentAccounts-name-${id}`);
-                                            }} className="inline-flex items-center px-3 py-1.5 rounded-full bg-brand-primary text-white text-sm shadow-sm hover:opacity-90">+ Add Investment Account</button>
-                                        </div>
-                                    )}
+                                    {(plan.investmentAccounts || []).length === 0 && null}
                                 </div>
                             )}
                         </div>
                     </InputSection>
 
             {/* Income - combined tabs for Pensions / Other Incomes */}
-            <InputSection title="Income" subtitle="Manage pensions and other income sources in tabs." titleColorClass="text-sky-600">
+            <InputSection
+                title="Income"
+                subtitle="Manage pensions and other income sources in tabs."
+                titleColorClass="text-sky-600"
+                actions={(
+                    <div>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                if (incomeTab === 'pensions') {
+                                    const id = Date.now().toString();
+                                    addToList('pensions', { id, owner: 'person1', name: 'New Pension', monthlyBenefit: 0, startAge: plan.person1.retirementAge, cola: 0, survivorBenefit: 0, taxable: true } as any);
+                                    setFocusTargetId(`pensions-name-${id}`);
+                                } else {
+                                    const id = Date.now().toString();
+                                    addToList('otherIncomes', { id, owner: 'person1', name: 'New Income', monthlyAmount: 0, startAge: plan.person1.retirementAge, endAge: plan.person1.lifeExpectancy, cola: 0, taxable: true } as any);
+                                    setFocusTargetId(`otherIncomes-name-${id}`);
+                                }
+                            }}
+                            className="inline-flex items-center px-3 py-1.5 rounded-full bg-brand-primary text-white text-sm shadow-sm hover:opacity-90"
+                        >
+                            + Add
+                        </button>
+                    </div>
+                )}
+            >
                 <div className="col-span-full">
                     <div className="flex items-center space-x-6 mb-3" role="tablist" aria-label="Income Tabs" onKeyDown={handleIncomeKeyDown}>
                         {incomeTab === 'pensions' ? (
@@ -474,15 +508,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                                     </div>
                                 </div>
                             ))}
-                            {(plan.pensions || []).length === 0 && (
-                                <div className="absolute top-3 right-3">
-                                    <button onClick={() => {
-                                        const id = Date.now().toString();
-                                        addToList('pensions', { id, owner: 'person1', name: 'New Pension', monthlyBenefit: 0, startAge: plan.person1.retirementAge, cola: 0, survivorBenefit: 0, taxable: true } as any);
-                                        setFocusTargetId(`pensions-name-${id}`);
-                                    }} className="inline-flex items-center px-3 py-1.5 rounded-full bg-brand-primary text-white text-sm shadow-sm hover:opacity-90">+ Add Pension</button>
-                                </div>
-                            )}
+                            {(plan.pensions || []).length === 0 && null}
                         </div>
                     )}
 
@@ -514,22 +540,40 @@ export const InputForm: React.FC<InputFormProps> = ({
                                     </div>
                                 </div>
                             ))}
-                            {(plan.otherIncomes || []).length === 0 && (
-                                <div className="absolute top-3 right-3">
-                                    <button onClick={() => {
-                                        const id = Date.now().toString();
-                                        addToList('otherIncomes', { id, owner: 'person1', name: 'New Income', monthlyAmount: 0, startAge: plan.person1.retirementAge, endAge: plan.person1.lifeExpectancy, cola: 0, taxable: true } as any);
-                                        setFocusTargetId(`otherIncomes-name-${id}`);
-                                    }} className="inline-flex items-center px-3 py-1.5 rounded-full bg-brand-primary text-white text-sm shadow-sm hover:opacity-90">+ Add Other Income</button>
-                                </div>
-                            )}
+                            {(plan.otherIncomes || []).length === 0 && null}
                         </div>
                     )}
                 </div>
             </InputSection>
 
             {/* Estate Planning - Gifts + Legacy (tabs) */}
-            <InputSection title="Estate Planning" subtitle="Manage gifts and legacy allocations." titleColorClass="text-purple-600">
+            <InputSection
+                title="Estate Planning"
+                subtitle="Manage gifts and legacy allocations."
+                titleColorClass="text-purple-600"
+                actions={(
+                    <div>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                if (estateTab === 'gifts') {
+                                    const id = Date.now().toString();
+                                    addToList('gifts', { id, beneficiary: '', owner: 'person1', isAnnual: false, amount: 0, annualAmount: 0, age: plan.person1.currentAge, startAge: plan.person1.retirementAge, endAge: plan.person1.lifeExpectancy } as any);
+                                    setFocusTargetId(`gift-beneficiary-${id}`);
+                                } else {
+                                    const id = Date.now().toString();
+                                    addToList('legacyDisbursements', { id, beneficiary: '', beneficiaryType: 'person', percentage: 0 } as any);
+                                    setFocusTargetId(`legacy-beneficiary-${id}`);
+                                }
+                            }}
+                            disabled={estateTab === 'legacy' && plan.dieWithZero}
+                            className={`inline-flex items-center px-3 py-1.5 rounded-full ${estateTab === 'legacy' && plan.dieWithZero ? 'bg-gray-200 text-gray-500' : 'bg-brand-primary text-white hover:opacity-90'} text-sm font-semibold`}
+                        >
+                            + Add
+                        </button>
+                    </div>
+                )}
+            >
                 <div className="col-span-full">
                     <div className="flex items-center space-x-6 mb-3" role="tablist" aria-label="Estate Tabs" onKeyDown={handleEstateKeyDown}>
                         {estateTab === 'gifts' ? (
@@ -634,11 +678,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                                     </div>
                                 </div>
                             ))}
-                            {(plan.gifts || []).length === 0 && (
-                                <div className="absolute top-3 right-3">
-                                    <button onClick={() => { const id = Date.now().toString(); addToList('gifts', { id, beneficiary: '', owner: 'person1', isAnnual: false, amount: 0, annualAmount: 0, age: plan.person1.currentAge, startAge: plan.person1.retirementAge, endAge: plan.person1.lifeExpectancy } as any); setFocusTargetId(`gift-beneficiary-${id}`); }} className="inline-flex items-center px-3 py-1.5 rounded-full bg-brand-primary text-white text-sm shadow-sm hover:opacity-90">+ Add Gift</button>
-                                </div>
-                            )}
+                            {(plan.gifts || []).length === 0 && null}
                         </div>
                     )}
 
@@ -665,11 +705,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                                 </div>
                             ))}
 
-                            {(plan.legacyDisbursements || []).length === 0 && (
-                                <div className="absolute top-3 right-3">
-                                    <button disabled={plan.dieWithZero} onClick={() => { const id = Date.now().toString(); addToList('legacyDisbursements', { id, beneficiary: '', beneficiaryType: 'person', percentage: 0 } as any); setFocusTargetId(`legacy-beneficiary-${id}`); }} className={`inline-flex items-center px-3 py-1.5 rounded-full ${plan.dieWithZero ? 'bg-gray-200 text-gray-500' : 'bg-brand-primary text-white hover:opacity-90'} text-sm font-semibold`}>+ Add Legacy</button>
-                                </div>
-                            )}
+                            {(plan.legacyDisbursements || []).length === 0 && null}
 
                             {/* Validation: ensure percentages do not exceed 100 */}
                             {(() => {
@@ -706,7 +742,23 @@ export const InputForm: React.FC<InputFormProps> = ({
                 };
 
                 return (
-                    <InputSection key={section} title={section} subtitle={subtitles[section]} titleColorClass={colors[section]} gridCols={1}>
+                    <InputSection key={section} title={section} subtitle={subtitles[section]} titleColorClass={colors[section]} gridCols={1} actions={(
+                        <div>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    if (listName === 'expensePeriods') {
+                                        const id = Date.now().toString();
+                                        addToList('expensePeriods', { id, monthlyAmount: 0, name: `Phase ${items.length + 1}`, startAge: plan.person1.retirementAge, startAgeRef: 'person1', endAge: plan.person1.lifeExpectancy, endAgeRef: 'person1' } as any);
+                                        setFocusTargetId(`expensePeriods-name-${id}`);
+                                    }
+                                }}
+                                className="inline-flex items-center px-3 py-1.5 rounded-full bg-brand-primary text-white text-sm shadow-sm hover:opacity-90"
+                            >
+                                + Add
+                            </button>
+                        </div>
+                    )}>
                         <div className="relative col-span-full pt-3 space-y-2">
                             {items.map((item) => (
                                 <div key={item.id} className={`grid gap-x-4 items-end p-2 rounded-md ${
