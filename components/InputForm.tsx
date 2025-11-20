@@ -417,12 +417,8 @@ export const InputForm: React.FC<InputFormProps> = ({
                                                                                 }}
                                                                                 className="w-full"
                                                                             />
-                                                                            <div className="w-16">
-                                                                                <NumberInput label="" suffix="%" value={Number(item.percentStocks ?? 0)} onChange={e => {
-                                                                                    const v = Number(e.target.value);
-                                                                                    handleDynamicListChange('investmentAccounts', item.id, 'percentStocks', String(v));
-                                                                                    handleDynamicListChange('investmentAccounts', item.id, 'percentBonds', String(100 - v));
-                                                                                }} />
+                                                                            <div className="w-20 text-right">
+                                                                                <div aria-live="polite" className="text-sm font-medium">{Number(item.percentStocks ?? 0)}%</div>
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -911,12 +907,8 @@ export const InputForm: React.FC<InputFormProps> = ({
                                                     }}
                                                     className="w-full"
                                                 />
-                                                <div className="w-16">
-                                                    <NumberInput label="" suffix="%" value={Number(item.percentStocks ?? 0)} onChange={e => {
-                                                        const v = Number(e.target.value);
-                                                        handleDynamicListChange(listName, item.id, 'percentStocks', String(v));
-                                                        handleDynamicListChange(listName, item.id, 'percentBonds', String(100 - v));
-                                                    }} />
+                                                <div className="w-20 text-right">
+                                                    <div aria-live="polite" className="text-sm font-medium">{Number(item.percentStocks ?? 0)}%</div>
                                                 </div>
                                             </div>
                                         </div>
