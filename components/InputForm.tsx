@@ -401,8 +401,34 @@ export const InputForm: React.FC<InputFormProps> = ({
                                                                     <TextInput id={`investmentAccounts-name-${item.id}`} label="Name" value={item.name} onChange={e => handleDynamicListChange('investmentAccounts', item.id, 'name', e.target.value)} />
                                                                     <NumberInput label="Balance" prefix="$" value={item.balance} onChange={e => handleDynamicListChange('investmentAccounts', item.id, 'balance', e.target.value)}/>
                                                                     <NumberInput label="Annual Contrib." prefix="$" value={item.annualContribution} onChange={e => handleDynamicListChange('investmentAccounts', item.id, 'annualContribution', e.target.value)}/>
-                                                                    <NumberInput label="% Stocks" suffix="%" value={(item.percentStocks ?? 0)} onChange={e => handleDynamicListChange('investmentAccounts', item.id, 'percentStocks', e.target.value)} />
-                                                                    <NumberInput label="% Bonds" suffix="%" value={(item.percentBonds ?? 0)} onChange={e => handleDynamicListChange('investmentAccounts', item.id, 'percentBonds', e.target.value)} />
+                                                                    <div className="col-span-2">
+                                                                        <label className="block text-sm font-medium text-brand-text-secondary">% Stocks</label>
+                                                                        <div className="flex items-center space-x-3">
+                                                                            <input
+                                                                                type="range"
+                                                                                min={0}
+                                                                                max={100}
+                                                                                aria-label={`% Stocks for ${item.name || 'account'}`}
+                                                                                value={Number(item.percentStocks ?? 0)}
+                                                                                onChange={e => {
+                                                                                    const v = Number(e.target.value);
+                                                                                    handleDynamicListChange('investmentAccounts', item.id, 'percentStocks', String(v));
+                                                                                    handleDynamicListChange('investmentAccounts', item.id, 'percentBonds', String(100 - v));
+                                                                                }}
+                                                                                className="w-full"
+                                                                            />
+                                                                            <div className="w-16">
+                                                                                <NumberInput label="" suffix="%" value={Number(item.percentStocks ?? 0)} onChange={e => {
+                                                                                    const v = Number(e.target.value);
+                                                                                    handleDynamicListChange('investmentAccounts', item.id, 'percentStocks', String(v));
+                                                                                    handleDynamicListChange('investmentAccounts', item.id, 'percentBonds', String(100 - v));
+                                                                                }} />
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div>
+                                                                        <NumberInput label="% Bonds" suffix="%" value={100 - (Number(item.percentStocks ?? 0))} disabled />
+                                                                    </div>
                                                                 <div className="flex items-end">
                                                                     <ActionIcons onAdd={() => {
                                                                         const id = Date.now().toString();
@@ -869,8 +895,34 @@ export const InputForm: React.FC<InputFormProps> = ({
                                     {listName === 'investmentAccounts' && <>
                                         <NumberInput label="Balance" prefix="$" value={item.balance} onChange={e => handleDynamicListChange(listName, item.id, 'balance', e.target.value)}/>
                                         <NumberInput label="Annual Contrib." prefix="$" value={item.annualContribution} onChange={e => handleDynamicListChange(listName, item.id, 'annualContribution', e.target.value)}/>
-                                        <NumberInput label="% Stocks" suffix="%" value={(item.percentStocks ?? 0)} onChange={e => handleDynamicListChange(listName, item.id, 'percentStocks', e.target.value)} />
-                                        <NumberInput label="% Bonds" suffix="%" value={(item.percentBonds ?? 0)} onChange={e => handleDynamicListChange(listName, item.id, 'percentBonds', e.target.value)} />
+                                        <div className="col-span-2">
+                                            <label className="block text-sm font-medium text-brand-text-secondary">% Stocks</label>
+                                            <div className="flex items-center space-x-3">
+                                                <input
+                                                    type="range"
+                                                    min={0}
+                                                    max={100}
+                                                    aria-label={`% Stocks for ${item.name || 'account'}`}
+                                                    value={Number(item.percentStocks ?? 0)}
+                                                    onChange={e => {
+                                                        const v = Number(e.target.value);
+                                                        handleDynamicListChange(listName, item.id, 'percentStocks', String(v));
+                                                        handleDynamicListChange(listName, item.id, 'percentBonds', String(100 - v));
+                                                    }}
+                                                    className="w-full"
+                                                />
+                                                <div className="w-16">
+                                                    <NumberInput label="" suffix="%" value={Number(item.percentStocks ?? 0)} onChange={e => {
+                                                        const v = Number(e.target.value);
+                                                        handleDynamicListChange(listName, item.id, 'percentStocks', String(v));
+                                                        handleDynamicListChange(listName, item.id, 'percentBonds', String(100 - v));
+                                                    }} />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <NumberInput label="% Bonds" suffix="%" value={100 - (Number(item.percentStocks ?? 0))} disabled />
+                                        </div>
                                         <div className="flex items-end">
                                             <ActionIcons onAdd={() => {
                                                 const id = Date.now().toString();
