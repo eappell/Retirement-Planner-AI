@@ -32,17 +32,12 @@ export const Header: React.FC<HeaderProps> = ({
     handlePrint,
     setIsManualOpen
 }) => {
-    const [isBackupMenuOpen, setIsBackupMenuOpen] = useState(false);
     const [isScenarioMenuOpen, setIsScenarioMenuOpen] = useState(false);
-    const backupMenuRef = useRef<HTMLDivElement>(null);
     const scenarioMenuRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
-            if (backupMenuRef.current && !backupMenuRef.current.contains(event.target as Node)) {
-                setIsBackupMenuOpen(false);
-            }
-             if (scenarioMenuRef.current && !scenarioMenuRef.current.contains(event.target as Node)) {
+            if (scenarioMenuRef.current && !scenarioMenuRef.current.contains(event.target as Node)) {
                 setIsScenarioMenuOpen(false);
             }
         };
@@ -52,15 +47,7 @@ export const Header: React.FC<HeaderProps> = ({
         };
     }, []);
 
-    const onDownload = () => {
-        handleDownloadScenarios();
-        setIsBackupMenuOpen(false);
-    };
-
-    const onUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-        handleUploadScenarios(event);
-        setIsBackupMenuOpen(false);
-    }
+    // download/upload handlers are called directly from the UI below
     
     return (
         <header className="bg-brand-surface shadow-md h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 sticky top-0 z-20">
@@ -98,61 +85,52 @@ export const Header: React.FC<HeaderProps> = ({
                         <span>Scenarios</span>
                     </button>
                     {isScenarioMenuOpen && (
-                        <div className="origin-top-right absolute right-0 mt-2 w-96 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-30 p-4">
-                            <div className="space-y-4">
-                                <h3 className="text-lg font-semibold text-brand-text-primary">Scenario Manager</h3>
-                                <div>
-                                    <SelectInput label="Current Scenario" value={activeScenario.id || ''} onChange={e => handleSelectScenario(e.target.value)}>
-                                        {Object.values(scenarios).map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-                                    </SelectInput>
-                                </div>
-                                <TextInput label="Scenario Name" value={activeScenario.name} onChange={e => handleUpdateScenarioName(e.target.value)} />
-                                <div className="grid grid-cols-3 gap-2">
-                                    <button onClick={handleNewScenario} className="w-full px-3 py-1.5 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors">New</button>
-                                    <button onClick={handleCopyScenario} className="w-full px-3 py-1.5 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">Copy</button>
-                                    <button onClick={handleDeleteScenario} disabled={Object.keys(scenarios).length <= 1} className="w-full px-3 py-1.5 text-sm bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-400 transition-colors">Delete</button>
-                                </div>
-                                <div className="col-span-full pt-2 border-t">
-                                    <p className="text-xs text-gray-500">This data is stored in your browser. If you clear your browser cache without saving the scenarios file, you <strong className="text-red-600">WILL LOSE</strong> your scenarios. Use the Backup feature to download your scenarios file to save all your hard work.</p>
+                            <div className="origin-top-right absolute right-0 mt-2 w-96 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-30 p-4">
+                                <div className="space-y-4">
+                                    <h3 className="text-lg font-semibold text-brand-text-primary">Scenario Manager</h3>
+                                    <div>
+                                        <SelectInput label="Current Scenario" value={activeScenario.id || ''} onChange={e => handleSelectScenario(e.target.value)}>
+                                            {Object.values(scenarios).map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                                        </SelectInput>
+                                    </div>
+                                    <TextInput label="Scenario Name" value={activeScenario.name} onChange={e => handleUpdateScenarioName(e.target.value)} />
+                                    <div className="grid grid-cols-3 gap-2">
+                                        <button onClick={handleNewScenario} className="w-full px-3 py-1.5 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors">New</button>
+                                        <button onClick={handleCopyScenario} className="w-full px-3 py-1.5 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">Copy</button>
+                                        <button onClick={handleDeleteScenario} disabled={Object.keys(scenarios).length <= 1} className="w-full px-3 py-1.5 text-sm bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-400 transition-colors">Delete</button>
+                                    </div>
+                                    <div className="col-span-full pt-2 border-t">
+                                        <p className="text-xs text-gray-500">This data is stored in your browser. If you clear your browser cache without saving the scenarios file, you <strong className="text-red-600">WILL LOSE</strong> your scenarios. Use the Backup feature to download your scenarios file to save all your hard work.</p>
+                                    </div>
+
+                                    {/* Backup / Restore moved here from the top header */}
+                                    <div className="pt-2 border-t">
+                                        <div className="py-1">
+                                            <button
+                                                onClick={() => handleDownloadScenarios()}
+                                                className="flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                                                <span className="ml-3">Download Scenarios</span>
+                                            </button>
+                                            <label className="flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer rounded-md mt-2">
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0l-4 4m4-4v12" /></svg>
+                                                <span className="ml-3">Upload Scenarios</span>
+                                                <input
+                                                    type="file"
+                                                    onChange={e => handleUploadScenarios(e)}
+                                                    accept=".retire"
+                                                    className="hidden"
+                                                />
+                                            </label>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    )}
+                        )}
                 </div>
 
-                <div className="relative" ref={backupMenuRef}>
-                    <button
-                        type="button"
-                        onClick={() => setIsBackupMenuOpen(prev => !prev)}
-                        className="flex items-center space-x-2 text-sm text-gray-600 hover:text-brand-primary transition-colors font-medium p-2 rounded-md hover:bg-gray-100"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" /></svg>
-                        <span>Backup</span>
-                    </button>
-                    {isBackupMenuOpen && (
-                        <div className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-30">
-                            <div className="py-1">
-                                <button
-                                    onClick={onDownload}
-                                    className="flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                                    <span className="ml-3">Download Scenarios</span>
-                                </button>
-                                <label className="flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer">
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0l-4 4m4-4v12" /></svg>
-                                    <span className="ml-3">Upload Scenarios</span>
-                                    <input
-                                        type="file"
-                                        onChange={onUpload}
-                                        accept=".retire"
-                                        className="hidden"
-                                    />
-                                </label>
-                            </div>
-                        </div>
-                    )}
-                </div>
+                
                 <ThemeToggle />
                     <button 
                     type="button" 

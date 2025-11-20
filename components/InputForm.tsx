@@ -660,7 +660,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                                 onClick={() => setEstateTab('legacy')}
                                 className={`text-sm pb-2 ${'border-b-2 border-orange-600 text-orange-700 font-medium'}`}
                             >
-                                Legacy Gifts
+                                Legacy
                             </button>
                         ) : (
                             <button
