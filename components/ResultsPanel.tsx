@@ -19,7 +19,7 @@ export const ResultsPanel: React.FC<ResultsPanelProps> = React.memo(({ results, 
                 title="Avg. Monthly Net Income" 
                 value={results && !isLoading ? formatCurrency(results.avgMonthlyNetIncomeFuture) : '---'}
                 subValue={results && !isLoading ? `(${formatCurrency(results.avgMonthlyNetIncomeToday)} today's $)` : ''}
-                icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm-5-5a2 2 0 114 0 2 2 0 01-4 0z" /></svg>}
+                icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="1" y="6" width="22" height="12" rx="2" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" /><path strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" d="M12 9.5v5M10 9a1 1 0 012 0 1 1 0 01-2 0M14 15a1 1 0 01-2 0 1 1 0 012 0" /></svg>}
                 colorClass="bg-green-500"
             />
                 <IndicatorCard 
