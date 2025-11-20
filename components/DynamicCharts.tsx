@@ -32,9 +32,9 @@ const generateScenarioData = (plan: RetirementPlan): ScenarioData[] => {
     const endAge = Math.max(plan.person1.lifeExpectancy, isCouple ? plan.person2.lifeExpectancy : 0);
     const simulationYears = endAge - startAge;
 
-    // Asset-class assumptions used for scenario adjustments
-    const STOCK_MEAN = 0.08;
-    const BOND_MEAN = 0.03;
+    // Asset-class defaults
+    const STOCK_MEAN_DEFAULT = 0.08;
+    const BOND_MEAN_DEFAULT = 0.03;
 
     scenarios.forEach((adjustment, index) => {
         let retirementAccounts = cloneArray(plan.retirementAccounts);
@@ -56,9 +56,23 @@ const generateScenarioData = (plan: RetirementPlan): ScenarioData[] => {
                 }
                 acc.balance *= (1 + (plan.avgReturn / 100) + adjustment);
             });
-            // For investment accounts, use allocation-weighted returns using STOCK/BOND means
-            const stockReturn = STOCK_MEAN + adjustment;
-            const bondReturn = BOND_MEAN + adjustment;
+            // For investment accounts, compute portfolio-weighted bias from plan.avgReturn and optional plan overrides
+            const totalInvBal = investmentAccounts.reduce((s, a) => s + (a.balance || 0), 0);
+            let portfolioStocksPct = 0;
+            if (totalInvBal > 0) {
+                const stocksWeight = investmentAccounts.reduce((s, a) => s + ((a.balance || 0) * ((a.percentStocks ?? 60) / 100)), 0);
+                portfolioStocksPct = stocksWeight / totalInvBal;
+            } else {
+                const n = investmentAccounts.length || 1;
+                portfolioStocksPct = (investmentAccounts.reduce((s, a) => s + (a.percentStocks ?? 60), 0) / n) / 100;
+            }
+            const baseStock = (plan.stockMean !== undefined ? plan.stockMean / 100 : STOCK_MEAN_DEFAULT);
+            const baseBond = (plan.bondMean !== undefined ? plan.bondMean / 100 : BOND_MEAN_DEFAULT);
+            const portfolioBaseAvg = portfolioStocksPct * baseStock + (1 - portfolioStocksPct) * baseBond;
+            const desiredAvg = plan.avgReturn / 100;
+            const delta = desiredAvg - portfolioBaseAvg;
+            const stockReturn = baseStock + delta + adjustment;
+            const bondReturn = baseBond + delta + adjustment;
             investmentAccounts.forEach(acc => {
                 const owner = plan[acc.owner as keyof typeof plan] as Person;
                 const ownerAge = acc.owner === 'person1' ? currentAge1 : currentAge2;

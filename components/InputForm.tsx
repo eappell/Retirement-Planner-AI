@@ -148,6 +148,18 @@ export const InputForm: React.FC<InputFormProps> = ({
                 title="Plan Information"
                 subtitle="Set the high-level assumptions for your retirement plan."
             >
+                    <div className="col-span-full">
+                        <details className="mt-3">
+                            <summary className="cursor-pointer text-sm font-medium text-gray-700">Advanced Market Assumptions</summary>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
+                                <NumberInput label="Stocks: Expected Return" suffix="%" value={(plan.stockMean ?? 8)} onChange={e => handlePlanChange('stockMean', Number(e.target.value))} />
+                                <NumberInput label="Stocks: Volatility (std dev)" suffix="%" value={(plan.stockStd ?? 15)} onChange={e => handlePlanChange('stockStd', Number(e.target.value))} />
+                                <NumberInput label="Bonds: Expected Return" suffix="%" value={(plan.bondMean ?? 3)} onChange={e => handlePlanChange('bondMean', Number(e.target.value))} />
+                                <NumberInput label="Bonds: Volatility (std dev)" suffix="%" value={(plan.bondStd ?? 6)} onChange={e => handlePlanChange('bondStd', Number(e.target.value))} />
+                            </div>
+                            <p className="text-xs text-gray-500 mt-2">These settings let you tweak the expected returns and volatilities used when calculating allocation-weighted returns for investment accounts. The plan-level Average Return still acts as a baseline and will bias these values so the overall portfolio still matches your `Avg. Return`.</p>
+                        </details>
+                    </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 col-span-full">
                     <div className="flex flex-col space-y-2 h-full">
                         {(Object.values(PlanType) as PlanType[]).map(type => (
