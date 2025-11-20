@@ -32,6 +32,7 @@ export const InputForm: React.FC<InputFormProps> = ({
     const [focusTargetId, setFocusTargetId] = useState<string | null>(null);
     const [incomeTab, setIncomeTab] = useState<'pensions' | 'other'>('pensions');
     const [accountsTab, setAccountsTab] = useState<'retirement' | 'investment'>('retirement');
+    const [estateTab, setEstateTab] = useState<'gifts' | 'legacy'>('gifts');
     useEffect(() => {
         if (!focusTargetId) return;
         const el = document.getElementById(focusTargetId) as HTMLInputElement | null;
@@ -96,6 +97,38 @@ export const InputForm: React.FC<InputFormProps> = ({
         else setIncomeTab('other');
         const el = document.getElementById(nextId);
         el?.focus();
+    };
+
+    // Keyboard navigation for Estate Planning tabs
+    const handleEstateKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+        const ids = ['tab-gifts', 'tab-legacy'];
+        const activeId = document.activeElement?.id || '';
+        const idx = ids.indexOf(activeId);
+        let next = idx;
+        if (e.key === 'ArrowRight') next = idx === -1 ? 0 : (idx + 1) % ids.length;
+        else if (e.key === 'ArrowLeft') next = idx === -1 ? ids.length - 1 : (idx - 1 + ids.length) % ids.length;
+        else if (e.key === 'Home') next = 0;
+        else if (e.key === 'End') next = ids.length - 1;
+        else return;
+        e.preventDefault();
+        const nextId = ids[next];
+        if (nextId === 'tab-gifts') setEstateTab('gifts');
+        else setEstateTab('legacy');
+        const el = document.getElementById(nextId);
+        el?.focus();
+    };
+
+    // helpers for gifts & legacy so they can be used in the new Estate section
+    const addGiftGlobal = () => {
+        const id = Date.now().toString();
+        addToList('gifts', { id, beneficiary: '', owner: 'person1', isAnnual: false, amount: 0, annualAmount: 0, age: plan.person1.currentAge, startAge: plan.person1.retirementAge, endAge: plan.person1.lifeExpectancy } as any);
+        setFocusTargetId(`gift-beneficiary-${id}`);
+    };
+
+    const addLegacyGlobal = () => {
+        const id = Date.now().toString();
+        addToList('legacyDisbursements', { id, beneficiary: '', beneficiaryType: 'person', percentage: 0 } as any);
+        setFocusTargetId(`legacy-beneficiary-${id}`);
     };
     
     return (
@@ -242,7 +275,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                                     type="button"
                                     role="tab"
                                     id="tab-retirement"
-                                    aria-selected={(accountsTab === 'retirement' ? 'true' : 'false') as 'true' | 'false'}
+                                    aria-selected={accountsTab === 'retirement'}
                                     aria-controls="panel-retirement"
                                     onClick={() => setAccountsTab('retirement')}
                                     className={`text-sm pb-2 ${accountsTab === 'retirement' ? 'border-b-2 border-cyan-600 text-cyan-700 font-medium' : 'border-b-2 border-transparent text-gray-600 hover:text-gray-800'}`}
@@ -253,7 +286,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                                     type="button"
                                     role="tab"
                                     id="tab-investment"
-                                    aria-selected={(accountsTab === 'investment' ? 'true' : 'false') as 'true' | 'false'}
+                                    aria-selected={accountsTab === 'investment'}
                                     aria-controls="panel-investment"
                                     onClick={() => setAccountsTab('investment')}
                                     className={`text-sm pb-2 ${accountsTab === 'investment' ? 'border-b-2 border-teal-600 text-teal-700 font-medium' : 'border-b-2 border-transparent text-gray-600 hover:text-gray-800'}`}
@@ -341,7 +374,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                             type="button"
                             role="tab"
                             id="tab-pensions"
-                            aria-selected={(incomeTab === 'pensions' ? 'true' : 'false') as 'true' | 'false'}
+                            aria-selected={incomeTab === 'pensions'}
                             aria-controls="panel-pensions"
                             onClick={() => setIncomeTab('pensions')}
                             className={`text-sm pb-2 ${incomeTab === 'pensions' ? 'border-b-2 border-sky-600 text-sky-700 font-medium' : 'border-b-2 border-transparent text-gray-600 hover:text-gray-800'}`}
@@ -352,7 +385,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                             type="button"
                             role="tab"
                             id="tab-otherincomes"
-                            aria-selected={(incomeTab === 'other' ? 'true' : 'false') as 'true' | 'false'}
+                            aria-selected={incomeTab === 'other'}
                             aria-controls="panel-otherincomes"
                             onClick={() => setIncomeTab('other')}
                             className={`text-sm pb-2 ${incomeTab === 'other' ? 'border-b-2 border-lime-600 text-lime-700 font-medium' : 'border-b-2 border-transparent text-gray-600 hover:text-gray-800'}`}
@@ -443,14 +476,147 @@ export const InputForm: React.FC<InputFormProps> = ({
                 </div>
             </InputSection>
 
-            {['Expense Periods', 'Gifts'].map(section => {
+            {/* Estate Planning - Gifts + Legacy (tabs) */}
+            <InputSection title="Estate Planning" subtitle="Manage gifts and legacy allocations." titleColorClass="text-purple-600">
+                <div className="col-span-full">
+                    <div className="flex items-center space-x-6 mb-3" role="tablist" aria-label="Estate Tabs" onKeyDown={handleEstateKeyDown}>
+                        <button
+                            type="button"
+                            role="tab"
+                            id="tab-gifts"
+                            aria-selected={estateTab === 'gifts'}
+                            aria-controls="panel-gifts"
+                            onClick={() => setEstateTab('gifts')}
+                            className={`text-sm pb-2 ${estateTab === 'gifts' ? 'border-b-2 border-purple-600 text-purple-700 font-medium' : 'border-b-2 border-transparent text-gray-600 hover:text-gray-800'}`}
+                        >
+                            Gifts
+                        </button>
+                        <button
+                            type="button"
+                            role="tab"
+                            id="tab-legacy"
+                            aria-selected={estateTab === 'legacy'}
+                            aria-controls="panel-legacy"
+                            onClick={() => setEstateTab('legacy')}
+                            className={`text-sm pb-2 ${estateTab === 'legacy' ? 'border-b-2 border-orange-600 text-orange-700 font-medium' : 'border-b-2 border-transparent text-gray-600 hover:text-gray-800'}`}
+                        >
+                            Legacy Disbursements
+                        </button>
+                    </div>
+
+                    {/* Gifts panel */}
+                    {estateTab === 'gifts' && (
+                        <div id="panel-gifts" role="tabpanel" aria-labelledby="tab-gifts" className="space-y-2">
+                            {((plan.gifts || []) as any[]).map(item => (
+                                <div key={item.id} className="grid gap-x-4 items-end p-2 rounded-md bg-purple-50/50 grid-cols-6">
+                                    <div className="w-full">
+                                        <SelectInput label="Owner" value={item.owner || 'person1'} onChange={e => handleDynamicListChange('gifts', item.id, 'owner', e.target.value)}>
+                                            <option value="person1">{plan.person1.name}</option>
+                                            {isCouple && <option value="person2">{plan.person2.name}</option>}
+                                        </SelectInput>
+                                    </div>
+                                    <div className="w-48">
+                                        <TextInput id={`gift-beneficiary-${item.id}`} label="Beneficiary" value={item.beneficiary} onChange={e => handleDynamicListChange('gifts', item.id, 'beneficiary', e.target.value)} />
+                                    </div>
+                                    <div className="w-full">
+                                        <SelectInput label="Type" value={item.isAnnual ? 'annual' : 'one-time'} onChange={e => handleDynamicListChange('gifts', item.id, 'isAnnual', e.target.value === 'annual')}>
+                                            <option value="one-time">One-time</option>
+                                            <option value="annual">Annual</option>
+                                        </SelectInput>
+                                    </div>
+                                    {!item.isAnnual && (
+                                        <>
+                                            <div className="w-full">
+                                                <NumberInput label="Amount" prefix="$" value={item.amount || 0} onChange={e => handleDynamicListChange('gifts', item.id, 'amount', e.target.value)} />
+                                            </div>
+                                            <div className="w-20">
+                                                <NumberInput label="Age" value={item.age || plan.person1.currentAge} onChange={e => handleDynamicListChange('gifts', item.id, 'age', e.target.value)} />
+                                            </div>
+                                        </>
+                                    )}
+                                    {item.isAnnual && (
+                                        <>
+                                            <div className="w-full">
+                                                <NumberInput label="Amount" prefix="$" value={item.annualAmount || 0} onChange={e => handleDynamicListChange('gifts', item.id, 'annualAmount', e.target.value)} />
+                                            </div>
+                                            <div className="w-28">
+                                                <div className="flex space-x-1">
+                                                    <div className="w-1/2">
+                                                        <NumberInput label="Start" placeholder="e.g., 67" value={item.startAge || plan.person1.retirementAge} onChange={e => handleDynamicListChange('gifts', item.id, 'startAge', e.target.value)} />
+                                                    </div>
+                                                    <div className="w-1/2">
+                                                        <NumberInput label="End" placeholder="e.g., 90" value={item.endAge || plan.person1.lifeExpectancy} onChange={e => handleDynamicListChange('gifts', item.id, 'endAge', e.target.value)} />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </>
+                                    )}
+                                    <div className="flex items-end">
+                                        <ActionIcons onAdd={() => { const id = Date.now().toString(); addToList('gifts', { id, beneficiary: '', owner: 'person1', isAnnual: false, amount: 0, annualAmount: 0, age: plan.person1.currentAge, startAge: plan.person1.retirementAge, endAge: plan.person1.lifeExpectancy } as any); setFocusTargetId(`gift-beneficiary-${id}`); }} onRemove={() => removeFromList('gifts', item.id)} canRemove={(plan.gifts || []).length > 0} />
+                                    </div>
+                                </div>
+                            ))}
+                            {(plan.gifts || []).length === 0 && (
+                                <div className="text-center py-2">
+                                    <button onClick={() => { const id = Date.now().toString(); addToList('gifts', { id, beneficiary: '', owner: 'person1', isAnnual: false, amount: 0, annualAmount: 0, age: plan.person1.currentAge, startAge: plan.person1.retirementAge, endAge: plan.person1.lifeExpectancy } as any); setFocusTargetId(`gift-beneficiary-${id}`); }} className="text-sm text-brand-primary font-semibold hover:underline">+ Add Gift</button>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Legacy panel */}
+                    {estateTab === 'legacy' && (
+                        <div id="panel-legacy" role="tabpanel" aria-labelledby="tab-legacy" className="space-y-2">
+                            {(plan.legacyDisbursements || []).map((ld) => (
+                                <div key={ld.id} className="grid grid-cols-6 gap-x-4 items-end p-2 rounded-md bg-orange-50/50">
+                                    <div className="col-span-2">
+                                        <TextInput id={`legacy-beneficiary-${ld.id}`} label="Beneficiary" value={ld.beneficiary} disabled={plan.dieWithZero} onChange={e => handleDynamicListChange('legacyDisbursements', ld.id, 'beneficiary', e.target.value)} />
+                                    </div>
+                                    <div>
+                                        <SelectInput label="Type" value={ld.beneficiaryType} disabled={plan.dieWithZero} onChange={e => handleDynamicListChange('legacyDisbursements', ld.id, 'beneficiaryType', e.target.value)}>
+                                            <option value="person">Person</option>
+                                            <option value="organization">Organization</option>
+                                        </SelectInput>
+                                    </div>
+                                    <div className="w-28">
+                                        <NumberInput label="Percentage" suffix="%" value={ld.percentage} disabled={plan.dieWithZero} onChange={e => handleDynamicListChange('legacyDisbursements', ld.id, 'percentage', e.target.value)} />
+                                    </div>
+                                    <div className="flex items-end">
+                                        <ActionIcons onAdd={() => { const id = Date.now().toString(); addToList('legacyDisbursements', { ...ld, id, beneficiary: '', beneficiaryType: 'person', percentage: 0 } as any); setFocusTargetId(`legacy-beneficiary-${id}`); }} onRemove={() => removeFromList('legacyDisbursements', ld.id)} canRemove={(plan.legacyDisbursements || []).length > 0} />
+                                    </div>
+                                </div>
+                            ))}
+
+                            {(plan.legacyDisbursements || []).length === 0 && (
+                                <div className="text-center py-2">
+                                    <button disabled={plan.dieWithZero} onClick={() => { const id = Date.now().toString(); addToList('legacyDisbursements', { id, beneficiary: '', beneficiaryType: 'person', percentage: 0 } as any); setFocusTargetId(`legacy-beneficiary-${id}`); }} className={`text-sm font-semibold ${plan.dieWithZero ? 'text-gray-400' : 'text-brand-primary hover:underline'}`}>+ Add Legacy Disbursement</button>
+                                </div>
+                            )}
+
+                            {/* Validation: ensure percentages do not exceed 100 */}
+                            {(() => {
+                                const totalPct = (plan.legacyDisbursements || []).reduce((s, x) => s + (x.percentage || 0), 0);
+                                if (totalPct > 100) {
+                                    return <p className="text-sm text-red-600">Total legacy percentages exceed 100% ({totalPct}%). Please adjust.</p>;
+                                }
+                                if (totalPct > 0 && totalPct < 100) {
+                                    return <p className="text-sm text-gray-600">Total allocated: {totalPct}%. Remaining estate will be {100 - totalPct}%.</p>;
+                                }
+                                return null;
+                            })()}
+                            {plan.dieWithZero && <p className="text-sm text-gray-500 italic">Legacy disbursements are disabled while Die With Zero is enabled.</p>}
+                        </div>
+                    )}
+                </div>
+            </InputSection>
+
+            {['Expense Periods'].map(section => {
                 const listName = section.replace(' ', '').charAt(0).toLowerCase() + section.replace(' ', '').slice(1) as DynamicListKey;
                 const items = (plan[listName] as any[]) || [];
                 const subtitles: { [key: string]: string } = {
                     'Retirement Accounts': 'Add 401(k)s, IRAs, and other tax-advantaged accounts.',
                     'Investment Accounts': 'Add taxable brokerage and other investment accounts.',
                     'Expense Periods': 'Model different spending levels for different phases of retirement.',
-                    'Gifts': 'Add one-time or annual gifts to beneficiaries; affects cashflow and legacy.',
                     'Legacy Disbursements': 'Allocate percentages of the final estate to beneficiaries.'
                 };
 
@@ -458,15 +624,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                     'Retirement Accounts': 'text-cyan-600',
                     'Investment Accounts': 'text-teal-600',
                     'Expense Periods': 'text-red-600',
-                    'Gifts': 'text-purple-600',
                     'Legacy Disbursements': 'text-orange-600'
-                };
-
-                const addGift = () => {
-                    const id = Date.now().toString();
-                    addToList('gifts', { id, beneficiary: '', owner: 'person1', isAnnual: false, amount: 0, annualAmount: 0, age: plan.person1.currentAge, startAge: plan.person1.retirementAge, endAge: plan.person1.lifeExpectancy });
-                    // request focus for the newly-created beneficiary input
-                    setFocusTargetId(`gift-beneficiary-${id}`);
                 };
 
                 return (
@@ -474,10 +632,10 @@ export const InputForm: React.FC<InputFormProps> = ({
                         <div className="col-span-full space-y-2">
                             {items.map((item) => (
                                 <div key={item.id} className={`grid gap-x-4 items-end p-2 rounded-md ${
-                                    {'Retirement Accounts': 'bg-cyan-50/50 grid-cols-7', 'Investment Accounts': 'bg-teal-50/50 grid-cols-5', 'Expense Periods': 'bg-red-50/50 grid-cols-5', 'Gifts': 'bg-purple-50/50 grid-cols-6', 'Legacy Disbursements': 'bg-orange-50/50 grid-cols-6'}[section]
+                                    {'Retirement Accounts': 'bg-cyan-50/50 grid-cols-7', 'Investment Accounts': 'bg-teal-50/50 grid-cols-5', 'Expense Periods': 'bg-red-50/50 grid-cols-5', 'Legacy Disbursements': 'bg-orange-50/50 grid-cols-6'}[section]
                                 }`}> 
                                     {/* Common fields */}
-                                    {listName !== 'expensePeriods' && listName !== 'gifts' && (
+                                    {listName !== 'expensePeriods' && (
                                         <>
                                             <SelectInput label="Owner" value={item.owner} onChange={e => handleDynamicListChange(listName, item.id, 'owner', e.target.value)} data-list={listName} data-id={item.id}>
                                                 <option value="person1">{plan.person1.name}</option>
@@ -519,53 +677,6 @@ export const InputForm: React.FC<InputFormProps> = ({
                                         </div>
                                     </>}
                                     {/* pensions and otherIncomes are rendered in the dedicated Income tabs above */}
-                                        {listName === 'gifts' && <>
-                                            <div className="w-full">
-                                            <SelectInput label="Owner" value={item.owner || 'person1'} onChange={e => handleDynamicListChange(listName, item.id, 'owner', e.target.value)}>
-                                                <option value="person1">{plan.person1.name}</option>
-                                                {isCouple && <option value="person2">{plan.person2.name}</option>}
-                                            </SelectInput>
-                                        </div>
-                                        <div className="w-48">
-                                            <TextInput id={`gift-beneficiary-${item.id}`} label="Beneficiary" value={item.beneficiary} onChange={e => handleDynamicListChange(listName, item.id, 'beneficiary', e.target.value)} />
-                                        </div>
-                                            <div className="w-full">
-                                                <SelectInput label="Type" value={item.isAnnual ? 'annual' : 'one-time'} onChange={e => handleDynamicListChange(listName, item.id, 'isAnnual', e.target.value === 'annual')}>
-                                                    <option value="one-time">One-time</option>
-                                                    <option value="annual">Annual</option>
-                                                </SelectInput>
-                                            </div>
-                                            {!item.isAnnual && (
-                                                <>
-                                                    <div className="w-full">
-                                                        <NumberInput label="Amount" prefix="$" value={item.amount || 0} onChange={e => handleDynamicListChange(listName, item.id, 'amount', e.target.value)} />
-                                                    </div>
-                                                    <div className="w-20">
-                                                        <NumberInput label="Age" value={item.age || plan.person1.currentAge} onChange={e => handleDynamicListChange(listName, item.id, 'age', e.target.value)} />
-                                                    </div>
-                                                </>
-                                            )}
-                                            {item.isAnnual && (
-                                            <>
-                                                <div className="w-full">
-                                                    <NumberInput label="Amount" prefix="$" value={item.annualAmount || 0} onChange={e => handleDynamicListChange(listName, item.id, 'annualAmount', e.target.value)} />
-                                                </div>
-                                                <div className="w-28">
-                                                    <div className="flex space-x-1">
-                                                        <div className="w-1/2">
-                                                            <NumberInput label="Start" placeholder="e.g., 67" value={item.startAge || plan.person1.retirementAge} onChange={e => handleDynamicListChange(listName, item.id, 'startAge', e.target.value)} />
-                                                        </div>
-                                                        <div className="w-1/2">
-                                                            <NumberInput label="End" placeholder="e.g., 90" value={item.endAge || plan.person1.lifeExpectancy} onChange={e => handleDynamicListChange(listName, item.id, 'endAge', e.target.value)} />
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </>
-                                        )}
-                                        <div className="flex items-end">
-                                            <ActionIcons onAdd={addGift} onRemove={() => removeFromList('gifts', item.id)} canRemove={items.length > 0} />
-                                        </div>
-                                        </>}
                                     {listName === 'expensePeriods' && <>
                                             <TextInput label="Name" value={item.name} onChange={e => handleDynamicListChange(listName, item.id, 'name', e.target.value)} data-list={listName} data-id={item.id} />
                                             <NumberInput label="Total Monthly Expenses" prefix="$" value={item.monthlyAmount} onChange={e => handleDynamicListChange(listName, item.id, 'monthlyAmount', e.target.value)}/>
@@ -587,75 +698,11 @@ export const InputForm: React.FC<InputFormProps> = ({
                                     </>}
                                 </div>
                             ))}
-                            {listName === 'gifts' && items.length === 0 && (
-                                <div className="text-center py-2">
-                                    <button onClick={addGift} className="text-sm text-brand-primary font-semibold hover:underline">
-                                        + Add {section.slice(0, -1)}
-                                    </button>
-                                </div>
-                            )}
+                            
                         </div>
                     </InputSection>
                 )
             })}
-
-            {/* Legacy Disbursements - separate section from Gifts */}
-            <InputSection title="Legacy Disbursements" subtitle="Allocate percentages of the final estate to beneficiaries. Disabled when Die With Zero is enabled." titleColorClass="text-orange-600">
-                <div className="col-span-full space-y-2">
-                        {(plan.legacyDisbursements || []).map((ld) => (
-                        <div key={ld.id} className="grid grid-cols-6 gap-x-4 items-end p-2 rounded-md bg-orange-50/50">
-                            <div className="col-span-2">
-                                <TextInput id={`legacy-beneficiary-${ld.id}`} label="Beneficiary" value={ld.beneficiary} disabled={plan.dieWithZero} onChange={e => handleDynamicListChange('legacyDisbursements', ld.id, 'beneficiary', e.target.value)} />
-                            </div>
-                            <div>
-                                <SelectInput label="Type" value={ld.beneficiaryType} disabled={plan.dieWithZero} onChange={e => handleDynamicListChange('legacyDisbursements', ld.id, 'beneficiaryType', e.target.value)}>
-                                    <option value="person">Person</option>
-                                    <option value="organization">Organization</option>
-                                </SelectInput>
-                            </div>
-                            <div className="w-28">
-                                <NumberInput label="Percentage" suffix="%" value={ld.percentage} disabled={plan.dieWithZero} onChange={e => handleDynamicListChange('legacyDisbursements', ld.id, 'percentage', e.target.value)} />
-                            </div>
-                            <div className="flex items-end">
-                                <ActionIcons onAdd={() => {
-                                        const id = Date.now().toString();
-                                        addToList('legacyDisbursements', { ...ld, id, beneficiary: '', beneficiaryType: 'person', percentage: 0 });
-                                        setFocusTargetId(`legacy-beneficiary-${id}`);
-                                    }} onRemove={() => removeFromList('legacyDisbursements', ld.id)} canRemove={(plan.legacyDisbursements || []).length > 0} />
-                            </div>
-                        </div>
-                    ))}
-
-                    {(plan.legacyDisbursements || []).length === 0 && (
-                        <div className="text-center py-2">
-                            <button
-                                disabled={plan.dieWithZero}
-                                onClick={() => {
-                                    const id = Date.now().toString();
-                                    addToList('legacyDisbursements', { id, beneficiary: '', beneficiaryType: 'person', percentage: 0 });
-                                    setFocusTargetId(`legacy-beneficiary-${id}`);
-                                }}
-                                className={`text-sm font-semibold ${plan.dieWithZero ? 'text-gray-400' : 'text-brand-primary hover:underline'}`}
-                            >
-                                + Add Legacy Disbursement
-                            </button>
-                        </div>
-                    )}
-
-                    {/* Validation: ensure percentages do not exceed 100 */}
-                    {(() => {
-                        const totalPct = (plan.legacyDisbursements || []).reduce((s, x) => s + (x.percentage || 0), 0);
-                        if (totalPct > 100) {
-                            return <p className="text-sm text-red-600">Total legacy percentages exceed 100% ({totalPct}%). Please adjust.</p>;
-                        }
-                        if (totalPct > 0 && totalPct < 100) {
-                            return <p className="text-sm text-gray-600">Total allocated: {totalPct}%. Remaining estate will be {100 - totalPct}%.</p>;
-                        }
-                        return null;
-                    })()}
-                    {plan.dieWithZero && <p className="text-sm text-gray-500 italic">Legacy disbursements are disabled while Die With Zero is enabled.</p>}
-                </div>
-            </InputSection>
         </>
     );
 };
