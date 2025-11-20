@@ -3,7 +3,7 @@ import { RetirementPlan, PlanType, Person, MonteCarloResult } from './types';
 import { UserManualModal } from './components/UserManualModal';
 import { ScrollToTopButton } from './components/ScrollToTopButton';
 import { PrintableReport } from './components/PrintableReport';
-import { Header } from './components/Header';
+import Header from './components/Header';
 import { ResultsPanel } from './components/ResultsPanel';
 import { InputForm } from './components/InputForm';
 import { AnalysisSections } from './components/AnalysisSections';
