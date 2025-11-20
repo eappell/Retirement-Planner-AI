@@ -112,7 +112,12 @@ const Header: React.FC<HeaderProps> = ({
 
         <div className="relative" ref={scenarioMenuRef}>
           <button type="button" onClick={() => setIsScenarioMenuOpen(prev => !prev)} className="flex items-center space-x-2 text-sm text-gray-600 hover:text-brand-primary transition-colors font-medium p-2 rounded-md hover:bg-gray-100">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7h16v2H4zM4 11h16v2H4zM4 15h16v2H4z"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+              <rect x="3" y="4" width="18" height="6" rx="1" ry="1" />
+              <rect x="3" y="13" width="18" height="6" rx="1" ry="1" />
+              <path d="M7 7v2" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
+              <path d="M7 16v1" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
+            </svg>
             <span>Scenarios</span>
           </button>
 
@@ -120,7 +125,12 @@ const Header: React.FC<HeaderProps> = ({
             <div className="origin-top-right absolute right-0 mt-2 w-96 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-30 p-4">
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-brand-text-primary flex items-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 7h18M3 11h18M3 15h18" /></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                    <rect x="3" y="4" width="18" height="6" rx="1" ry="1" />
+                    <rect x="3" y="13" width="18" height="6" rx="1" ry="1" />
+                    <path d="M7 7v2" strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} />
+                    <path d="M7 16v1" strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} />
+                  </svg>
                   Scenario Manager
                 </h3>
                 <div>
