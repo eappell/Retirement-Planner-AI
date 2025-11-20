@@ -47,6 +47,11 @@ export const Header: React.FC<HeaderProps> = ({
         };
     }, []);
 
+    const handleUploadAndClose = (e: React.ChangeEvent<HTMLInputElement>) => {
+        handleUploadScenarios(e);
+        setIsScenarioMenuOpen(false);
+    };
+
     // download/upload handlers are called directly from the UI below
     
     return (
@@ -118,7 +123,7 @@ export const Header: React.FC<HeaderProps> = ({
                                                 <span className="ml-3">Upload Scenarios</span>
                                                 <input
                                                     type="file"
-                                                    onChange={e => handleUploadScenarios(e)}
+                                                    onChange={handleUploadAndClose}
                                                     accept=".retire"
                                                     className="hidden"
                                                 />
