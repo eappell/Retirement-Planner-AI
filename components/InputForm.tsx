@@ -355,7 +355,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                                         </div>
                                     ))}
                                     {(plan.retirementAccounts || []).length === 0 && (
-                                        <div className="absolute top-3 right-3">
+                                        <div className="flex justify-center py-6">
                                             <button onClick={() => {
                                                 const id = Date.now().toString();
                                                 addToList('retirementAccounts', { id, owner: 'person1', name: 'New Account', type: '401k', balance: 0, annualContribution: 0, match: 0 } as any);
@@ -383,7 +383,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                                         </div>
                                     ))}
                                     {(plan.investmentAccounts || []).length === 0 && (
-                                        <div className="absolute top-3 right-3">
+                                        <div className="flex justify-center py-6">
                                             <button onClick={() => {
                                                 const id = Date.now().toString();
                                                 addToList('investmentAccounts', { id, balance: 0, annualContribution: 0 } as any);
@@ -483,7 +483,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                                 </div>
                             ))}
                             {(plan.pensions || []).length === 0 && (
-                                <div className="absolute top-3 right-3">
+                                <div className="flex justify-center py-6">
                                     <button onClick={() => {
                                         const id = Date.now().toString();
                                         addToList('pensions', { id, owner: 'person1', name: 'New Pension', monthlyBenefit: 0, startAge: plan.person1.retirementAge, cola: 0, survivorBenefit: 0, taxable: true } as any);
@@ -523,7 +523,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                                 </div>
                             ))}
                             {(plan.otherIncomes || []).length === 0 && (
-                                <div className="absolute top-3 right-3">
+                                <div className="flex justify-center py-6">
                                     <button onClick={() => {
                                         const id = Date.now().toString();
                                         addToList('otherIncomes', { id, owner: 'person1', name: 'New Income', monthlyAmount: 0, startAge: plan.person1.retirementAge, endAge: plan.person1.lifeExpectancy, cola: 0, taxable: true } as any);
@@ -647,7 +647,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                                 </div>
                             ))}
                             {(plan.gifts || []).length === 0 && (
-                                <div className="absolute top-3 right-3">
+                                <div className="flex justify-center py-6">
                                     <button onClick={() => { const id = Date.now().toString(); addToList('gifts', { id, beneficiary: '', owner: 'person1', isAnnual: false, amount: 0, annualAmount: 0, age: plan.person1.currentAge, startAge: plan.person1.retirementAge, endAge: plan.person1.lifeExpectancy } as any); setFocusTargetId(`gift-beneficiary-${id}`); }} className="inline-flex items-center px-3 py-1.5 rounded-full bg-brand-primary text-white text-sm shadow-sm hover:opacity-90">+ Add Gift</button>
                                 </div>
                             )}
@@ -678,7 +678,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                             ))}
 
                             {(plan.legacyDisbursements || []).length === 0 && (
-                                <div className="absolute top-3 right-3">
+                                <div className="flex justify-center py-6">
                                     <button disabled={plan.dieWithZero} onClick={() => { const id = Date.now().toString(); addToList('legacyDisbursements', { id, beneficiary: '', beneficiaryType: 'person', percentage: 0 } as any); setFocusTargetId(`legacy-beneficiary-${id}`); }} className={`inline-flex items-center px-3 py-1.5 rounded-full ${plan.dieWithZero ? 'bg-gray-200 text-gray-500' : 'bg-brand-primary text-white hover:opacity-90'} text-sm font-semibold`}>+ Add Legacy</button>
                                 </div>
                             )}
@@ -789,7 +789,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                                 </div>
                             ))}
                             {items.length === 0 && listName === 'expensePeriods' && (
-                                <div className="absolute top-3 right-3">
+                                <div className="flex justify-center py-6">
                                     <button onClick={() => { const id = Date.now().toString(); addToList('expensePeriods', { id, monthlyAmount: 0, name: `Phase ${items.length + 1}`, startAge: plan.person1.retirementAge, startAgeRef: 'person1', endAge: plan.person1.lifeExpectancy, endAgeRef: 'person1' } as any); setFocusTargetId(`expensePeriods-name-${id}`); }} className="inline-flex items-center px-3 py-1.5 rounded-full bg-brand-primary text-white text-sm shadow-sm hover:opacity-90">+ Add Expense Period</button>
                                 </div>
                             )}
