@@ -69,10 +69,10 @@ const manualContent = [
         id: 'income',
         title: 'Income',
         icon: (
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-3.866 0-7 1.79-7 4s3.134 4 7 4 7-1.79 7-4-3.134-4-7-4z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12v4c0 2.21 3.134 4 7 4" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 0C9.239 4 7 5.343 7 7s2.239 3 5 3 5-1.343 5-3-2.239-3-5-3z" />
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="none" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 2c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2-3-.895-3-2" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 10c0 2.21 3.582 4 8 4s8-1.79 8-4-3.582-4-8-4-8 1.79-8 4z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 14c0 1.105 2.239 2 5 2s5-.895 5-2" />
             </svg>
         ),
         content: (
