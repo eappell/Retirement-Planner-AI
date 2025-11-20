@@ -30,6 +30,7 @@ export const InputForm: React.FC<InputFormProps> = ({
 }) => {
     const isCouple = plan.planType === PlanType.COUPLE;
     const [focusTargetId, setFocusTargetId] = useState<string | null>(null);
+    const [accountsTab, setAccountsTab] = useState<'retirement' | 'investment'>('retirement');
     useEffect(() => {
         if (!focusTargetId) return;
         const el = document.getElementById(focusTargetId) as HTMLInputElement | null;
@@ -194,8 +195,87 @@ export const InputForm: React.FC<InputFormProps> = ({
                     {isCouple && <p className="col-span-full text-xs text-gray-500 mt-2">Note: Survivor benefits are simplified. Typically, a surviving spouse receives the higher of their own benefit or their deceased spouse's benefit.</p>}
             </InputSection>
 
+                    {/* Accounts - combined tabs for Retirement / Investment accounts */}
+                    <InputSection title="Accounts" subtitle="Manage retirement and investment accounts in separate tabs." titleColorClass="text-cyan-600">
+                        <div className="col-span-full">
+                            <div className="flex items-center space-x-2 mb-3">
+                                <button type="button" onClick={() => setAccountsTab('retirement')} className={`px-3 py-1 rounded-md text-sm ${accountsTab === 'retirement' ? 'bg-cyan-600 text-white' : 'bg-gray-100 text-gray-700'}`}>Retirement Accounts</button>
+                                <button type="button" onClick={() => setAccountsTab('investment')} className={`px-3 py-1 rounded-md text-sm ${accountsTab === 'investment' ? 'bg-teal-600 text-white' : 'bg-gray-100 text-gray-700'}`}>Investment Accounts</button>
+                            </div>
 
-            {['Retirement Accounts', 'Investment Accounts', 'Pensions', 'Other Incomes', 'Expense Periods', 'Gifts'].map(section => {
+                            {/* Retirement tab content */}
+                            {accountsTab === 'retirement' && (
+                                <div className="space-y-2">
+                                    {((plan.retirementAccounts || []) as any[]).map(item => (
+                                        <div key={item.id} className="grid gap-x-4 items-end p-2 rounded-md bg-cyan-50/50 grid-cols-7">
+                                            <SelectInput label="Owner" value={item.owner} onChange={e => handleDynamicListChange('retirementAccounts', item.id, 'owner', e.target.value)}>
+                                                <option value="person1">{plan.person1.name}</option>
+                                                {isCouple && <option value="person2">{plan.person2.name}</option>}
+                                            </SelectInput>
+                                            <TextInput id={`retirementAccounts-name-${item.id}`} label="Name" value={item.name} onChange={e => handleDynamicListChange('retirementAccounts', item.id, 'name', e.target.value)} />
+                                            <SelectInput label="Type" value={item.type} onChange={e => handleDynamicListChange('retirementAccounts', item.id, 'type', e.target.value)}>
+                                                <option>401k</option>
+                                                <option>457b</option>
+                                                <option>IRA</option>
+                                                <option>Roth IRA</option>
+                                                <option>Other</option>
+                                            </SelectInput>
+                                            <NumberInput label="Balance" prefix="$" value={item.balance} onChange={e => handleDynamicListChange('retirementAccounts', item.id, 'balance', e.target.value)}/>
+                                            <NumberInput label="Annual Contrib." prefix="$" value={item.annualContribution} onChange={e => handleDynamicListChange('retirementAccounts', item.id, 'annualContribution', e.target.value)}/>
+                                            <NumberInput label="Match" suffix="%" value={item.match} onChange={e => handleDynamicListChange('retirementAccounts', item.id, 'match', e.target.value)}/>
+                                            <div className="flex items-end">
+                                                <ActionIcons onAdd={() => {
+                                                    const id = Date.now().toString();
+                                                    addToList('retirementAccounts', { ...item, id, balance: 0, annualContribution: 0, match: 0 } as any);
+                                                    setFocusTargetId(`retirementAccounts-name-${id}`);
+                                                }} onRemove={() => removeFromList('retirementAccounts', item.id)} canRemove={(plan.retirementAccounts || []).length > 1} />
+                                            </div>
+                                        </div>
+                                    ))}
+                                    {(plan.retirementAccounts || []).length === 0 && (
+                                        <div className="text-center py-2">
+                                            <button onClick={() => {
+                                                const id = Date.now().toString();
+                                                addToList('retirementAccounts', { id, owner: 'person1', name: 'New Account', type: '401k', balance: 0, annualContribution: 0, match: 0 } as any);
+                                                setFocusTargetId(`retirementAccounts-name-${id}`);
+                                            }} className="text-sm text-brand-primary font-semibold hover:underline">+ Add Retirement Account</button>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Investment tab content */}
+                            {accountsTab === 'investment' && (
+                                <div className="space-y-2">
+                                    {((plan.investmentAccounts || []) as any[]).map(item => (
+                                        <div key={item.id} className="grid gap-x-4 items-end p-2 rounded-md bg-teal-50/50 grid-cols-5">
+                                            <NumberInput label="Balance" prefix="$" value={item.balance} onChange={e => handleDynamicListChange('investmentAccounts', item.id, 'balance', e.target.value)}/>
+                                            <NumberInput label="Annual Contrib." prefix="$" value={item.annualContribution} onChange={e => handleDynamicListChange('investmentAccounts', item.id, 'annualContribution', e.target.value)}/>
+                                            <div className="flex items-end">
+                                                <ActionIcons onAdd={() => {
+                                                    const id = Date.now().toString();
+                                                    addToList('investmentAccounts', { ...item, id, balance: 0, annualContribution: 0 } as any);
+                                                    setFocusTargetId(`investmentAccounts-name-${id}`);
+                                                }} onRemove={() => removeFromList('investmentAccounts', item.id)} canRemove={(plan.investmentAccounts || []).length > 1} />
+                                            </div>
+                                        </div>
+                                    ))}
+                                    {(plan.investmentAccounts || []).length === 0 && (
+                                        <div className="text-center py-2">
+                                            <button onClick={() => {
+                                                const id = Date.now().toString();
+                                                addToList('investmentAccounts', { id, balance: 0, annualContribution: 0 } as any);
+                                                setFocusTargetId(`investmentAccounts-name-${id}`);
+                                            }} className="text-sm text-brand-primary font-semibold hover:underline">+ Add Investment Account</button>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    </InputSection>
+
+
+            {['Pensions', 'Other Incomes', 'Expense Periods', 'Gifts'].map(section => {
                 const listName = section.replace(' ', '').charAt(0).toLowerCase() + section.replace(' ', '').slice(1) as DynamicListKey;
                 const items = (plan[listName] as any[]) || [];
                 const subtitles: { [key: string]: string } = {
