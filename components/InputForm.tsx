@@ -393,11 +393,16 @@ export const InputForm: React.FC<InputFormProps> = ({
                                                     const invalid = total !== 100;
                                                     return (
                                                         <React.Fragment key={item.id}>
-                                                            <div className={`grid gap-x-4 items-end p-2 rounded-md ${invalid ? 'bg-teal-50/60' : 'bg-teal-50/50'} grid-cols-7`}>
-                                                                <NumberInput label="Balance" prefix="$" value={item.balance} onChange={e => handleDynamicListChange('investmentAccounts', item.id, 'balance', e.target.value)}/>
-                                                                <NumberInput label="Annual Contrib." prefix="$" value={item.annualContribution} onChange={e => handleDynamicListChange('investmentAccounts', item.id, 'annualContribution', e.target.value)}/>
-                                                                <NumberInput label="% Stocks" suffix="%" value={(item.percentStocks ?? 0)} onChange={e => handleDynamicListChange('investmentAccounts', item.id, 'percentStocks', e.target.value)} />
-                                                                <NumberInput label="% Bonds" suffix="%" value={(item.percentBonds ?? 0)} onChange={e => handleDynamicListChange('investmentAccounts', item.id, 'percentBonds', e.target.value)} />
+                                                                <div className={`grid gap-x-4 items-end p-2 rounded-md ${invalid ? 'bg-teal-50/60' : 'bg-teal-50/50'} grid-cols-9`}>
+                                                                    <SelectInput label="Owner" value={item.owner || 'person1'} onChange={e => handleDynamicListChange('investmentAccounts', item.id, 'owner', e.target.value)}>
+                                                                        <option value="person1">{plan.person1.name}</option>
+                                                                        {isCouple && <option value="person2">{plan.person2.name}</option>}
+                                                                    </SelectInput>
+                                                                    <TextInput id={`investmentAccounts-name-${item.id}`} label="Name" value={item.name} onChange={e => handleDynamicListChange('investmentAccounts', item.id, 'name', e.target.value)} />
+                                                                    <NumberInput label="Balance" prefix="$" value={item.balance} onChange={e => handleDynamicListChange('investmentAccounts', item.id, 'balance', e.target.value)}/>
+                                                                    <NumberInput label="Annual Contrib." prefix="$" value={item.annualContribution} onChange={e => handleDynamicListChange('investmentAccounts', item.id, 'annualContribution', e.target.value)}/>
+                                                                    <NumberInput label="% Stocks" suffix="%" value={(item.percentStocks ?? 0)} onChange={e => handleDynamicListChange('investmentAccounts', item.id, 'percentStocks', e.target.value)} />
+                                                                    <NumberInput label="% Bonds" suffix="%" value={(item.percentBonds ?? 0)} onChange={e => handleDynamicListChange('investmentAccounts', item.id, 'percentBonds', e.target.value)} />
                                                                 <div className="flex items-end">
                                                                     <ActionIcons onAdd={() => {
                                                                         const id = Date.now().toString();
