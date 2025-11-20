@@ -63,44 +63,24 @@ html, body {
   color: var(--card-label-color) !important;
 }
 
-/* Person sections: make slightly darker and text white in dark mode */
-.theme-dark .bg-blue-50,
-.theme-dark .bg-rose-50,
-.theme-dark .bg-blue-100,
-.theme-dark .bg-rose-100 {
-  background-color: #082233 !important; /* darker panel */
-  border-color: rgba(255,255,255,0.06) !important;
-  color: var(--brand-text-primary) !important;
-}
-.theme-dark .bg-blue-50 h3,
-.theme-dark .bg-rose-50 h3,
-.theme-dark .bg-blue-100 h3,
-.theme-dark .bg-rose-100 h3 {
+/* Unified section styling: make all section-like utility backgrounds match the
+   card surface and use white text for legibility in dark mode. This simplifies
+   per-color overrides and ensures consistent appearance across sections. */
+.theme-dark [class*="bg-"][class*="-50"],
+.theme-dark [class*="bg-"][class*="-100"],
+.theme-dark [class*="bg-"][class*="-200"] {
+  background-color: var(--brand-surface) !important;
   color: #ffffff !important;
+  border-color: rgba(255,255,255,0.06) !important;
 }
-
-/* Account sections: use light purple background and black text in dark mode */
-.theme-dark .bg-cyan-50,
-.theme-dark .bg-cyan-50\/50,
-.theme-dark .bg-teal-50,
-.theme-dark .bg-teal-50\/50 {
-  background-color: #efe6ff !important; /* light purple */
-  color: #000000 !important;
-  border-color: rgba(0,0,0,0.06) !important;
-}
-.theme-dark .bg-cyan-50 h3,
-.theme-dark .bg-teal-50 h3,
-.theme-dark .bg-cyan-50 label,
-.theme-dark .bg-teal-50 label,
-.theme-dark .bg-cyan-50 .text-sm.font-medium,
-.theme-dark .bg-teal-50 .text-sm.font-medium {
-  color: #000000 !important;
-}
-
-/* Also target common utility variants that include a slash (e.g., bg-cyan-50/50) via attribute selector fallback */
-.theme-dark [class*="bg-cyan-50"] {
-  background-color: #efe6ff !important;
-}
-.theme-dark [class*="bg-teal-50"] {
-  background-color: #efe6ff !important;
+.theme-dark [class*="bg-"][class*="-50"] h3,
+.theme-dark [class*="bg-"][class*="-100"] h3,
+.theme-dark [class*="bg-"][class*="-200"] h3,
+.theme-dark [class*="bg-"][class*="-50"] label,
+.theme-dark [class*="bg-"][class*="-100"] label,
+.theme-dark [class*="bg-"][class*="-200"] label,
+.theme-dark [class*="bg-"][class*="-50"] .text-sm.font-medium,
+.theme-dark [class*="bg-"][class*="-100"] .text-sm.font-medium,
+.theme-dark [class*="bg-"][class*="-200"] .text-sm.font-medium {
+  color: #ffffff !important;
 }
