@@ -198,7 +198,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                     {/* Accounts - combined tabs for Retirement / Investment accounts */}
                     <InputSection title="Accounts" subtitle="Manage retirement and investment accounts in separate tabs." titleColorClass="text-cyan-600">
                         <div className="col-span-full">
-                            <div className="inline-flex rounded-md bg-gray-100 p-1 mb-3" role="tablist" aria-label="Accounts Tabs">
+                            <div className="flex items-center space-x-2 mb-3" role="tablist" aria-label="Accounts Tabs">
                                 <button
                                     type="button"
                                     role="tab"
@@ -206,9 +206,9 @@ export const InputForm: React.FC<InputFormProps> = ({
                                     aria-selected={accountsTab === 'retirement' ? 'true' : 'false'}
                                     aria-controls="panel-retirement"
                                     onClick={() => setAccountsTab('retirement')}
-                                    className={`px-3 py-1 text-sm rounded-md ${accountsTab === 'retirement' ? 'bg-white text-cyan-600 shadow-sm' : 'text-gray-600 hover:bg-white'}`}
+                                    className={`text-sm rounded-full px-3 py-1 ${accountsTab === 'retirement' ? 'bg-cyan-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
                                 >
-                                    Retirement
+                                    Retirement Accounts
                                 </button>
                                 <button
                                     type="button"
@@ -217,9 +217,9 @@ export const InputForm: React.FC<InputFormProps> = ({
                                     aria-selected={accountsTab === 'investment' ? 'true' : 'false'}
                                     aria-controls="panel-investment"
                                     onClick={() => setAccountsTab('investment')}
-                                    className={`ml-1 px-3 py-1 text-sm rounded-md ${accountsTab === 'investment' ? 'bg-white text-teal-600 shadow-sm' : 'text-gray-600 hover:bg-white'}`}
+                                    className={`text-sm rounded-full px-3 py-1 ${accountsTab === 'investment' ? 'bg-teal-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
                                 >
-                                    Investment
+                                    Investment Accounts
                                 </button>
                             </div>
 
