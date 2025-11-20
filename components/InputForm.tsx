@@ -59,6 +59,44 @@ export const InputForm: React.FC<InputFormProps> = ({
             )}
         </div>
     );
+
+    // Keyboard navigation for Accounts tabs (Left/Right/Home/End)
+    const handleAccountsKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+        const ids = ['tab-retirement', 'tab-investment'];
+        const activeId = document.activeElement?.id || '';
+        const idx = ids.indexOf(activeId);
+        let next = idx;
+        if (e.key === 'ArrowRight') next = idx === -1 ? 0 : (idx + 1) % ids.length;
+        else if (e.key === 'ArrowLeft') next = idx === -1 ? ids.length - 1 : (idx - 1 + ids.length) % ids.length;
+        else if (e.key === 'Home') next = 0;
+        else if (e.key === 'End') next = ids.length - 1;
+        else return;
+        e.preventDefault();
+        const nextId = ids[next];
+        if (nextId === 'tab-retirement') setAccountsTab('retirement');
+        else setAccountsTab('investment');
+        const el = document.getElementById(nextId);
+        el?.focus();
+    };
+
+    // Keyboard navigation for Income tabs (Left/Right/Home/End)
+    const handleIncomeKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+        const ids = ['tab-pensions', 'tab-otherincomes'];
+        const activeId = document.activeElement?.id || '';
+        const idx = ids.indexOf(activeId);
+        let next = idx;
+        if (e.key === 'ArrowRight') next = idx === -1 ? 0 : (idx + 1) % ids.length;
+        else if (e.key === 'ArrowLeft') next = idx === -1 ? ids.length - 1 : (idx - 1 + ids.length) % ids.length;
+        else if (e.key === 'Home') next = 0;
+        else if (e.key === 'End') next = ids.length - 1;
+        else return;
+        e.preventDefault();
+        const nextId = ids[next];
+        if (nextId === 'tab-pensions') setIncomeTab('pensions');
+        else setIncomeTab('other');
+        const el = document.getElementById(nextId);
+        el?.focus();
+    };
     
     return (
         <>
@@ -199,12 +237,12 @@ export const InputForm: React.FC<InputFormProps> = ({
                     {/* Accounts - combined tabs for Retirement / Investment accounts */}
                     <InputSection title="Accounts" subtitle="Manage retirement and investment accounts in separate tabs." titleColorClass="text-cyan-600">
                         <div className="col-span-full">
-                            <div className="flex items-center space-x-6 mb-3" role="tablist" aria-label="Accounts Tabs">
+                            <div className="flex items-center space-x-6 mb-3" role="tablist" aria-label="Accounts Tabs" onKeyDown={handleAccountsKeyDown}>
                                 <button
                                     type="button"
                                     role="tab"
                                     id="tab-retirement"
-                                    aria-selected={accountsTab === 'retirement' ? 'true' : 'false'}
+                                    aria-selected={(accountsTab === 'retirement' ? 'true' : 'false') as 'true' | 'false'}
                                     aria-controls="panel-retirement"
                                     onClick={() => setAccountsTab('retirement')}
                                     className={`text-sm pb-2 ${accountsTab === 'retirement' ? 'border-b-2 border-cyan-600 text-cyan-700 font-medium' : 'border-b-2 border-transparent text-gray-600 hover:text-gray-800'}`}
@@ -215,7 +253,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                                     type="button"
                                     role="tab"
                                     id="tab-investment"
-                                    aria-selected={accountsTab === 'investment' ? 'true' : 'false'}
+                                    aria-selected={(accountsTab === 'investment' ? 'true' : 'false') as 'true' | 'false'}
                                     aria-controls="panel-investment"
                                     onClick={() => setAccountsTab('investment')}
                                     className={`text-sm pb-2 ${accountsTab === 'investment' ? 'border-b-2 border-teal-600 text-teal-700 font-medium' : 'border-b-2 border-transparent text-gray-600 hover:text-gray-800'}`}
@@ -298,7 +336,7 @@ export const InputForm: React.FC<InputFormProps> = ({
             {/* Income - combined tabs for Pensions / Other Incomes */}
             <InputSection title="Income" subtitle="Manage pensions and other income sources in tabs." titleColorClass="text-sky-600">
                 <div className="col-span-full">
-                    <div className="flex items-center space-x-6 mb-3" role="tablist" aria-label="Income Tabs">
+                    <div className="flex items-center space-x-6 mb-3" role="tablist" aria-label="Income Tabs" onKeyDown={handleIncomeKeyDown}>
                         <button
                             type="button"
                             role="tab"
@@ -411,32 +449,19 @@ export const InputForm: React.FC<InputFormProps> = ({
                 const subtitles: { [key: string]: string } = {
                     'Retirement Accounts': 'Add 401(k)s, IRAs, and other tax-advantaged accounts.',
                     'Investment Accounts': 'Add taxable brokerage and other investment accounts.',
-                    'Pensions': 'Add any defined-benefit pension plans.',
-                    'Other Incomes': 'Add any other sources of income, like rental properties or part-time work.',
                     'Expense Periods': 'Model different spending levels for different phases of retirement.',
-                    'Gifts': 'Add one-time or annual gifts to beneficiaries; affects cashflow and legacy.'
-                    , 'Legacy Disbursements': 'Allocate percentages of the final estate to beneficiaries.'
+                    'Gifts': 'Add one-time or annual gifts to beneficiaries; affects cashflow and legacy.',
+                    'Legacy Disbursements': 'Allocate percentages of the final estate to beneficiaries.'
                 };
-                    const colors: { [key: string]: string } = {
+
+                const colors: { [key: string]: string } = {
                     'Retirement Accounts': 'text-cyan-600',
                     'Investment Accounts': 'text-teal-600',
-                    'Pensions': 'text-sky-600',
-                    'Other Incomes': 'text-lime-600',
                     'Expense Periods': 'text-red-600',
                     'Gifts': 'text-purple-600',
                     'Legacy Disbursements': 'text-orange-600'
                 };
-                
-                const addPension = () => {
-                    const id = Date.now().toString();
-                    addToList('pensions', { id, owner: 'person1', name: 'New Pension', monthlyBenefit: 0, startAge: Math.min(plan.person1.retirementAge, isCouple ? plan.person2.retirementAge : Infinity), cola: 0, survivorBenefit: 0, taxable: true });
-                    setFocusTargetId(`pensions-name-${id}`);
-                };
-                const addOtherIncome = () => {
-                    const id = Date.now().toString();
-                    addToList('otherIncomes', { id, owner: 'person1', name: 'New Income', monthlyAmount: 0, startAge: plan.person1.retirementAge, endAge: plan.person1.lifeExpectancy, cola: 0, taxable: true });
-                    setFocusTargetId(`otherIncomes-name-${id}`);
-                };
+
                 const addGift = () => {
                     const id = Date.now().toString();
                     addToList('gifts', { id, beneficiary: '', owner: 'person1', isAnnual: false, amount: 0, annualAmount: 0, age: plan.person1.currentAge, startAge: plan.person1.retirementAge, endAge: plan.person1.lifeExpectancy });
@@ -449,7 +474,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                         <div className="col-span-full space-y-2">
                             {items.map((item) => (
                                 <div key={item.id} className={`grid gap-x-4 items-end p-2 rounded-md ${
-                                    {'Retirement Accounts': 'bg-cyan-50/50 grid-cols-7', 'Investment Accounts': 'bg-teal-50/50 grid-cols-5', 'Pensions': 'bg-sky-50/50 grid-cols-8', 'Other Incomes': 'bg-lime-50/50 grid-cols-8', 'Expense Periods': 'bg-red-50/50 grid-cols-5', 'Gifts': 'bg-purple-50/50 grid-cols-6', 'Legacy Disbursements': 'bg-orange-50/50 grid-cols-6'}[section]
+                                    {'Retirement Accounts': 'bg-cyan-50/50 grid-cols-7', 'Investment Accounts': 'bg-teal-50/50 grid-cols-5', 'Expense Periods': 'bg-red-50/50 grid-cols-5', 'Gifts': 'bg-purple-50/50 grid-cols-6', 'Legacy Disbursements': 'bg-orange-50/50 grid-cols-6'}[section]
                                 }`}> 
                                     {/* Common fields */}
                                     {listName !== 'expensePeriods' && listName !== 'gifts' && (
@@ -493,44 +518,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                                             }} onRemove={() => removeFromList('investmentAccounts', item.id)} canRemove={items.length > 1} />
                                         </div>
                                     </>}
-                                    {listName === 'pensions' && <>
-                                        <NumberInput label="Monthly Benefit" prefix="$" value={item.monthlyBenefit} onChange={e => handleDynamicListChange(listName, item.id, 'monthlyBenefit', e.target.value)}/>
-                                        <NumberInput label="Start Age" value={item.startAge} onChange={e => handleDynamicListChange(listName, item.id, 'startAge', e.target.value)}/>
-                                        <NumberInput label="COLA" suffix="%" value={item.cola} onChange={e => handleDynamicListChange(listName, item.id, 'cola', e.target.value)}/>
-                                        <NumberInput label="Survivor" suffix="%" value={item.survivorBenefit} onChange={e => handleDynamicListChange(listName, item.id, 'survivorBenefit', e.target.value)}/>
-                                        <div className="flex flex-col items-center justify-end h-full pb-1">
-                                            <label htmlFor={`taxable-${item.id}`} className="mb-1 text-sm font-medium text-brand-text-secondary">Taxable</label>
-                                            <input
-                                                type="checkbox"
-                                                id={`taxable-${item.id}`}
-                                                checked={item.taxable !== false}
-                                                onChange={e => handleDynamicListChange(listName, item.id, 'taxable', e.target.checked)}
-                                                className="h-5 w-5 rounded text-brand-primary focus:ring-brand-primary"
-                                            />
-                                        </div>
-                                        <div className="flex items-end">
-                                            <ActionIcons onAdd={addPension} onRemove={() => removeFromList('pensions', item.id)} canRemove={items.length > 0} />
-                                        </div>
-                                    </>}
-                                        {listName === 'otherIncomes' && <>
-                                        <NumberInput label="Monthly Amount" prefix="$" value={item.monthlyAmount} onChange={e => handleDynamicListChange(listName, item.id, 'monthlyAmount', e.target.value)}/>
-                                        <NumberInput label="Start Age" value={item.startAge} onChange={e => handleDynamicListChange(listName, item.id, 'startAge', e.target.value)}/>
-                                        <NumberInput label="End Age" value={item.endAge} onChange={e => handleDynamicListChange(listName, item.id, 'endAge', e.target.value)}/>
-                                        <NumberInput label="COLA" suffix="%" value={item.cola} onChange={e => handleDynamicListChange(listName, item.id, 'cola', e.target.value)}/>
-                                            <div className="flex flex-col items-center justify-end h-full pb-1">
-                                            <label htmlFor={`taxable-${item.id}`} className="mb-1 text-sm font-medium text-brand-text-secondary">Taxable</label>
-                                            <input
-                                                type="checkbox"
-                                                id={`taxable-${item.id}`}
-                                                checked={item.taxable !== false}
-                                                onChange={e => handleDynamicListChange(listName, item.id, 'taxable', e.target.checked)}
-                                                className="h-5 w-5 rounded text-brand-primary focus:ring-brand-primary"
-                                            />
-                                        </div>
-                                            <div className="flex items-end">
-                                            <ActionIcons onAdd={addOtherIncome} onRemove={() => removeFromList('otherIncomes', item.id)} canRemove={items.length > 0} />
-                                        </div>
-                                    </>}
+                                    {/* pensions and otherIncomes are rendered in the dedicated Income tabs above */}
                                         {listName === 'gifts' && <>
                                             <div className="w-full">
                                             <SelectInput label="Owner" value={item.owner || 'person1'} onChange={e => handleDynamicListChange(listName, item.id, 'owner', e.target.value)}>
@@ -599,9 +587,9 @@ export const InputForm: React.FC<InputFormProps> = ({
                                     </>}
                                 </div>
                             ))}
-                            {(listName === 'pensions' || listName === 'otherIncomes' || listName === 'gifts') && items.length === 0 && (
+                            {listName === 'gifts' && items.length === 0 && (
                                 <div className="text-center py-2">
-                                    <button onClick={listName === 'pensions' ? addPension : listName === 'otherIncomes' ? addOtherIncome : addGift} className="text-sm text-brand-primary font-semibold hover:underline">
+                                    <button onClick={addGift} className="text-sm text-brand-primary font-semibold hover:underline">
                                         + Add {section.slice(0, -1)}
                                     </button>
                                 </div>
