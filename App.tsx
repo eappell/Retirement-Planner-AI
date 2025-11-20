@@ -3,6 +3,7 @@ import { RetirementPlan, PlanType, Person, MonteCarloResult } from './types';
 import { UserManualModal } from './components/UserManualModal';
 import { ScrollToTopButton } from './components/ScrollToTopButton';
 import { PrintableReport } from './components/PrintableReport';
+// Import canonical Header implementation
 import Header from './components/Header';
 import { ResultsPanel } from './components/ResultsPanel';
 import { InputForm } from './components/InputForm';
