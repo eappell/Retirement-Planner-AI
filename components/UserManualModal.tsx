@@ -52,23 +52,47 @@ const manualContent = [
     },
     {
         id: 'accounts',
-        title: 'Accounts, Incomes & Expenses',
-        icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm-5-5a2 2 0 114 0 2 2 0 01-4 0z" /></svg>,
+        title: 'Accounts',
+        icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2z" /></svg>,
         content: (
-             <>
-                <p>This is where you build the detailed picture of your finances. The UI groups items into tabs so you can focus on a single category at a time:</p>
+            <>
+                <p>Manage your investment and retirement accounts here.</p>
                 <ul>
-                    <li><strong>Accounts (tabs):</strong> Two tabs — <em>Retirement Accounts</em> and <em>Investment Accounts</em> — let you manage tax-advantaged and taxable accounts separately. Use the <strong>+</strong> pill in the tab panel to add a new account for that tab.</li>
-                    <li><strong>Pensions, Annuities & Other Income (tabs):</strong> The Income section uses tabs to separate <em>Pensions</em>, <em><span className="inline-flex items-center"><svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 text-indigo-600" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a6 6 0 100 12 6 6 0 000-12zm1 7H9V7h2v2z"/></svg> Annuities</span></em> and <em>Other Incomes</em>. Annuities are a dedicated list for regular contract payments you expect to receive.</li>
-                    <li><strong>Expenses:</strong> Model different spending phases with Expense Periods (e.g., Go-Go, Slow-Go, No-Go).</li>
+                    <li><strong>Retirement Accounts:</strong> Add 401(k), 457(b), IRA, Roth IRA, or other tax-advantaged accounts. Provide balance, annual contributions, and employer match.</li>
+                    <li><strong>Investment Accounts:</strong> Taxable brokerage and other investment accounts. Track balances and contributions separately from retirement accounts.</li>
                 </ul>
-                <p className="mt-3">Controls you should know about:</p>
+                <p className="mt-3 p-2 bg-indigo-50 border-l-4 border-indigo-400 rounded-r-md"><strong>Tip:</strong> Use the tabbed Accounts view to keep tax-advantaged and taxable accounts organized and to add accounts directly to the active tab.</p>
+            </>
+        )
+    },
+    {
+        id: 'income',
+        title: 'Income',
+        icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3"/></svg>,
+        content: (
+            <>
+                <p>The Income section is tabbed so you can manage different income types separately.</p>
                 <ul>
-                    <li><strong>+ Add</strong>: A compact pill-style add button appears in each tab panel (centered when the panel is empty). Clicking it creates a typed item and focuses the primary input for quick editing.</li>
-                    <li><strong>🗑️ Remove</strong>: Use the trash icon to remove items. Most lists require at least one item; the UI will prevent removing the final required item where appropriate.</li>
-                    <li><strong>Keyboard Navigation:</strong> Tablists support <code>Left</code>/<code>Right</code> arrow navigation and <code>Home</code>/<code>End</code> to jump to the first/last tab. After adding an item the form will move focus into the new row so you can type immediately.</li>
+                    <li><strong>Pensions:</strong> Add employer or government pensions with monthly benefits, COLA, and survivor options.</li>
+                    <li><strong>Annuities:</strong> Add annuity contracts that pay regular monthly amounts. Use the Annuities tab to track start age, COLA and taxable status.</li>
+                    <li><strong>Other Incomes:</strong> Add any additional recurring income (rental income, part-time work, etc.).</li>
                 </ul>
-                <p className="mt-3 p-2 bg-indigo-50 border-l-4 border-indigo-400 rounded-r-md"><strong>Tip:</strong> Use the per-tab <strong>+ Add</strong> to keep items organized; for example, add pensions in the Pensions tab and annuities in the Annuities tab so similar income sources are grouped together.</p>
+                <p className="mt-3 p-2 bg-indigo-50 border-l-4 border-indigo-400 rounded-r-md"><strong>Tip:</strong> Add each income source in its corresponding tab to keep projections accurate and easier to review.</p>
+            </>
+        )
+    },
+    {
+        id: 'expenses',
+        title: 'Expenses',
+        icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h18v4H3zM5 11h14v10H5z"/></svg>,
+        content: (
+            <>
+                <p>Model your spending across different phases of retirement using Expense Periods.</p>
+                <ul>
+                    <li><strong>Expense Periods:</strong> Create multiple periods to represent varying spending (for example: Go-Go, Slow-Go, No-Go).</li>
+                    <li><strong>Start/End Ages:</strong> Assign start and end ages for each period; the planner will apply the monthly expenses during those ages.</li>
+                </ul>
+                <p className="mt-3 p-2 bg-indigo-50 border-l-4 border-indigo-400 rounded-r-md"><strong>Tip:</strong> Stagger expense periods to reflect lifestyle changes (higher spending early in retirement, lower later).</p>
             </>
         )
     },
@@ -117,24 +141,36 @@ const manualContent = [
                     <li><strong>Delete:</strong> Removes the current scenario. You cannot delete the last remaining scenario.</li>
                 </ul>
                 <p className="mt-3 p-2 bg-yellow-50 border-l-4 border-yellow-400 rounded-r-md"><strong>Important:</strong> All your scenarios are saved in your browser's local storage. This data can be lost if you clear your cache. Always use the Backup feature to save your work!</p>
+                <h4 className="font-bold mt-4 mb-2">Backup & Restore</h4>
+                <p>This feature allows you to save all of your scenarios to a file and load them back later. This is useful for moving your plans to a different computer or browser, or just for keeping a safe backup.</p>
+                <ul>
+                    <li><strong>Download Scenarios:</strong> Saves a file named <code>retirement_scenarios.retire</code> containing all scenarios and current data.</li>
+                    <li><strong>Upload Scenarios:</strong> Opens a file prompt — choose a previously downloaded <code>.retire</code> file to restore your scenarios.</li>
+                </ul>
+                <p className="mt-3 p-2 bg-red-50 border-l-4 border-red-400 rounded-r-md"><strong>Warning:</strong> Uploading a scenarios file will completely overwrite all scenarios currently in the application. This action cannot be undone. Always keep a copy of important files.</p>
             </>
         )
     },
+    
+    ,
     {
-        id: 'backupRestore',
-        title: 'Backup & Restore',
-        icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" /></svg>,
+        id: 'tabsAccessibility',
+        title: 'Tabs & Accessibility',
+        icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16"/></svg>,
         content: (
             <>
-                <p>This feature allows you to save all of your scenarios to a file and load them back later. This is perfect for moving your plans to a different computer or browser, or just for keeping a safe backup. Access it via the "Backup" button in the top header.</p>
+                <p>The application groups related inputs into tabbed panels. These follow common ARIA patterns and support keyboard navigation.</p>
                 <ul>
-                    <li><strong>Download Scenarios:</strong> This will save a single file named <code>retirement_scenarios.retire</code> to your computer. This file contains all the scenarios and data you've created.</li>
-                    <li><strong>Upload Scenarios:</strong> This will open a file prompt. Select a previously downloaded <code>.retire</code> file to load it.</li>
+                    <li><strong>Arrow Keys:</strong> Use <code>Left</code> and <code>Right</code> to move between tabs in a tablist.</li>
+                    <li><strong>Home / End:</strong> Press <code>Home</code> to jump to the first tab and <code>End</code> to jump to the last tab.</li>
+                    <li><strong>Focus After Add:</strong> When you click the per-tab <strong>+ Add</strong> button the UI will create a typed item and move focus into the primary input so you can begin typing immediately.</li>
+                    <li><strong>Screen Readers:</strong> Tabs expose <code>role="tablist"</code>, each tab uses <code>role="tab"</code>, and panels use <code>role="tabpanel"</code> with <code>aria-controls</code>/<code>aria-labelledby</code> to connect tabs to panels.</li>
                 </ul>
-                <p className="mt-3 p-2 bg-red-50 border-l-4 border-red-400 rounded-r-md"><strong>Warning:</strong> Uploading a scenarios file will completely overwrite all scenarios currently in the application. This action cannot be undone.</p>
+                <p className="mt-3 p-2 bg-indigo-50 border-l-4 border-indigo-400 rounded-r-md"><strong>Tip:</strong> Focused tab buttons receive visible focus and the active tab has <code>aria-selected="true"</code> for assistive tech compatibility.</p>
             </>
         )
-    },
+    }
+    ,
     {
         id: 'adsenseSetup',
         title: 'AdSense Setup Guide',
@@ -182,24 +218,6 @@ useEffect(() => {
      data-full-width-responsive="true">
 </ins>`}
                 </pre>
-            </>
-        )
-    }
-    ,
-    {
-        id: 'tabsAccessibility',
-        title: 'Tabs & Accessibility',
-        icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16"/></svg>,
-        content: (
-            <>
-                <p>The application groups related inputs into tabbed panels. These follow common ARIA patterns and support keyboard navigation.</p>
-                <ul>
-                    <li><strong>Arrow Keys:</strong> Use <code>Left</code> and <code>Right</code> to move between tabs in a tablist.</li>
-                    <li><strong>Home / End:</strong> Press <code>Home</code> to jump to the first tab and <code>End</code> to jump to the last tab.</li>
-                    <li><strong>Focus After Add:</strong> When you click the per-tab <strong>+ Add</strong> button the UI will create a typed item and move focus into the primary input so you can begin typing immediately.</li>
-                    <li><strong>Screen Readers:</strong> Tabs expose <code>role="tablist"</code>, each tab uses <code>role="tab"</code>, and panels use <code>role="tabpanel"</code> with <code>aria-controls</code>/<code>aria-labelledby</code> to connect tabs to panels.</li>
-                </ul>
-                <p className="mt-3 p-2 bg-indigo-50 border-l-4 border-indigo-400 rounded-r-md"><strong>Tip:</strong> Focused tab buttons receive visible focus and the active tab has <code>aria-selected="true"</code> for assistive tech compatibility.</p>
             </>
         )
     }
