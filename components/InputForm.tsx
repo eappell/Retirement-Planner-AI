@@ -198,7 +198,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                     {/* Accounts - combined tabs for Retirement / Investment accounts */}
                     <InputSection title="Accounts" subtitle="Manage retirement and investment accounts in separate tabs." titleColorClass="text-cyan-600">
                         <div className="col-span-full">
-                            <div className="flex items-center space-x-6 mb-3" role="tablist" aria-label="Accounts Tabs">
+                            <div className="inline-flex rounded-md bg-gray-100 p-1 mb-3" role="tablist" aria-label="Accounts Tabs">
                                 <button
                                     type="button"
                                     role="tab"
@@ -206,9 +206,9 @@ export const InputForm: React.FC<InputFormProps> = ({
                                     aria-selected={accountsTab === 'retirement' ? 'true' : 'false'}
                                     aria-controls="panel-retirement"
                                     onClick={() => setAccountsTab('retirement')}
-                                    className={`text-sm pb-2 ${accountsTab === 'retirement' ? 'border-b-2 border-cyan-600 text-cyan-700 font-medium' : 'border-b-2 border-transparent text-gray-600 hover:text-gray-800'}`}
+                                    className={`px-3 py-1 text-sm rounded-md ${accountsTab === 'retirement' ? 'bg-white text-cyan-600 shadow-sm' : 'text-gray-600 hover:bg-white'}`}
                                 >
-                                    Retirement Accounts
+                                    Retirement
                                 </button>
                                 <button
                                     type="button"
@@ -217,9 +217,9 @@ export const InputForm: React.FC<InputFormProps> = ({
                                     aria-selected={accountsTab === 'investment' ? 'true' : 'false'}
                                     aria-controls="panel-investment"
                                     onClick={() => setAccountsTab('investment')}
-                                    className={`text-sm pb-2 ${accountsTab === 'investment' ? 'border-b-2 border-teal-600 text-teal-700 font-medium' : 'border-b-2 border-transparent text-gray-600 hover:text-gray-800'}`}
+                                    className={`ml-1 px-3 py-1 text-sm rounded-md ${accountsTab === 'investment' ? 'bg-white text-teal-600 shadow-sm' : 'text-gray-600 hover:bg-white'}`}
                                 >
-                                    Investment Accounts
+                                    Investment
                                 </button>
                             </div>
 
