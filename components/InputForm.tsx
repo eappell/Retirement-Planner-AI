@@ -380,25 +380,49 @@ export const InputForm: React.FC<InputFormProps> = ({
                             {/* Investment tab content */}
                             {accountsTab === 'investment' && (
                                 <div id="panel-investment" role="tabpanel" aria-labelledby="tab-investment" className="relative pt-3 space-y-2">
-                                    {((plan.investmentAccounts || []) as InvestmentAccount[]).map(item => (
-                                        <div key={item.id} className="grid gap-x-4 items-end p-2 rounded-md bg-teal-50/50 grid-cols-5">
-                                            <NumberInput label="Balance" prefix="$" value={item.balance} onChange={e => handleDynamicListChange('investmentAccounts', item.id, 'balance', e.target.value)}/>
-                                            <NumberInput label="Annual Contrib." prefix="$" value={item.annualContribution} onChange={e => handleDynamicListChange('investmentAccounts', item.id, 'annualContribution', e.target.value)}/>
-                                            <div className="flex items-end">
-                                                <ActionIcons onAdd={() => {
-                                                    const id = Date.now().toString();
-                                                    const newInv: InvestmentAccount = { ...item, id, balance: 0, annualContribution: 0 } as InvestmentAccount;
-                                                    addToList('investmentAccounts', newInv);
-                                                    setFocusTargetId(`investmentAccounts-name-${id}`);
-                                                }} onRemove={() => removeFromList('investmentAccounts', item.id)} canRemove={(plan.investmentAccounts || []).length > 1} />
-                                            </div>
-                                        </div>
-                                    ))}
+                                    {(() => {
+                                        const invs = (plan.investmentAccounts || []) as InvestmentAccount[];
+                                        const anyInvalid = invs.some(i => (Number(i.percentStocks || 0) + Number(i.percentBonds || 0)) !== 100);
+                                        return (
+                                            <>
+                                                {anyInvalid && <p className="text-sm text-red-600 mb-2">One or more investment accounts have allocations that do not total 100%.</p>}
+                                                {invs.map(item => {
+                                                    const stocks = Number(item.percentStocks || 0);
+                                                    const bonds = Number(item.percentBonds || 0);
+                                                    const total = stocks + bonds;
+                                                    const invalid = total !== 100;
+                                                    return (
+                                                        <React.Fragment key={item.id}>
+                                                            <div className={`grid gap-x-4 items-end p-2 rounded-md ${invalid ? 'bg-teal-50/60' : 'bg-teal-50/50'} grid-cols-7`}>
+                                                                <NumberInput label="Balance" prefix="$" value={item.balance} onChange={e => handleDynamicListChange('investmentAccounts', item.id, 'balance', e.target.value)}/>
+                                                                <NumberInput label="Annual Contrib." prefix="$" value={item.annualContribution} onChange={e => handleDynamicListChange('investmentAccounts', item.id, 'annualContribution', e.target.value)}/>
+                                                                <NumberInput label="% Stocks" suffix="%" value={(item.percentStocks ?? 0)} onChange={e => handleDynamicListChange('investmentAccounts', item.id, 'percentStocks', e.target.value)} />
+                                                                <NumberInput label="% Bonds" suffix="%" value={(item.percentBonds ?? 0)} onChange={e => handleDynamicListChange('investmentAccounts', item.id, 'percentBonds', e.target.value)} />
+                                                                <div className="flex items-end">
+                                                                    <ActionIcons onAdd={() => {
+                                                                        const id = Date.now().toString();
+                                                                        const newInv: InvestmentAccount = { ...item, id, balance: 0, annualContribution: 0, percentStocks: 60, percentBonds: 40 } as InvestmentAccount;
+                                                                        addToList('investmentAccounts', newInv);
+                                                                        setFocusTargetId(`investmentAccounts-name-${id}`);
+                                                                    }} onRemove={() => removeFromList('investmentAccounts', item.id)} canRemove={(plan.investmentAccounts || []).length > 1} />
+                                                                </div>
+                                                            </div>
+                                                            {invalid && (
+                                                                <div className="col-span-full px-2">
+                                                                    <p className="text-sm text-red-600 mt-1">Allocation totals must equal 100% (currently {total}%). Please adjust % Stocks and % Bonds.</p>
+                                                                </div>
+                                                            )}
+                                                        </React.Fragment>
+                                                    );
+                                                })}
+                                            </>
+                                        );
+                                    })()}
                                     {(plan.investmentAccounts || []).length === 0 && (
                                         <div className="flex justify-center py-6">
                                             <AddButton label="+ Add Investment Account" icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M3 3h4v14H3zM9 8h4v9H9zM15 12h4v5h-4z" /></svg>} onClick={() => {
                                                 const id = Date.now().toString();
-                                                const newInv: InvestmentAccount = { id, owner: 'person1', name: 'New Investment', balance: 0, annualContribution: 0 };
+                                                const newInv: InvestmentAccount = { id, owner: 'person1', name: 'New Investment', balance: 0, annualContribution: 0, percentStocks: 60, percentBonds: 40 };
                                                 addToList('investmentAccounts', newInv);
                                                 setFocusTargetId(`investmentAccounts-name-${id}`);
                                             }} />
@@ -802,9 +826,9 @@ export const InputForm: React.FC<InputFormProps> = ({
                 return (
                     <InputSection key={section} title={section} subtitle={subtitles[section]} titleColorClass={colors[section]} gridCols={1}>
                         <div className="relative col-span-full pt-3 space-y-2">
-                            {items.map((item) => (
+                                    {items.map((item) => (
                                 <div key={item.id} className={`grid gap-x-4 items-end p-2 rounded-md ${
-                                    {'Retirement Accounts': 'bg-cyan-50/50 grid-cols-7', 'Investment Accounts': 'bg-teal-50/50 grid-cols-5', 'Expense Periods': 'bg-red-50/50 grid-cols-5', 'Legacy Disbursements': 'bg-orange-50/50 grid-cols-6'}[section]
+                                    {'Retirement Accounts': 'bg-cyan-50/50 grid-cols-7', 'Investment Accounts': 'bg-teal-50/50 grid-cols-7', 'Expense Periods': 'bg-red-50/50 grid-cols-5', 'Legacy Disbursements': 'bg-orange-50/50 grid-cols-6'}[section]
                                 }`}> 
                                     {/* Common fields */}
                                     {listName !== 'expensePeriods' && (
@@ -840,14 +864,25 @@ export const InputForm: React.FC<InputFormProps> = ({
                                     {listName === 'investmentAccounts' && <>
                                         <NumberInput label="Balance" prefix="$" value={item.balance} onChange={e => handleDynamicListChange(listName, item.id, 'balance', e.target.value)}/>
                                         <NumberInput label="Annual Contrib." prefix="$" value={item.annualContribution} onChange={e => handleDynamicListChange(listName, item.id, 'annualContribution', e.target.value)}/>
+                                        <NumberInput label="% Stocks" suffix="%" value={(item.percentStocks ?? 0)} onChange={e => handleDynamicListChange(listName, item.id, 'percentStocks', e.target.value)} />
+                                        <NumberInput label="% Bonds" suffix="%" value={(item.percentBonds ?? 0)} onChange={e => handleDynamicListChange(listName, item.id, 'percentBonds', e.target.value)} />
                                         <div className="flex items-end">
                                             <ActionIcons onAdd={() => {
                                                 const id = Date.now().toString();
-                                                addToList('investmentAccounts', { ...item, id, balance: 0, annualContribution: 0 });
+                                                addToList('investmentAccounts', { ...item, id, balance: 0, annualContribution: 0, percentStocks: 60, percentBonds: 40 });
                                                 setFocusTargetId(`investmentAccounts-name-${id}`);
                                             }} onRemove={() => removeFromList('investmentAccounts', item.id)} canRemove={items.length > 1} />
                                         </div>
                                     </>}
+                                    {listName === 'investmentAccounts' && (() => {
+                                        const stocks = Number(item.percentStocks || 0);
+                                        const bonds = Number(item.percentBonds || 0);
+                                        const total = stocks + bonds;
+                                        if (total !== 100) {
+                                            return (<div className="col-span-full px-2"><p className="text-sm text-red-600 mt-1">Allocation totals must equal 100% (currently {total}%).</p></div>);
+                                        }
+                                        return null;
+                                    })()}
                                     {/* pensions and otherIncomes are rendered in the dedicated Income tabs above */}
                                     {listName === 'expensePeriods' && <>
                                             <TextInput label="Name" value={item.name} onChange={e => handleDynamicListChange(listName, item.id, 'name', e.target.value)} data-list={listName} data-id={item.id} />
