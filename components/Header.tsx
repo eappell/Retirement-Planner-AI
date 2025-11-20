@@ -104,23 +104,19 @@ export const Header: React.FC<HeaderProps> = ({
                                         <button onClick={handleCopyScenario} className="w-full px-3 py-1.5 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">Copy</button>
                                         <button onClick={handleDeleteScenario} disabled={Object.keys(scenarios).length <= 1} className="w-full px-3 py-1.5 text-sm bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-400 transition-colors">Delete</button>
                                     </div>
-                                    <div className="col-span-full pt-2 border-t">
-                                        <p className="text-xs text-gray-500">This data is stored in your browser. If you clear your browser cache without saving the scenarios file, you <strong className="text-red-600">WILL LOSE</strong> your scenarios. Use the Backup feature to download your scenarios file to save all your hard work.</p>
-                                    </div>
-
                                     {/* Backup / Restore moved here from the top header */}
-                                    <div className="pt-2 border-t">
-                                        <div className="py-1">
+                                    <div className="col-span-full pt-2 border-t">
+                                        <div className="grid grid-cols-2 gap-2">
                                             <button
                                                 onClick={() => handleDownloadScenarios()}
-                                                className="flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
+                                                className="flex items-center justify-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
                                             >
                                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                                                <span className="ml-3">Download Scenarios</span>
+                                                <span className="ml-3">Download</span>
                                             </button>
-                                            <label className="flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer rounded-md mt-2">
+                                            <label className="flex items-center justify-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer rounded-md">
                                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0l-4 4m4-4v12" /></svg>
-                                                <span className="ml-3">Upload Scenarios</span>
+                                                <span className="ml-3">Upload</span>
                                                 <input
                                                     type="file"
                                                     onChange={handleUploadAndClose}
@@ -129,6 +125,10 @@ export const Header: React.FC<HeaderProps> = ({
                                                 />
                                             </label>
                                         </div>
+                                    </div>
+
+                                    <div className="col-span-full pt-2">
+                                        <p className="text-xs text-gray-500">This data is stored in your browser. If you clear your browser cache without saving the scenarios file, you <strong className="text-red-600">WILL LOSE</strong> your scenarios. Use the Backup feature to download your scenarios file to save all your hard work.</p>
                                     </div>
                                 </div>
                             </div>
