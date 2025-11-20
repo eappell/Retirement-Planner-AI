@@ -1,4 +1,5 @@
 import React from 'react';
+import useTheme from '../hooks/useTheme';
 
 interface InputSectionProps {
   title: React.ReactNode;
@@ -10,6 +11,7 @@ interface InputSectionProps {
 }
 
 export const InputSection: React.FC<InputSectionProps> = ({ title, subtitle, titleColorClass = 'text-brand-text-primary', children, actions, gridCols = 3 }) => {
+  const { theme } = useTheme();
   const getIconForTitle = (t: React.ReactNode) => {
     if (typeof t !== 'string') return null;
     const key = t.toLowerCase();
@@ -46,11 +48,14 @@ export const InputSection: React.FC<InputSectionProps> = ({ title, subtitle, tit
 
   const icon = getIconForTitle(title);
 
+  const isAnnual = typeof title === 'string' && title.toLowerCase().includes('annual');
+  const effectiveTitleClass = theme === 'dark' && isAnnual ? 'text-white' : titleColorClass;
+
   return (
     <div className="bg-brand-surface p-6 rounded-lg shadow-sm mb-6">
       <div className="flex justify-between items-start border-b border-gray-200 pb-3 mb-4">
         <div>
-            <h3 className={`text-xl font-bold ${titleColorClass} flex items-center`}>{icon}<span>{title}</span></h3>
+            <h3 className={`text-xl font-bold ${effectiveTitleClass} flex items-center`}>{icon}<span>{title}</span></h3>
             {subtitle && <p className="text-sm text-brand-text-secondary mt-1">{subtitle}</p>}
         </div>
         {actions && <div className="flex-shrink-0 ml-4">{actions}</div>}
