@@ -357,7 +357,11 @@ export const InputForm: React.FC<InputFormProps> = ({
                                     ))}
                                     {(plan.retirementAccounts || []).length === 0 && (
                                         <div className="flex justify-center py-6">
-                                            <AddButton label="+ Add Retirement Account" onClick={() => {
+                                            <AddButton label="+ Add Retirement Account" icon={
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
+                                                </svg>
+                                            } onClick={() => {
                                                 const id = Date.now().toString();
                                                 addToList('retirementAccounts', { id, owner: 'person1', name: 'New Account', type: '401k', balance: 0, annualContribution: 0, match: 0 } as any);
                                                 setFocusTargetId(`retirementAccounts-name-${id}`);
@@ -385,7 +389,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                                     ))}
                                     {(plan.investmentAccounts || []).length === 0 && (
                                         <div className="flex justify-center py-6">
-                                            <AddButton label="+ Add Investment Account" onClick={() => {
+                                            <AddButton label="+ Add Investment Account" icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" /></svg>} onClick={() => {
                                                 const id = Date.now().toString();
                                                 addToList('investmentAccounts', { id, balance: 0, annualContribution: 0 } as any);
                                                 setFocusTargetId(`investmentAccounts-name-${id}`);
@@ -485,7 +489,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                             ))}
                             {(plan.pensions || []).length === 0 && (
                                 <div className="flex justify-center py-6">
-                                    <AddButton label="+ Add Pension" onClick={() => {
+                                    <AddButton label="+ Add Pension" icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" /></svg>} onClick={() => {
                                         const id = Date.now().toString();
                                         addToList('pensions', { id, owner: 'person1', name: 'New Pension', monthlyBenefit: 0, startAge: plan.person1.retirementAge, cola: 0, survivorBenefit: 0, taxable: true } as any);
                                         setFocusTargetId(`pensions-name-${id}`);
@@ -525,7 +529,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                             ))}
                             {(plan.otherIncomes || []).length === 0 && (
                                 <div className="flex justify-center py-6">
-                                    <AddButton label="+ Add Other Income" onClick={() => {
+                                    <AddButton label="+ Add Other Income" icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" /></svg>} onClick={() => {
                                         const id = Date.now().toString();
                                         addToList('otherIncomes', { id, owner: 'person1', name: 'New Income', monthlyAmount: 0, startAge: plan.person1.retirementAge, endAge: plan.person1.lifeExpectancy, cola: 0, taxable: true } as any);
                                         setFocusTargetId(`otherIncomes-name-${id}`);
@@ -649,7 +653,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                             ))}
                             {(plan.gifts || []).length === 0 && (
                                 <div className="flex justify-center py-6">
-                                    <AddButton label="+ Add Gift" onClick={() => { const id = Date.now().toString(); addToList('gifts', { id, beneficiary: '', owner: 'person1', isAnnual: false, amount: 0, annualAmount: 0, age: plan.person1.currentAge, startAge: plan.person1.retirementAge, endAge: plan.person1.lifeExpectancy } as any); setFocusTargetId(`gift-beneficiary-${id}`); }} />
+                                    <AddButton label="+ Add Gift" icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" /></svg>} onClick={() => { const id = Date.now().toString(); addToList('gifts', { id, beneficiary: '', owner: 'person1', isAnnual: false, amount: 0, annualAmount: 0, age: plan.person1.currentAge, startAge: plan.person1.retirementAge, endAge: plan.person1.lifeExpectancy } as any); setFocusTargetId(`gift-beneficiary-${id}`); }} />
                                 </div>
                             )}
                         </div>
@@ -680,7 +684,7 @@ export const InputForm: React.FC<InputFormProps> = ({
 
                             {(plan.legacyDisbursements || []).length === 0 && (
                                 <div className="flex justify-center py-6">
-                                    <AddButton label="+ Add Legacy" disabled={plan.dieWithZero} onClick={() => { const id = Date.now().toString(); addToList('legacyDisbursements', { id, beneficiary: '', beneficiaryType: 'person', percentage: 0 } as any); setFocusTargetId(`legacy-beneficiary-${id}`); }} />
+                                    <AddButton label="+ Add Legacy" icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" /></svg>} disabled={plan.dieWithZero} onClick={() => { const id = Date.now().toString(); addToList('legacyDisbursements', { id, beneficiary: '', beneficiaryType: 'person', percentage: 0 } as any); setFocusTargetId(`legacy-beneficiary-${id}`); }} />
                                 </div>
                             )}
 
@@ -791,7 +795,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                             ))}
                             {items.length === 0 && listName === 'expensePeriods' && (
                                 <div className="flex justify-center py-6">
-                                    <AddButton label="+ Add Expense Period" onClick={() => { const id = Date.now().toString(); addToList('expensePeriods', { id, monthlyAmount: 0, name: `Phase ${items.length + 1}`, startAge: plan.person1.retirementAge, startAgeRef: 'person1', endAge: plan.person1.lifeExpectancy, endAgeRef: 'person1' } as any); setFocusTargetId(`expensePeriods-name-${id}`); }} />
+                                    <AddButton label="+ Add Expense Period" icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" /></svg>} onClick={() => { const id = Date.now().toString(); addToList('expensePeriods', { id, monthlyAmount: 0, name: `Phase ${items.length + 1}`, startAge: plan.person1.retirementAge, startAgeRef: 'person1', endAge: plan.person1.lifeExpectancy, endAgeRef: 'person1' } as any); setFocusTargetId(`expensePeriods-name-${id}`); }} />
                                 </div>
                             )}
                         </div>
