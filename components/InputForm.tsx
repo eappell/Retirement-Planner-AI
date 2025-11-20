@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import AddButton from './AddButton';
 import { RetirementPlan, Person, PlanType, RetirementAccount, InvestmentAccount, Pension, OtherIncome, ExpensePeriod } from '../types';
 import { InputSection } from './InputSection';
 import { NumberInput, SelectInput, TextInput } from './FormControls';
@@ -30,6 +31,9 @@ export const InputForm: React.FC<InputFormProps> = ({
 }) => {
     const isCouple = plan.planType === PlanType.COUPLE;
     const [focusTargetId, setFocusTargetId] = useState<string | null>(null);
+    const [incomeTab, setIncomeTab] = useState<'pensions' | 'other'>('pensions');
+    const [accountsTab, setAccountsTab] = useState<'retirement' | 'investment'>('retirement');
+    const [estateTab, setEstateTab] = useState<'gifts' | 'legacy'>('gifts');
     useEffect(() => {
         if (!focusTargetId) return;
         const el = document.getElementById(focusTargetId) as HTMLInputElement | null;
@@ -57,6 +61,76 @@ export const InputForm: React.FC<InputFormProps> = ({
             )}
         </div>
     );
+
+    // Keyboard navigation for Accounts tabs (Left/Right/Home/End)
+    const handleAccountsKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+        const ids = ['tab-retirement', 'tab-investment'];
+        const activeId = document.activeElement?.id || '';
+        const idx = ids.indexOf(activeId);
+        let next = idx;
+        if (e.key === 'ArrowRight') next = idx === -1 ? 0 : (idx + 1) % ids.length;
+        else if (e.key === 'ArrowLeft') next = idx === -1 ? ids.length - 1 : (idx - 1 + ids.length) % ids.length;
+        else if (e.key === 'Home') next = 0;
+        else if (e.key === 'End') next = ids.length - 1;
+        else return;
+        e.preventDefault();
+        const nextId = ids[next];
+        if (nextId === 'tab-retirement') setAccountsTab('retirement');
+        else setAccountsTab('investment');
+        const el = document.getElementById(nextId);
+        el?.focus();
+    };
+
+    // Keyboard navigation for Income tabs (Left/Right/Home/End)
+    const handleIncomeKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+        const ids = ['tab-pensions', 'tab-otherincomes'];
+        const activeId = document.activeElement?.id || '';
+        const idx = ids.indexOf(activeId);
+        let next = idx;
+        if (e.key === 'ArrowRight') next = idx === -1 ? 0 : (idx + 1) % ids.length;
+        else if (e.key === 'ArrowLeft') next = idx === -1 ? ids.length - 1 : (idx - 1 + ids.length) % ids.length;
+        else if (e.key === 'Home') next = 0;
+        else if (e.key === 'End') next = ids.length - 1;
+        else return;
+        e.preventDefault();
+        const nextId = ids[next];
+        if (nextId === 'tab-pensions') setIncomeTab('pensions');
+        else setIncomeTab('other');
+        const el = document.getElementById(nextId);
+        el?.focus();
+    };
+
+    // Keyboard navigation for Estate Planning tabs
+    const handleEstateKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+        const ids = ['tab-gifts', 'tab-legacy'];
+        const activeId = document.activeElement?.id || '';
+        const idx = ids.indexOf(activeId);
+        let next = idx;
+        if (e.key === 'ArrowRight') next = idx === -1 ? 0 : (idx + 1) % ids.length;
+        else if (e.key === 'ArrowLeft') next = idx === -1 ? ids.length - 1 : (idx - 1 + ids.length) % ids.length;
+        else if (e.key === 'Home') next = 0;
+        else if (e.key === 'End') next = ids.length - 1;
+        else return;
+        e.preventDefault();
+        const nextId = ids[next];
+        if (nextId === 'tab-gifts') setEstateTab('gifts');
+        else setEstateTab('legacy');
+        const el = document.getElementById(nextId);
+        el?.focus();
+    };
+
+    // helpers for gifts & legacy so they can be used in the new Estate section
+    const addGiftGlobal = () => {
+        const id = Date.now().toString();
+        addToList('gifts', { id, beneficiary: '', owner: 'person1', isAnnual: false, amount: 0, annualAmount: 0, age: plan.person1.currentAge, startAge: plan.person1.retirementAge, endAge: plan.person1.lifeExpectancy } as any);
+        setFocusTargetId(`gift-beneficiary-${id}`);
+    };
+
+    const addLegacyGlobal = () => {
+        const id = Date.now().toString();
+        addToList('legacyDisbursements', { id, beneficiary: '', beneficiaryType: 'person', percentage: 0 } as any);
+        setFocusTargetId(`legacy-beneficiary-${id}`);
+    };
     
     return (
         <>
@@ -124,7 +198,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                             onChange={e => handlePlanChange('legacyAmount', Number(e.target.value))}
                             disabled={!plan.dieWithZero}
                             className={`w-32 pl-7 pr-2 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-brand-primary focus:border-transparent text-sm ${
-                                !plan.dieWithZero 
+                                !plan.dieWithZero
                                 ? 'bg-gray-100 text-gray-500 cursor-not-allowed' 
                                 : 'bg-white text-brand-text-primary'
                             }`}
@@ -194,55 +268,470 @@ export const InputForm: React.FC<InputFormProps> = ({
                     {isCouple && <p className="col-span-full text-xs text-gray-500 mt-2">Note: Survivor benefits are simplified. Typically, a surviving spouse receives the higher of their own benefit or their deceased spouse's benefit.</p>}
             </InputSection>
 
+                    {/* Accounts - combined tabs for Retirement / Investment accounts */}
+                    <InputSection
+                        title="Accounts"
+                        subtitle="Manage retirement and investment accounts in separate tabs."
+                        titleColorClass="text-cyan-600"
+                    >
+                        <div className="col-span-full">
+                            <div className="flex items-center space-x-6 mb-3" role="tablist" aria-label="Accounts Tabs" onKeyDown={handleAccountsKeyDown}>
+                                {accountsTab === 'retirement' ? (
+                                    <button
+                                        type="button"
+                                        role="tab"
+                                        id="tab-retirement"
+                                        aria-selected="true"
+                                        aria-controls="panel-retirement"
+                                        onClick={() => setAccountsTab('retirement')}
+                                        className={`text-sm pb-2 ${'border-b-2 border-cyan-600 text-cyan-700 font-medium'}`}
+                                    >
+                                        Retirement Accounts
+                                    </button>
+                                ) : (
+                                    <button
+                                        type="button"
+                                        role="tab"
+                                        id="tab-retirement"
+                                        aria-controls="panel-retirement"
+                                        onClick={() => setAccountsTab('retirement')}
+                                        className={`text-sm pb-2 ${'border-b-2 border-transparent text-gray-600 hover:text-gray-800'}`}
+                                    >
+                                        Retirement Accounts
+                                    </button>
+                                )}
+                                {accountsTab === 'investment' ? (
+                                    <button
+                                        type="button"
+                                        role="tab"
+                                        id="tab-investment"
+                                        aria-selected="true"
+                                        aria-controls="panel-investment"
+                                        onClick={() => setAccountsTab('investment')}
+                                        className={`text-sm pb-2 ${'border-b-2 border-teal-600 text-teal-700 font-medium'}`}
+                                    >
+                                        Investment Accounts
+                                    </button>
+                                ) : (
+                                    <button
+                                        type="button"
+                                        role="tab"
+                                        id="tab-investment"
+                                        aria-controls="panel-investment"
+                                        onClick={() => setAccountsTab('investment')}
+                                        className={`text-sm pb-2 ${'border-b-2 border-transparent text-gray-600 hover:text-gray-800'}`}
+                                    >
+                                        Investment Accounts
+                                    </button>
+                                )}
+                            </div>
 
-            {['Retirement Accounts', 'Investment Accounts', 'Pensions', 'Other Incomes', 'Expense Periods', 'Gifts'].map(section => {
+                            {/* Retirement tab content */}
+                            {accountsTab === 'retirement' && (
+                                <div id="panel-retirement" role="tabpanel" aria-labelledby="tab-retirement" className="relative pt-3 space-y-2">
+                                    {((plan.retirementAccounts || []) as any[]).map(item => (
+                                        <div key={item.id} className="grid gap-x-4 items-end p-2 rounded-md bg-cyan-50/50 grid-cols-7">
+                                            <SelectInput label="Owner" value={item.owner} onChange={e => handleDynamicListChange('retirementAccounts', item.id, 'owner', e.target.value)}>
+                                                <option value="person1">{plan.person1.name}</option>
+                                                {isCouple && <option value="person2">{plan.person2.name}</option>}
+                                            </SelectInput>
+                                            <TextInput id={`retirementAccounts-name-${item.id}`} label="Name" value={item.name} onChange={e => handleDynamicListChange('retirementAccounts', item.id, 'name', e.target.value)} />
+                                            <SelectInput label="Type" value={item.type} onChange={e => handleDynamicListChange('retirementAccounts', item.id, 'type', e.target.value)}>
+                                                <option>401k</option>
+                                                <option>457b</option>
+                                                <option>IRA</option>
+                                                <option>Roth IRA</option>
+                                                <option>Other</option>
+                                            </SelectInput>
+                                            <NumberInput label="Balance" prefix="$" value={item.balance} onChange={e => handleDynamicListChange('retirementAccounts', item.id, 'balance', e.target.value)}/>
+                                            <NumberInput label="Annual Contrib." prefix="$" value={item.annualContribution} onChange={e => handleDynamicListChange('retirementAccounts', item.id, 'annualContribution', e.target.value)}/>
+                                            <NumberInput label="Match" suffix="%" value={item.match} onChange={e => handleDynamicListChange('retirementAccounts', item.id, 'match', e.target.value)}/>
+                                            <div className="flex items-end">
+                                                <ActionIcons onAdd={() => {
+                                                    const id = Date.now().toString();
+                                                    addToList('retirementAccounts', { ...item, id, balance: 0, annualContribution: 0, match: 0 } as any);
+                                                    setFocusTargetId(`retirementAccounts-name-${id}`);
+                                                }} onRemove={() => removeFromList('retirementAccounts', item.id)} canRemove={(plan.retirementAccounts || []).length > 1} />
+                                            </div>
+                                        </div>
+                                    ))}
+                                    {(plan.retirementAccounts || []).length === 0 && (
+                                        <div className="flex justify-center py-6">
+                                            <AddButton label="+ Add Retirement Account" icon={
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path d="M10 2L2 7h2v9h12V7h2L10 2z" />
+                                                    <path d="M9 12h2v3H9v-3z" />
+                                                </svg>
+                                            } onClick={() => {
+                                                const id = Date.now().toString();
+                                                addToList('retirementAccounts', { id, owner: 'person1', name: 'New Account', type: '401k', balance: 0, annualContribution: 0, match: 0 } as any);
+                                                setFocusTargetId(`retirementAccounts-name-${id}`);
+                                            }} />
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Investment tab content */}
+                            {accountsTab === 'investment' && (
+                                <div id="panel-investment" role="tabpanel" aria-labelledby="tab-investment" className="relative pt-3 space-y-2">
+                                    {((plan.investmentAccounts || []) as any[]).map(item => (
+                                        <div key={item.id} className="grid gap-x-4 items-end p-2 rounded-md bg-teal-50/50 grid-cols-5">
+                                            <NumberInput label="Balance" prefix="$" value={item.balance} onChange={e => handleDynamicListChange('investmentAccounts', item.id, 'balance', e.target.value)}/>
+                                            <NumberInput label="Annual Contrib." prefix="$" value={item.annualContribution} onChange={e => handleDynamicListChange('investmentAccounts', item.id, 'annualContribution', e.target.value)}/>
+                                            <div className="flex items-end">
+                                                <ActionIcons onAdd={() => {
+                                                    const id = Date.now().toString();
+                                                    addToList('investmentAccounts', { ...item, id, balance: 0, annualContribution: 0 } as any);
+                                                    setFocusTargetId(`investmentAccounts-name-${id}`);
+                                                }} onRemove={() => removeFromList('investmentAccounts', item.id)} canRemove={(plan.investmentAccounts || []).length > 1} />
+                                            </div>
+                                        </div>
+                                    ))}
+                                    {(plan.investmentAccounts || []).length === 0 && (
+                                        <div className="flex justify-center py-6">
+                                            <AddButton label="+ Add Investment Account" icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M3 3h4v14H3zM9 8h4v9H9zM15 12h4v5h-4z" /></svg>} onClick={() => {
+                                                const id = Date.now().toString();
+                                                addToList('investmentAccounts', { id, balance: 0, annualContribution: 0 } as any);
+                                                setFocusTargetId(`investmentAccounts-name-${id}`);
+                                            }} />
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    </InputSection>
+
+            {/* Income - combined tabs for Pensions / Other Incomes */}
+            <InputSection
+                title="Income"
+                subtitle="Manage pensions and other income sources in tabs."
+                titleColorClass="text-sky-600"
+            >
+                <div className="col-span-full">
+                    <div className="flex items-center space-x-6 mb-3" role="tablist" aria-label="Income Tabs" onKeyDown={handleIncomeKeyDown}>
+                        {incomeTab === 'pensions' ? (
+                            <button
+                                type="button"
+                                role="tab"
+                                id="tab-pensions"
+                                aria-selected="true"
+                                aria-controls="panel-pensions"
+                                onClick={() => setIncomeTab('pensions')}
+                                className={`text-sm pb-2 ${'border-b-2 border-sky-600 text-sky-700 font-medium'}`}
+                            >
+                                Pensions
+                            </button>
+                        ) : (
+                            <button
+                                type="button"
+                                role="tab"
+                                id="tab-pensions"
+                                aria-controls="panel-pensions"
+                                onClick={() => setIncomeTab('pensions')}
+                                className={`text-sm pb-2 ${'border-b-2 border-transparent text-gray-600 hover:text-gray-800'}`}
+                            >
+                                Pensions
+                            </button>
+                        )}
+                        {incomeTab === 'other' ? (
+                            <button
+                                type="button"
+                                role="tab"
+                                id="tab-otherincomes"
+                                aria-selected="true"
+                                aria-controls="panel-otherincomes"
+                                onClick={() => setIncomeTab('other')}
+                                className={`text-sm pb-2 ${'border-b-2 border-lime-600 text-lime-700 font-medium'}`}
+                            >
+                                Other Incomes
+                            </button>
+                        ) : (
+                            <button
+                                type="button"
+                                role="tab"
+                                id="tab-otherincomes"
+                                aria-controls="panel-otherincomes"
+                                onClick={() => setIncomeTab('other')}
+                                className={`text-sm pb-2 ${'border-b-2 border-transparent text-gray-600 hover:text-gray-800'}`}
+                            >
+                                Other Incomes
+                            </button>
+                        )}
+                    </div>
+
+                    {/* Pensions panel */}
+                    {incomeTab === 'pensions' && (
+                        <div id="panel-pensions" role="tabpanel" aria-labelledby="tab-pensions" className="relative pt-3 space-y-2">
+                            {((plan.pensions || []) as any[]).map(item => (
+                                <div key={item.id} className="grid gap-x-4 items-end p-2 rounded-md bg-sky-50/50 grid-cols-8">
+                                    <NumberInput label="Monthly Benefit" prefix="$" value={item.monthlyBenefit} onChange={e => handleDynamicListChange('pensions', item.id, 'monthlyBenefit', e.target.value)}/>
+                                    <NumberInput label="Start Age" value={item.startAge} onChange={e => handleDynamicListChange('pensions', item.id, 'startAge', e.target.value)}/>
+                                    <NumberInput label="COLA" suffix="%" value={item.cola} onChange={e => handleDynamicListChange('pensions', item.id, 'cola', e.target.value)}/>
+                                    <NumberInput label="Survivor" suffix="%" value={item.survivorBenefit} onChange={e => handleDynamicListChange('pensions', item.id, 'survivorBenefit', e.target.value)}/>
+                                    <div className="flex flex-col items-center justify-end h-full pb-1">
+                                        <label htmlFor={`taxable-${item.id}`} className="mb-1 text-sm font-medium text-brand-text-secondary">Taxable</label>
+                                        <input
+                                            type="checkbox"
+                                            id={`taxable-${item.id}`}
+                                            checked={item.taxable !== false}
+                                            onChange={e => handleDynamicListChange('pensions', item.id, 'taxable', e.target.checked)}
+                                            className="h-5 w-5 rounded text-brand-primary focus:ring-brand-primary"
+                                        />
+                                    </div>
+                                    <div className="flex items-end">
+                                        <ActionIcons onAdd={() => {
+                                            const id = Date.now().toString();
+                                            addToList('pensions', { id, owner: 'person1', name: 'New Pension', monthlyBenefit: 0, startAge: Math.min(plan.person1.retirementAge, isCouple ? plan.person2.retirementAge : Infinity), cola: 0, survivorBenefit: 0, taxable: true } as any);
+                                            setFocusTargetId(`pensions-name-${id}`);
+                                        }} onRemove={() => removeFromList('pensions', item.id)} canRemove={(plan.pensions || []).length > 0} />
+                                    </div>
+                                </div>
+                            ))}
+                            {(plan.pensions || []).length === 0 && (
+                                <div className="flex justify-center py-6">
+                                    <AddButton label="+ Add Pension" icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zm1 8.414V6a1 1 0 10-2 0v5a1 1 0 00.293.707l3 3a1 1 0 101.414-1.414L11 10.414z" /></svg>} onClick={() => {
+                                            const id = Date.now().toString();
+                                            addToList('pensions', { id, owner: 'person1', name: 'New Pension', monthlyBenefit: 0, startAge: plan.person1.retirementAge, cola: 0, survivorBenefit: 0, taxable: true } as any);
+                                            setFocusTargetId(`pensions-name-${id}`);
+                                        }} />
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Other Incomes panel */}
+                    {incomeTab === 'other' && (
+                        <div id="panel-otherincomes" role="tabpanel" aria-labelledby="tab-otherincomes" className="relative pt-3 space-y-2">
+                            {((plan.otherIncomes || []) as any[]).map(item => (
+                                <div key={item.id} className="grid gap-x-4 items-end p-2 rounded-md bg-lime-50/50 grid-cols-8">
+                                    <NumberInput label="Monthly Amount" prefix="$" value={item.monthlyAmount} onChange={e => handleDynamicListChange('otherIncomes', item.id, 'monthlyAmount', e.target.value)}/>
+                                    <NumberInput label="Start Age" value={item.startAge} onChange={e => handleDynamicListChange('otherIncomes', item.id, 'startAge', e.target.value)}/>
+                                    <NumberInput label="End Age" value={item.endAge} onChange={e => handleDynamicListChange('otherIncomes', item.id, 'endAge', e.target.value)}/>
+                                    <NumberInput label="COLA" suffix="%" value={item.cola} onChange={e => handleDynamicListChange('otherIncomes', item.id, 'cola', e.target.value)}/>
+                                    <div className="flex flex-col items-center justify-end h-full pb-1">
+                                        <label htmlFor={`taxable-${item.id}`} className="mb-1 text-sm font-medium text-brand-text-secondary">Taxable</label>
+                                        <input
+                                            type="checkbox"
+                                            id={`taxable-${item.id}`}
+                                            checked={item.taxable !== false}
+                                            onChange={e => handleDynamicListChange('otherIncomes', item.id, 'taxable', e.target.checked)}
+                                            className="h-5 w-5 rounded text-brand-primary focus:ring-brand-primary"
+                                        />
+                                    </div>
+                                    <div className="flex items-end">
+                                        <ActionIcons onAdd={() => {
+                                            const id = Date.now().toString();
+                                            addToList('otherIncomes', { id, owner: 'person1', name: 'New Income', monthlyAmount: 0, startAge: plan.person1.retirementAge, endAge: plan.person1.lifeExpectancy, cola: 0, taxable: true } as any);
+                                            setFocusTargetId(`otherIncomes-name-${id}`);
+                                        }} onRemove={() => removeFromList('otherIncomes', item.id)} canRemove={(plan.otherIncomes || []).length > 0} />
+                                    </div>
+                                </div>
+                            ))}
+                            {(plan.otherIncomes || []).length === 0 && (
+                                <div className="flex justify-center py-6">
+                                    <AddButton label="+ Add Other Income" icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zM10 6a2 2 0 100 4 2 2 0 000-4zM8 12v2h4v-2H8z" /></svg>} onClick={() => {
+                                            const id = Date.now().toString();
+                                            addToList('otherIncomes', { id, owner: 'person1', name: 'New Income', monthlyAmount: 0, startAge: plan.person1.retirementAge, endAge: plan.person1.lifeExpectancy, cola: 0, taxable: true } as any);
+                                            setFocusTargetId(`otherIncomes-name-${id}`);
+                                        }} />
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
+            </InputSection>
+
+            {/* Estate Planning - Gifts + Legacy (tabs) */}
+            <InputSection
+                title="Estate Planning"
+                subtitle="Manage gifts and legacy allocations."
+                titleColorClass="text-purple-600"
+            >
+                <div className="col-span-full">
+                    <div className="flex items-center space-x-6 mb-3" role="tablist" aria-label="Estate Tabs" onKeyDown={handleEstateKeyDown}>
+                        {estateTab === 'gifts' ? (
+                            <button
+                                type="button"
+                                role="tab"
+                                id="tab-gifts"
+                                aria-selected="true"
+                                aria-controls="panel-gifts"
+                                onClick={() => setEstateTab('gifts')}
+                                className={`text-sm pb-2 ${'border-b-2 border-purple-600 text-purple-700 font-medium'}`}
+                            >
+                                Gifts
+                            </button>
+                        ) : (
+                            <button
+                                type="button"
+                                role="tab"
+                                id="tab-gifts"
+                                aria-controls="panel-gifts"
+                                onClick={() => setEstateTab('gifts')}
+                                className={`text-sm pb-2 ${'border-b-2 border-transparent text-gray-600 hover:text-gray-800'}`}
+                            >
+                                Gifts
+                            </button>
+                        )}
+                        {estateTab === 'legacy' ? (
+                            <button
+                                type="button"
+                                role="tab"
+                                id="tab-legacy"
+                                aria-selected="true"
+                                aria-controls="panel-legacy"
+                                onClick={() => setEstateTab('legacy')}
+                                className={`text-sm pb-2 ${'border-b-2 border-orange-600 text-orange-700 font-medium'}`}
+                            >
+                                Legacy Disbursements
+                            </button>
+                        ) : (
+                            <button
+                                type="button"
+                                role="tab"
+                                id="tab-legacy"
+                                aria-controls="panel-legacy"
+                                onClick={() => setEstateTab('legacy')}
+                                className={`text-sm pb-2 ${'border-b-2 border-transparent text-gray-600 hover:text-gray-800'}`}
+                            >
+                                Legacy Disbursements
+                            </button>
+                        )}
+                    </div>
+
+                    {/* Gifts panel */}
+                    {estateTab === 'gifts' && (
+                        <div id="panel-gifts" role="tabpanel" aria-labelledby="tab-gifts" className="relative pt-3 space-y-2">
+                            {((plan.gifts || []) as any[]).map(item => (
+                                <div key={item.id} className="grid gap-x-4 items-end p-2 rounded-md bg-purple-50/50 grid-cols-6">
+                                    <div className="w-full">
+                                        <SelectInput label="Owner" value={item.owner || 'person1'} onChange={e => handleDynamicListChange('gifts', item.id, 'owner', e.target.value)}>
+                                            <option value="person1">{plan.person1.name}</option>
+                                            {isCouple && <option value="person2">{plan.person2.name}</option>}
+                                        </SelectInput>
+                                    </div>
+                                    <div className="w-48">
+                                        <TextInput id={`gift-beneficiary-${item.id}`} label="Beneficiary" value={item.beneficiary} onChange={e => handleDynamicListChange('gifts', item.id, 'beneficiary', e.target.value)} />
+                                    </div>
+                                    <div className="w-full">
+                                        <SelectInput label="Type" value={item.isAnnual ? 'annual' : 'one-time'} onChange={e => handleDynamicListChange('gifts', item.id, 'isAnnual', e.target.value === 'annual')}>
+                                            <option value="one-time">One-time</option>
+                                            <option value="annual">Annual</option>
+                                        </SelectInput>
+                                    </div>
+                                    {!item.isAnnual && (
+                                        <>
+                                            <div className="w-full">
+                                                <NumberInput label="Amount" prefix="$" value={item.amount || 0} onChange={e => handleDynamicListChange('gifts', item.id, 'amount', e.target.value)} />
+                                            </div>
+                                            <div className="w-20">
+                                                <NumberInput label="Age" value={item.age || plan.person1.currentAge} onChange={e => handleDynamicListChange('gifts', item.id, 'age', e.target.value)} />
+                                            </div>
+                                        </>
+                                    )}
+                                    {item.isAnnual && (
+                                        <>
+                                            <div className="w-full">
+                                                <NumberInput label="Amount" prefix="$" value={item.annualAmount || 0} onChange={e => handleDynamicListChange('gifts', item.id, 'annualAmount', e.target.value)} />
+                                            </div>
+                                            <div className="w-28">
+                                                <div className="flex space-x-1">
+                                                    <div className="w-1/2">
+                                                        <NumberInput label="Start" placeholder="e.g., 67" value={item.startAge || plan.person1.retirementAge} onChange={e => handleDynamicListChange('gifts', item.id, 'startAge', e.target.value)} />
+                                                    </div>
+                                                    <div className="w-1/2">
+                                                        <NumberInput label="End" placeholder="e.g., 90" value={item.endAge || plan.person1.lifeExpectancy} onChange={e => handleDynamicListChange('gifts', item.id, 'endAge', e.target.value)} />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </>
+                                    )}
+                                    <div className="flex items-end">
+                                        <ActionIcons onAdd={() => { const id = Date.now().toString(); addToList('gifts', { id, beneficiary: '', owner: 'person1', isAnnual: false, amount: 0, annualAmount: 0, age: plan.person1.currentAge, startAge: plan.person1.retirementAge, endAge: plan.person1.lifeExpectancy } as any); setFocusTargetId(`gift-beneficiary-${id}`); }} onRemove={() => removeFromList('gifts', item.id)} canRemove={(plan.gifts || []).length > 0} />
+                                    </div>
+                                </div>
+                            ))}
+                            {(plan.gifts || []).length === 0 && (
+                                <div className="flex justify-center py-6">
+                                    <AddButton label="+ Add Gift" icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M4 7h12v2H4zM10 3l2 4H8l2-4zM4 9v8h12V9H4z" /></svg>} onClick={() => { const id = Date.now().toString(); addToList('gifts', { id, beneficiary: '', owner: 'person1', isAnnual: false, amount: 0, annualAmount: 0, age: plan.person1.currentAge, startAge: plan.person1.retirementAge, endAge: plan.person1.lifeExpectancy } as any); setFocusTargetId(`gift-beneficiary-${id}`); }} />
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Legacy panel */}
+                    {estateTab === 'legacy' && (
+                        <div id="panel-legacy" role="tabpanel" aria-labelledby="tab-legacy" className="relative pt-3 space-y-2">
+                            {(plan.legacyDisbursements || []).map((ld) => (
+                                <div key={ld.id} className="grid grid-cols-6 gap-x-4 items-end p-2 rounded-md bg-orange-50/50">
+                                    <div className="col-span-2">
+                                        <TextInput id={`legacy-beneficiary-${ld.id}`} label="Beneficiary" value={ld.beneficiary} disabled={plan.dieWithZero} onChange={e => handleDynamicListChange('legacyDisbursements', ld.id, 'beneficiary', e.target.value)} />
+                                    </div>
+                                    <div>
+                                        <SelectInput label="Type" value={ld.beneficiaryType} disabled={plan.dieWithZero} onChange={e => handleDynamicListChange('legacyDisbursements', ld.id, 'beneficiaryType', e.target.value)}>
+                                            <option value="person">Person</option>
+                                            <option value="organization">Organization</option>
+                                        </SelectInput>
+                                    </div>
+                                    <div className="w-28">
+                                        <NumberInput label="Percentage" suffix="%" value={ld.percentage} disabled={plan.dieWithZero} onChange={e => handleDynamicListChange('legacyDisbursements', ld.id, 'percentage', e.target.value)} />
+                                    </div>
+                                    <div className="flex items-end">
+                                        <ActionIcons onAdd={() => { const id = Date.now().toString(); addToList('legacyDisbursements', { ...ld, id, beneficiary: '', beneficiaryType: 'person', percentage: 0 } as any); setFocusTargetId(`legacy-beneficiary-${id}`); }} onRemove={() => removeFromList('legacyDisbursements', ld.id)} canRemove={(plan.legacyDisbursements || []).length > 0} />
+                                    </div>
+                                </div>
+                            ))}
+
+                            {(plan.legacyDisbursements || []).length === 0 && (
+                                <div className="flex justify-center py-6">
+                                    <AddButton label="+ Add Legacy" icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M17 20v-2a4 4 0 00-4-4H7a4 4 0 00-4 4v2" /><path d="M9 10a4 4 0 100-8 4 4 0 000 8zM17 8a3 3 0 11-6 0 3 3 0 016 0z" /></svg>} disabled={plan.dieWithZero} onClick={() => { const id = Date.now().toString(); addToList('legacyDisbursements', { id, beneficiary: '', beneficiaryType: 'person', percentage: 0 } as any); setFocusTargetId(`legacy-beneficiary-${id}`); }} />
+                                </div>
+                            )}
+
+                            {/* Validation: ensure percentages do not exceed 100 */}
+                            {(() => {
+                                const totalPct = (plan.legacyDisbursements || []).reduce((s, x) => s + (x.percentage || 0), 0);
+                                if (totalPct > 100) {
+                                    return <p className="text-sm text-red-600">Total legacy percentages exceed 100% ({totalPct}%). Please adjust.</p>;
+                                }
+                                if (totalPct > 0 && totalPct < 100) {
+                                    return <p className="text-sm text-gray-600">Total allocated: {totalPct}%. Remaining estate will be {100 - totalPct}%.</p>;
+                                }
+                                return null;
+                            })()}
+                            {plan.dieWithZero && <p className="text-sm text-gray-500 italic">Legacy disbursements are disabled while Die With Zero is enabled.</p>}
+                        </div>
+                    )}
+                </div>
+            </InputSection>
+
+            {['Expense Periods'].map(section => {
                 const listName = section.replace(' ', '').charAt(0).toLowerCase() + section.replace(' ', '').slice(1) as DynamicListKey;
                 const items = (plan[listName] as any[]) || [];
                 const subtitles: { [key: string]: string } = {
                     'Retirement Accounts': 'Add 401(k)s, IRAs, and other tax-advantaged accounts.',
                     'Investment Accounts': 'Add taxable brokerage and other investment accounts.',
-                    'Pensions': 'Add any defined-benefit pension plans.',
-                    'Other Incomes': 'Add any other sources of income, like rental properties or part-time work.',
                     'Expense Periods': 'Model different spending levels for different phases of retirement.',
-                    'Gifts': 'Add one-time or annual gifts to beneficiaries; affects cashflow and legacy.'
-                    , 'Legacy Disbursements': 'Allocate percentages of the final estate to beneficiaries.'
+                    'Legacy Disbursements': 'Allocate percentages of the final estate to beneficiaries.'
                 };
-                    const colors: { [key: string]: string } = {
+
+                const colors: { [key: string]: string } = {
                     'Retirement Accounts': 'text-cyan-600',
                     'Investment Accounts': 'text-teal-600',
-                    'Pensions': 'text-sky-600',
-                    'Other Incomes': 'text-lime-600',
                     'Expense Periods': 'text-red-600',
-                    'Gifts': 'text-purple-600',
                     'Legacy Disbursements': 'text-orange-600'
-                };
-                
-                const addPension = () => {
-                    const id = Date.now().toString();
-                    addToList('pensions', { id, owner: 'person1', name: 'New Pension', monthlyBenefit: 0, startAge: Math.min(plan.person1.retirementAge, isCouple ? plan.person2.retirementAge : Infinity), cola: 0, survivorBenefit: 0, taxable: true });
-                    setFocusTargetId(`pensions-name-${id}`);
-                };
-                const addOtherIncome = () => {
-                    const id = Date.now().toString();
-                    addToList('otherIncomes', { id, owner: 'person1', name: 'New Income', monthlyAmount: 0, startAge: plan.person1.retirementAge, endAge: plan.person1.lifeExpectancy, cola: 0, taxable: true });
-                    setFocusTargetId(`otherIncomes-name-${id}`);
-                };
-                const addGift = () => {
-                    const id = Date.now().toString();
-                    addToList('gifts', { id, beneficiary: '', owner: 'person1', isAnnual: false, amount: 0, annualAmount: 0, age: plan.person1.currentAge, startAge: plan.person1.retirementAge, endAge: plan.person1.lifeExpectancy });
-                    // request focus for the newly-created beneficiary input
-                    setFocusTargetId(`gift-beneficiary-${id}`);
                 };
 
                 return (
                     <InputSection key={section} title={section} subtitle={subtitles[section]} titleColorClass={colors[section]} gridCols={1}>
-                        <div className="col-span-full space-y-2">
+                        <div className="relative col-span-full pt-3 space-y-2">
                             {items.map((item) => (
                                 <div key={item.id} className={`grid gap-x-4 items-end p-2 rounded-md ${
-                                    {'Retirement Accounts': 'bg-cyan-50/50 grid-cols-7', 'Investment Accounts': 'bg-teal-50/50 grid-cols-5', 'Pensions': 'bg-sky-50/50 grid-cols-8', 'Other Incomes': 'bg-lime-50/50 grid-cols-8', 'Expense Periods': 'bg-red-50/50 grid-cols-5', 'Gifts': 'bg-purple-50/50 grid-cols-6', 'Legacy Disbursements': 'bg-orange-50/50 grid-cols-6'}[section]
+                                    {'Retirement Accounts': 'bg-cyan-50/50 grid-cols-7', 'Investment Accounts': 'bg-teal-50/50 grid-cols-5', 'Expense Periods': 'bg-red-50/50 grid-cols-5', 'Legacy Disbursements': 'bg-orange-50/50 grid-cols-6'}[section]
                                 }`}> 
                                     {/* Common fields */}
-                                    {listName !== 'expensePeriods' && listName !== 'gifts' && (
+                                    {listName !== 'expensePeriods' && (
                                         <>
                                             <SelectInput label="Owner" value={item.owner} onChange={e => handleDynamicListChange(listName, item.id, 'owner', e.target.value)} data-list={listName} data-id={item.id}>
                                                 <option value="person1">{plan.person1.name}</option>
@@ -283,91 +772,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                                             }} onRemove={() => removeFromList('investmentAccounts', item.id)} canRemove={items.length > 1} />
                                         </div>
                                     </>}
-                                    {listName === 'pensions' && <>
-                                        <NumberInput label="Monthly Benefit" prefix="$" value={item.monthlyBenefit} onChange={e => handleDynamicListChange(listName, item.id, 'monthlyBenefit', e.target.value)}/>
-                                        <NumberInput label="Start Age" value={item.startAge} onChange={e => handleDynamicListChange(listName, item.id, 'startAge', e.target.value)}/>
-                                        <NumberInput label="COLA" suffix="%" value={item.cola} onChange={e => handleDynamicListChange(listName, item.id, 'cola', e.target.value)}/>
-                                        <NumberInput label="Survivor" suffix="%" value={item.survivorBenefit} onChange={e => handleDynamicListChange(listName, item.id, 'survivorBenefit', e.target.value)}/>
-                                        <div className="flex flex-col items-center justify-end h-full pb-1">
-                                            <label htmlFor={`taxable-${item.id}`} className="mb-1 text-sm font-medium text-brand-text-secondary">Taxable</label>
-                                            <input
-                                                type="checkbox"
-                                                id={`taxable-${item.id}`}
-                                                checked={item.taxable !== false}
-                                                onChange={e => handleDynamicListChange(listName, item.id, 'taxable', e.target.checked)}
-                                                className="h-5 w-5 rounded text-brand-primary focus:ring-brand-primary"
-                                            />
-                                        </div>
-                                        <div className="flex items-end">
-                                            <ActionIcons onAdd={addPension} onRemove={() => removeFromList('pensions', item.id)} canRemove={items.length > 0} />
-                                        </div>
-                                    </>}
-                                        {listName === 'otherIncomes' && <>
-                                        <NumberInput label="Monthly Amount" prefix="$" value={item.monthlyAmount} onChange={e => handleDynamicListChange(listName, item.id, 'monthlyAmount', e.target.value)}/>
-                                        <NumberInput label="Start Age" value={item.startAge} onChange={e => handleDynamicListChange(listName, item.id, 'startAge', e.target.value)}/>
-                                        <NumberInput label="End Age" value={item.endAge} onChange={e => handleDynamicListChange(listName, item.id, 'endAge', e.target.value)}/>
-                                        <NumberInput label="COLA" suffix="%" value={item.cola} onChange={e => handleDynamicListChange(listName, item.id, 'cola', e.target.value)}/>
-                                            <div className="flex flex-col items-center justify-end h-full pb-1">
-                                            <label htmlFor={`taxable-${item.id}`} className="mb-1 text-sm font-medium text-brand-text-secondary">Taxable</label>
-                                            <input
-                                                type="checkbox"
-                                                id={`taxable-${item.id}`}
-                                                checked={item.taxable !== false}
-                                                onChange={e => handleDynamicListChange(listName, item.id, 'taxable', e.target.checked)}
-                                                className="h-5 w-5 rounded text-brand-primary focus:ring-brand-primary"
-                                            />
-                                        </div>
-                                            <div className="flex items-end">
-                                            <ActionIcons onAdd={addOtherIncome} onRemove={() => removeFromList('otherIncomes', item.id)} canRemove={items.length > 0} />
-                                        </div>
-                                    </>}
-                                        {listName === 'gifts' && <>
-                                            <div className="w-full">
-                                            <SelectInput label="Owner" value={item.owner || 'person1'} onChange={e => handleDynamicListChange(listName, item.id, 'owner', e.target.value)}>
-                                                <option value="person1">{plan.person1.name}</option>
-                                                {isCouple && <option value="person2">{plan.person2.name}</option>}
-                                            </SelectInput>
-                                        </div>
-                                        <div className="w-48">
-                                            <TextInput id={`gift-beneficiary-${item.id}`} label="Beneficiary" value={item.beneficiary} onChange={e => handleDynamicListChange(listName, item.id, 'beneficiary', e.target.value)} />
-                                        </div>
-                                            <div className="w-full">
-                                                <SelectInput label="Type" value={item.isAnnual ? 'annual' : 'one-time'} onChange={e => handleDynamicListChange(listName, item.id, 'isAnnual', e.target.value === 'annual')}>
-                                                    <option value="one-time">One-time</option>
-                                                    <option value="annual">Annual</option>
-                                                </SelectInput>
-                                            </div>
-                                            {!item.isAnnual && (
-                                                <>
-                                                    <div className="w-full">
-                                                        <NumberInput label="Amount" prefix="$" value={item.amount || 0} onChange={e => handleDynamicListChange(listName, item.id, 'amount', e.target.value)} />
-                                                    </div>
-                                                    <div className="w-20">
-                                                        <NumberInput label="Age" value={item.age || plan.person1.currentAge} onChange={e => handleDynamicListChange(listName, item.id, 'age', e.target.value)} />
-                                                    </div>
-                                                </>
-                                            )}
-                                            {item.isAnnual && (
-                                            <>
-                                                <div className="w-full">
-                                                    <NumberInput label="Amount" prefix="$" value={item.annualAmount || 0} onChange={e => handleDynamicListChange(listName, item.id, 'annualAmount', e.target.value)} />
-                                                </div>
-                                                <div className="w-28">
-                                                    <div className="flex space-x-1">
-                                                        <div className="w-1/2">
-                                                            <NumberInput label="Start" placeholder="e.g., 67" value={item.startAge || plan.person1.retirementAge} onChange={e => handleDynamicListChange(listName, item.id, 'startAge', e.target.value)} />
-                                                        </div>
-                                                        <div className="w-1/2">
-                                                            <NumberInput label="End" placeholder="e.g., 90" value={item.endAge || plan.person1.lifeExpectancy} onChange={e => handleDynamicListChange(listName, item.id, 'endAge', e.target.value)} />
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </>
-                                        )}
-                                        <div className="flex items-end">
-                                            <ActionIcons onAdd={addGift} onRemove={() => removeFromList('gifts', item.id)} canRemove={items.length > 0} />
-                                        </div>
-                                        </>}
+                                    {/* pensions and otherIncomes are rendered in the dedicated Income tabs above */}
                                     {listName === 'expensePeriods' && <>
                                             <TextInput label="Name" value={item.name} onChange={e => handleDynamicListChange(listName, item.id, 'name', e.target.value)} data-list={listName} data-id={item.id} />
                                             <NumberInput label="Total Monthly Expenses" prefix="$" value={item.monthlyAmount} onChange={e => handleDynamicListChange(listName, item.id, 'monthlyAmount', e.target.value)}/>
@@ -389,75 +794,15 @@ export const InputForm: React.FC<InputFormProps> = ({
                                     </>}
                                 </div>
                             ))}
-                            {(listName === 'pensions' || listName === 'otherIncomes' || listName === 'gifts') && items.length === 0 && (
-                                <div className="text-center py-2">
-                                    <button onClick={listName === 'pensions' ? addPension : listName === 'otherIncomes' ? addOtherIncome : addGift} className="text-sm text-brand-primary font-semibold hover:underline">
-                                        + Add {section.slice(0, -1)}
-                                    </button>
+                            {items.length === 0 && listName === 'expensePeriods' && (
+                                <div className="flex justify-center py-6">
+                                    <AddButton label="+ Add Expense Period" icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M6 2v2M14 2v2M3 8h14M4 6h12v12H4z" /></svg>} onClick={() => { const id = Date.now().toString(); addToList('expensePeriods', { id, monthlyAmount: 0, name: `Phase ${items.length + 1}`, startAge: plan.person1.retirementAge, startAgeRef: 'person1', endAge: plan.person1.lifeExpectancy, endAgeRef: 'person1' } as any); setFocusTargetId(`expensePeriods-name-${id}`); }} />
                                 </div>
                             )}
                         </div>
                     </InputSection>
                 )
             })}
-
-            {/* Legacy Disbursements - separate section from Gifts */}
-            <InputSection title="Legacy Disbursements" subtitle="Allocate percentages of the final estate to beneficiaries. Disabled when Die With Zero is enabled." titleColorClass="text-orange-600">
-                <div className="col-span-full space-y-2">
-                        {(plan.legacyDisbursements || []).map((ld) => (
-                        <div key={ld.id} className="grid grid-cols-6 gap-x-4 items-end p-2 rounded-md bg-orange-50/50">
-                            <div className="col-span-2">
-                                <TextInput id={`legacy-beneficiary-${ld.id}`} label="Beneficiary" value={ld.beneficiary} disabled={plan.dieWithZero} onChange={e => handleDynamicListChange('legacyDisbursements', ld.id, 'beneficiary', e.target.value)} />
-                            </div>
-                            <div>
-                                <SelectInput label="Type" value={ld.beneficiaryType} disabled={plan.dieWithZero} onChange={e => handleDynamicListChange('legacyDisbursements', ld.id, 'beneficiaryType', e.target.value)}>
-                                    <option value="person">Person</option>
-                                    <option value="organization">Organization</option>
-                                </SelectInput>
-                            </div>
-                            <div className="w-28">
-                                <NumberInput label="Percentage" suffix="%" value={ld.percentage} disabled={plan.dieWithZero} onChange={e => handleDynamicListChange('legacyDisbursements', ld.id, 'percentage', e.target.value)} />
-                            </div>
-                            <div className="flex items-end">
-                                <ActionIcons onAdd={() => {
-                                        const id = Date.now().toString();
-                                        addToList('legacyDisbursements', { ...ld, id, beneficiary: '', beneficiaryType: 'person', percentage: 0 });
-                                        setFocusTargetId(`legacy-beneficiary-${id}`);
-                                    }} onRemove={() => removeFromList('legacyDisbursements', ld.id)} canRemove={(plan.legacyDisbursements || []).length > 0} />
-                            </div>
-                        </div>
-                    ))}
-
-                    {(plan.legacyDisbursements || []).length === 0 && (
-                        <div className="text-center py-2">
-                            <button
-                                disabled={plan.dieWithZero}
-                                onClick={() => {
-                                    const id = Date.now().toString();
-                                    addToList('legacyDisbursements', { id, beneficiary: '', beneficiaryType: 'person', percentage: 0 });
-                                    setFocusTargetId(`legacy-beneficiary-${id}`);
-                                }}
-                                className={`text-sm font-semibold ${plan.dieWithZero ? 'text-gray-400' : 'text-brand-primary hover:underline'}`}
-                            >
-                                + Add Legacy Disbursement
-                            </button>
-                        </div>
-                    )}
-
-                    {/* Validation: ensure percentages do not exceed 100 */}
-                    {(() => {
-                        const totalPct = (plan.legacyDisbursements || []).reduce((s, x) => s + (x.percentage || 0), 0);
-                        if (totalPct > 100) {
-                            return <p className="text-sm text-red-600">Total legacy percentages exceed 100% ({totalPct}%). Please adjust.</p>;
-                        }
-                        if (totalPct > 0 && totalPct < 100) {
-                            return <p className="text-sm text-gray-600">Total allocated: {totalPct}%. Remaining estate will be {100 - totalPct}%.</p>;
-                        }
-                        return null;
-                    })()}
-                    {plan.dieWithZero && <p className="text-sm text-gray-500 italic">Legacy disbursements are disabled while Die With Zero is enabled.</p>}
-                </div>
-            </InputSection>
         </>
     );
 };
