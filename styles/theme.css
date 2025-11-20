@@ -94,6 +94,22 @@ html, body {
   transform: scale(1);
 }
 
+/* Buttons for scenario backup/restore */
+.btn-download {
+  background-color: #8595d4;
+  color: #ffffff;
+}
+.btn-download:hover {
+  filter: brightness(0.95);
+}
+.btn-upload {
+  background-color: #85d48d;
+  color: #ffffff;
+}
+.btn-upload:hover {
+  filter: brightness(0.95);
+}
+
 /* Improve left-nav text contrast in dark mode for the user manual */
 .theme-dark .user-manual-nav button {
   color: #ffffff !important;
