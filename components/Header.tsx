@@ -100,7 +100,7 @@ export const Header: React.FC<HeaderProps> = ({
                     {isScenarioMenuOpen && (
                         <div className="origin-top-right absolute right-0 mt-2 w-96 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-30 p-4">
                             <div className="space-y-4">
-                                <h3 className="text-lg font-semibold text-gray-800">Scenario Manager</h3>
+                                <h3 className="text-lg font-semibold text-brand-text-primary">Scenario Manager</h3>
                                 <div>
                                     <SelectInput label="Current Scenario" value={activeScenario.id || ''} onChange={e => handleSelectScenario(e.target.value)}>
                                         {Object.values(scenarios).map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
