@@ -17,7 +17,7 @@ export const DisclaimerModal: React.FC<DisclaimerModalProps> = ({ isOpen, requir
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" onClick={handleBackdrop}>
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-xl w-full p-6" onClick={e => e.stopPropagation()}>
-        <h2 className="text-lg font-semibold text-brand-text-primary dark:text-white">Important Disclaimer</h2>
+        <h2 className="text-lg font-semibold text-brand-text-secondary dark:text-gray-200">Important Disclaimer</h2>
         <div className="mt-3 text-sm text-brand-text-secondary dark:text-gray-200 space-y-3">
           <p>All figures, projections, and estimates provided by this application are intended solely for general planning and illustrative purposes. They are approximate in nature and should not be interpreted as precise forecasts or guarantees of future results.</p>
           <p>This application and its authors do not provide tax, legal, or investment advice. The information presented is not a substitute for professional advice from a qualified accountant, tax advisor, attorney, or financial planner. You should consult with an appropriately qualified professional before making any financial, tax, or legal decisions.</p>
