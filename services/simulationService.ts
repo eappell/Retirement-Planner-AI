@@ -77,6 +77,12 @@ export const runSimulation = (plan: RetirementPlan, volatility?: number): Calcul
     const avgReturn = plan.avgReturn / 100;
     const stdDev = volatility ? volatility / 100 : 0;
 
+    // Simple asset-class assumptions (annualized)
+    const STOCK_MEAN = 0.08; // 8% expected stock return
+    const STOCK_STD_DEFAULT = 0.15; // 15% stock volatility
+    const BOND_MEAN = 0.03; // 3% expected bond return
+    const BOND_STD_DEFAULT = 0.06; // 6% bond volatility
+
     const startAge = Math.min(plan.person1.currentAge, isCouple ? plan.person2.currentAge : Infinity);
     const endAge = Math.max(plan.person1.lifeExpectancy, isCouple ? plan.person2.lifeExpectancy : 0);
     const simulationYears = endAge - startAge;
@@ -115,6 +121,9 @@ export const runSimulation = (plan: RetirementPlan, volatility?: number): Calcul
             let totalGiftThisYear = 0;
 
             const currentYearReturn = volatility ? randomNormal(avgReturn, stdDev) : avgReturn;
+            // Asset-class returns for this year (used to weight by allocations)
+            const stockReturn = volatility ? randomNormal(STOCK_MEAN, stdDev || STOCK_STD_DEFAULT) : STOCK_MEAN;
+            const bondReturn = volatility ? randomNormal(BOND_MEAN, stdDev || BOND_STD_DEFAULT) : BOND_MEAN;
 
             if (p1Alive && currentAge1 >= RMD_START_AGE) {
                 const rmdFactor = RMD_UNIFORM_LIFETIME_TABLE[currentAge1] || 1;
@@ -140,7 +149,11 @@ export const runSimulation = (plan: RetirementPlan, volatility?: number): Calcul
                 if (ownerAge < owner.retirementAge) {
                     acc.balance += acc.annualContribution;
                 }
-                acc.balance *= (1 + currentYearReturn);
+                // Compute allocation-weighted return based on account-level percentStocks/percentBonds
+                const stocksPct = (acc.percentStocks !== undefined) ? Number(acc.percentStocks) / 100 : 0.6;
+                const bondsPct = (acc.percentBonds !== undefined) ? Number(acc.percentBonds) / 100 : (1 - stocksPct);
+                const accountReturn = (stocksPct * stockReturn) + (bondsPct * bondReturn);
+                acc.balance *= (1 + accountReturn);
             });
 
             const isP1Retired = currentAge1 >= plan.person1.retirementAge;

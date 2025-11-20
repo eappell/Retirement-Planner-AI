@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import AddButton from './AddButton';
 import { RetirementPlan, Person, PlanType, RetirementAccount, InvestmentAccount, Pension, OtherIncome, Annuity, ExpensePeriod, Gift, LegacyDisbursement } from '../types';
 import { InputSection } from './InputSection';
@@ -31,6 +31,9 @@ export const InputForm: React.FC<InputFormProps> = ({
 }) => {
     const isCouple = plan.planType === PlanType.COUPLE;
     const [focusTargetId, setFocusTargetId] = useState<string | null>(null);
+    const [draggingId, setDraggingId] = useState<string | null>(null);
+    const [draggingValue, setDraggingValue] = useState<number | null>(null);
+    const sliderRefs = useRef<Record<string, HTMLInputElement | null>>({});
     const [incomeTab, setIncomeTab] = useState<'pensions' | 'annuities' | 'other'>('pensions');
     const [accountsTab, setAccountsTab] = useState<'retirement' | 'investment'>('retirement');
     const [estateTab, setEstateTab] = useState<'gifts' | 'legacy'>('gifts');
@@ -404,19 +407,30 @@ export const InputForm: React.FC<InputFormProps> = ({
                                                                     <div className="col-span-2">
                                                                         <label className="block text-sm font-medium text-brand-text-secondary">% Stocks</label>
                                                                         <div className="flex items-center space-x-3">
-                                                                            <input
-                                                                                type="range"
-                                                                                min={0}
-                                                                                max={100}
-                                                                                aria-label={`% Stocks for ${item.name || 'account'}`}
-                                                                                value={Number(item.percentStocks ?? 0)}
-                                                                                onChange={e => {
-                                                                                    const v = Number(e.target.value);
-                                                                                    handleDynamicListChange('investmentAccounts', item.id, 'percentStocks', String(v));
-                                                                                    handleDynamicListChange('investmentAccounts', item.id, 'percentBonds', String(100 - v));
-                                                                                }}
-                                                                                className="w-full"
-                                                                            />
+                                                                                <div className="relative w-full" onMouseUp={() => setDraggingId(null)} onTouchEnd={() => setDraggingId(null)}>
+                                                                                    <input
+                                                                                        ref={el => { sliderRefs.current[item.id] = el; }}
+                                                                                        type="range"
+                                                                                        min={0}
+                                                                                        max={100}
+                                                                                        aria-label={`% Stocks for ${item.name || 'account'}`}
+                                                                                        value={Number(item.percentStocks ?? 0)}
+                                                                                        onMouseDown={() => setDraggingId(item.id)}
+                                                                                        onTouchStart={() => setDraggingId(item.id)}
+                                                                                        onChange={e => {
+                                                                                            const v = Number(e.target.value);
+                                                                                            handleDynamicListChange('investmentAccounts', item.id, 'percentStocks', String(v));
+                                                                                            handleDynamicListChange('investmentAccounts', item.id, 'percentBonds', String(100 - v));
+                                                                                            setDraggingValue(v);
+                                                                                        }}
+                                                                                        className="w-full"
+                                                                                    />
+                                                                                    {draggingId === item.id && (
+                                                                                        <div className="absolute -top-8 left-0 pointer-events-none w-full flex justify-center">
+                                                                                            <div className="bg-gray-800 text-white text-xs px-2 py-1 rounded">{draggingValue ?? Number(item.percentStocks ?? 0)}%</div>
+                                                                                        </div>
+                                                                                    )}
+                                                                                </div>
                                                                             <div className="w-20 text-right">
                                                                                 <div aria-live="polite" className="text-sm font-medium">{Number(item.percentStocks ?? 0)}%</div>
                                                                             </div>

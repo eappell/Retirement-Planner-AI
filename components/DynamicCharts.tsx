@@ -32,6 +32,10 @@ const generateScenarioData = (plan: RetirementPlan): ScenarioData[] => {
     const endAge = Math.max(plan.person1.lifeExpectancy, isCouple ? plan.person2.lifeExpectancy : 0);
     const simulationYears = endAge - startAge;
 
+    // Asset-class assumptions used for scenario adjustments
+    const STOCK_MEAN = 0.08;
+    const BOND_MEAN = 0.03;
+
     scenarios.forEach((adjustment, index) => {
         let retirementAccounts = cloneArray(plan.retirementAccounts);
         let investmentAccounts = cloneArray(plan.investmentAccounts);
@@ -52,13 +56,19 @@ const generateScenarioData = (plan: RetirementPlan): ScenarioData[] => {
                 }
                 acc.balance *= (1 + (plan.avgReturn / 100) + adjustment);
             });
+            // For investment accounts, use allocation-weighted returns using STOCK/BOND means
+            const stockReturn = STOCK_MEAN + adjustment;
+            const bondReturn = BOND_MEAN + adjustment;
             investmentAccounts.forEach(acc => {
                 const owner = plan[acc.owner as keyof typeof plan] as Person;
                 const ownerAge = acc.owner === 'person1' ? currentAge1 : currentAge2;
                 if(ownerAge < owner.retirementAge) {
                     acc.balance += acc.annualContribution;
                 }
-                acc.balance *= (1 + (plan.avgReturn / 100) + adjustment);
+                const stocksPct = (acc.percentStocks !== undefined) ? Number(acc.percentStocks) / 100 : 0.6;
+                const bondsPct = (acc.percentBonds !== undefined) ? Number(acc.percentBonds) / 100 : (1 - stocksPct);
+                const accountReturn = stocksPct * stockReturn + bondsPct * bondReturn;
+                acc.balance *= (1 + accountReturn);
             });
             
             // Simplified withdrawal
