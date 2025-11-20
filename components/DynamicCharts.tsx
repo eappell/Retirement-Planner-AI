@@ -136,7 +136,7 @@ const NetWorthScenarioChart: React.FC<{ scenarioData: ScenarioData[]; giftsByYea
         <div>
             <h4 className="font-semibold text-center mb-2">Projected Net Worth Scenarios</h4>
             <div className="relative">
-                 <svg viewBox={`0 0 ${width} ${height}`} className="w-full">
+                 <svg viewBox={`0 0 ${width} ${height}`} className="w-full networth-chart">
                     {/* Y Axis */}
                     <g className="text-xs text-gray-500">
                         {[0, 0.25, 0.5, 0.75, 1].map(tick => {
