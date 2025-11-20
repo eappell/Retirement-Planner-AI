@@ -16,6 +16,7 @@ interface HeaderProps {
   handleResetPlan: () => void;
   handlePrint: () => void;
   setIsManualOpen: (isOpen: boolean) => void;
+  setIsDisclaimerOpen: (isOpen: boolean, requireAccept?: boolean) => void;
 }
 
 const Header: React.FC<HeaderProps> = ({
@@ -31,6 +32,7 @@ const Header: React.FC<HeaderProps> = ({
   handleResetPlan,
   handlePrint,
   setIsManualOpen,
+  setIsDisclaimerOpen,
 }) => {
   const [isScenarioMenuOpen, setIsScenarioMenuOpen] = React.useState(false);
   const scenarioMenuRef = React.useRef<HTMLDivElement | null>(null);
@@ -103,6 +105,11 @@ const Header: React.FC<HeaderProps> = ({
         <button type="button" onClick={() => setIsManualOpen(true)} className="flex items-center space-x-2 text-sm text-gray-600 hover:text-brand-primary transition-colors font-medium p-2 rounded-md hover:bg-gray-100">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 20l8-4V6a2 2 0 00-2-2c-2 0-4 1-6 1s-4-1-6-1A2 2 0 002 6v10l8 4z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16"/></svg>
           <span>User Manual</span>
+        </button>
+
+        <button type="button" onClick={() => setIsDisclaimerOpen(true)} className="flex items-center space-x-2 text-sm text-gray-600 hover:text-red-600 transition-colors font-medium p-2 rounded-md hover:bg-gray-100" title="View disclaimer">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
+          <span>Disclaimer</span>
         </button>
 
         <button type="button" onClick={handlePrint} className="flex items-center space-x-2 text-sm text-gray-600 hover:text-brand-primary transition-colors font-medium p-2 rounded-md hover:bg-gray-100">

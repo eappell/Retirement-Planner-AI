@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { RetirementPlan, PlanType, Person, MonteCarloResult } from './types';
 import { UserManualModal } from './components/UserManualModal';
+import DisclaimerModal from './components/DisclaimerModal';
 import { ScrollToTopButton } from './components/ScrollToTopButton';
 import { PrintableReport } from './components/PrintableReport';
 // Import canonical Header implementation
@@ -87,6 +88,8 @@ const App: React.FC = () => {
     // UI state
     const [lastAddedInfo, setLastAddedInfo] = useState<{list: DynamicListKey, id: string} | null>(null);
     const [isManualOpen, setIsManualOpen] = useState(false);
+    const [isDisclaimerOpen, setIsDisclaimerOpen] = useState(false);
+    const [isDisclaimerRequireAccept, setIsDisclaimerRequireAccept] = useState(false);
     
     // --- Update Browser Title ---
     useEffect(() => {
@@ -107,6 +110,20 @@ const App: React.FC = () => {
             setLastAddedInfo(null); // Reset after focusing
         }
     }, [lastAddedInfo]);
+
+    // --- Disclaimer on first load ---
+    useEffect(() => {
+        try {
+            const accepted = localStorage.getItem('disclaimerAccepted_v1');
+            if (!accepted) {
+                // require acceptance on first load
+                setIsDisclaimerRequireAccept(true);
+                setIsDisclaimerOpen(true);
+            }
+        } catch (e) {
+            // ignore localStorage errors
+        }
+    }, []);
     
     // Note: updateActivePlan is now provided by useScenarioManagement hook
 
@@ -370,6 +387,10 @@ const App: React.FC = () => {
                     handleResetPlan={handleResetPlan}
                     handlePrint={handlePrint}
                     setIsManualOpen={setIsManualOpen}
+                    setIsDisclaimerOpen={(open: boolean, requireAccept?: boolean) => {
+                        setIsDisclaimerRequireAccept(Boolean(requireAccept));
+                        setIsDisclaimerOpen(open);
+                    }}
                 />
 
                 <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
@@ -401,6 +422,16 @@ const App: React.FC = () => {
                 </div>
                 
                 <UserManualModal isOpen={isManualOpen} onClose={() => setIsManualOpen(false)} />
+                <DisclaimerModal
+                    isOpen={isDisclaimerOpen}
+                    requireAccept={isDisclaimerRequireAccept}
+                    onAccept={() => {
+                        try { localStorage.setItem('disclaimerAccepted_v1', 'true'); } catch (e) { /* ignore */ }
+                        setIsDisclaimerOpen(false);
+                        setIsDisclaimerRequireAccept(false);
+                    }}
+                    onClose={() => setIsDisclaimerOpen(false)}
+                />
                 <ScrollToTopButton />
             </div>
         </div>
