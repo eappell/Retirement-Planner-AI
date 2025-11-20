@@ -8,8 +8,8 @@
 }
 
 .theme-dark {
-  --brand-background: #0f172a; /* slate-900 */
-  --brand-surface: #0b1220; /* near black */
+  --brand-background: #071025; /* darker slate */
+  --brand-surface: #0b2136; /* slightly lighter card surface */
   --brand-primary: #6366f1; /* indigo-500 */
   --brand-secondary: #60a5fa; /* sky-400 */
   --brand-text-primary: #e6eef8; /* light text */
@@ -29,3 +29,36 @@ html, body {
 .text-brand-primary { color: var(--brand-primary) !important; }
 .bg-brand-primary { background-color: var(--brand-primary) !important; }
 .bg-brand-secondary { background-color: var(--brand-secondary) !important; }
+
+/* Dark mode tweaks: make card surfaces distinguishable from background */
+.theme-dark .bg-brand-surface,
+.theme-dark .bg-white {
+  background-color: var(--brand-surface) !important;
+}
+
+/* Lighten common "card" gray utilities slightly in dark mode so they stand out */
+.theme-dark .bg-gray-50 { background-color: rgba(255,255,255,0.03) !important; }
+.theme-dark .bg-gray-100 { background-color: rgba(255,255,255,0.04) !important; }
+.theme-dark .bg-gray-200 { background-color: rgba(255,255,255,0.06) !important; }
+
+/* Ensure items that use gray backgrounds keep readable labels in dark mode */
+.theme-dark .bg-gray-50,
+.theme-dark .bg-gray-100,
+.theme-dark .bg-gray-200,
+.theme-dark .bg-gray-300 {
+  color: var(--brand-text-primary) !important;
+}
+
+/* For elements that intentionally use gray backgrounds for neutral UI controls,
+   make their textual labels darker for contrast as requested (e.g., account buttons).
+   We set the label color to near-black on those gray backgrounds to improve legibility. */
+.theme-dark .bg-gray-200,
+.theme-dark .bg-gray-100 {
+  --card-label-color: #000000;
+}
+.theme-dark .bg-gray-200 .text-sm.font-medium,
+.theme-dark .bg-gray-100 .text-sm.font-medium,
+.theme-dark .bg-gray-200 label,
+.theme-dark .bg-gray-100 label {
+  color: var(--card-label-color) !important;
+}
