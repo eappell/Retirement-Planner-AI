@@ -671,7 +671,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                                 onClick={() => setEstateTab('legacy')}
                                 className={`text-sm pb-2 ${'border-b-2 border-transparent text-gray-600 hover:text-gray-800'}`}
                             >
-                                Legacy Disbursements
+                                Legacy
                             </button>
                         )}
                     </div>
