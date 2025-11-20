@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import AddButton from './AddButton';
-import { RetirementPlan, Person, PlanType, RetirementAccount, InvestmentAccount, Pension, OtherIncome, ExpensePeriod, Gift, LegacyDisbursement } from '../types';
+import { RetirementPlan, Person, PlanType, RetirementAccount, InvestmentAccount, Pension, OtherIncome, Annuity, ExpensePeriod, Gift, LegacyDisbursement } from '../types';
 import { InputSection } from './InputSection';
 import { NumberInput, SelectInput, TextInput } from './FormControls';
 import { STATES } from '../constants';
 
-type DynamicListKey = 'retirementAccounts' | 'investmentAccounts' | 'pensions' | 'otherIncomes' | 'expensePeriods' | 'gifts' | 'legacyDisbursements';
+type DynamicListKey = 'retirementAccounts' | 'investmentAccounts' | 'pensions' | 'annuities' | 'otherIncomes' | 'expensePeriods' | 'gifts' | 'legacyDisbursements';
 
 interface InputFormProps {
     plan: RetirementPlan;
@@ -31,7 +31,7 @@ export const InputForm: React.FC<InputFormProps> = ({
 }) => {
     const isCouple = plan.planType === PlanType.COUPLE;
     const [focusTargetId, setFocusTargetId] = useState<string | null>(null);
-    const [incomeTab, setIncomeTab] = useState<'pensions' | 'other'>('pensions');
+    const [incomeTab, setIncomeTab] = useState<'pensions' | 'annuities' | 'other'>('pensions');
     const [accountsTab, setAccountsTab] = useState<'retirement' | 'investment'>('retirement');
     const [estateTab, setEstateTab] = useState<'gifts' | 'legacy'>('gifts');
     useEffect(() => {
@@ -83,7 +83,7 @@ export const InputForm: React.FC<InputFormProps> = ({
 
     // Keyboard navigation for Income tabs (Left/Right/Home/End)
     const handleIncomeKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-        const ids = ['tab-pensions', 'tab-otherincomes'];
+        const ids = ['tab-pensions', 'tab-annuities', 'tab-otherincomes'];
         const activeId = document.activeElement?.id || '';
         const idx = ids.indexOf(activeId);
         let next = idx;
@@ -95,6 +95,7 @@ export const InputForm: React.FC<InputFormProps> = ({
         e.preventDefault();
         const nextId = ids[next];
         if (nextId === 'tab-pensions') setIncomeTab('pensions');
+        else if (nextId === 'tab-annuities') setIncomeTab('annuities');
         else setIncomeTab('other');
         const el = document.getElementById(nextId);
         el?.focus();
@@ -440,6 +441,30 @@ export const InputForm: React.FC<InputFormProps> = ({
                                 Pensions
                             </button>
                         )}
+                        {incomeTab === 'annuities' ? (
+                            <button
+                                type="button"
+                                role="tab"
+                                id="tab-annuities"
+                                aria-selected="true"
+                                aria-controls="panel-annuities"
+                                onClick={() => setIncomeTab('annuities')}
+                                className={`text-sm pb-2 ${'border-b-2 border-indigo-600 text-indigo-700 font-medium'}`}
+                            >
+                                Annuities
+                            </button>
+                        ) : (
+                            <button
+                                type="button"
+                                role="tab"
+                                id="tab-annuities"
+                                aria-controls="panel-annuities"
+                                onClick={() => setIncomeTab('annuities')}
+                                className={`text-sm pb-2 ${'border-b-2 border-transparent text-gray-600 hover:text-gray-800'}`}
+                            >
+                                Annuities
+                            </button>
+                        )}
                         {incomeTab === 'other' ? (
                             <button
                                 type="button"
@@ -503,6 +528,47 @@ export const InputForm: React.FC<InputFormProps> = ({
                                             addToList('pensions', newPension);
                                             setFocusTargetId(`pensions-name-${id}`);
                                         }} />
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Annuities panel */}
+                    {incomeTab === 'annuities' && (
+                        <div id="panel-annuities" role="tabpanel" aria-labelledby="tab-annuities" className="relative pt-3 space-y-2">
+                            {((plan.annuities || []) as Annuity[]).map(item => (
+                                <div key={item.id} className="grid gap-x-4 items-end p-2 rounded-md bg-indigo-50/50 grid-cols-8">
+                                    <NumberInput label="Monthly Amount" prefix="$" value={item.monthlyAmount} onChange={e => handleDynamicListChange('annuities', item.id, 'monthlyAmount', e.target.value)}/>
+                                    <NumberInput label="Start Age" value={item.startAge} onChange={e => handleDynamicListChange('annuities', item.id, 'startAge', e.target.value)}/>
+                                    <NumberInput label="COLA" suffix="%" value={item.cola} onChange={e => handleDynamicListChange('annuities', item.id, 'cola', e.target.value)}/>
+                                    <div className="flex flex-col items-center justify-end h-full pb-1">
+                                        <label htmlFor={`annuities-taxable-${item.id}`} className="mb-1 text-sm font-medium text-brand-text-secondary">Taxable</label>
+                                        <input
+                                            type="checkbox"
+                                            id={`annuities-taxable-${item.id}`}
+                                            checked={item.taxable !== false}
+                                            onChange={e => handleDynamicListChange('annuities', item.id, 'taxable', e.target.checked)}
+                                            className="h-5 w-5 rounded text-brand-primary focus:ring-brand-primary"
+                                        />
+                                    </div>
+                                    <div className="flex items-end">
+                                        <ActionIcons onAdd={() => {
+                                            const id = Date.now().toString();
+                                            const newAnnuity: Annuity = { id, owner: 'person1', name: 'New Annuity', monthlyAmount: 0, startAge: plan.person1.retirementAge, cola: 0, taxable: true };
+                                            addToList('annuities', newAnnuity);
+                                            setFocusTargetId(`annuities-name-${id}`);
+                                        }} onRemove={() => removeFromList('annuities', item.id)} canRemove={(plan.annuities || []).length > 0} />
+                                    </div>
+                                </div>
+                            ))}
+                            {(plan.annuities || []).length === 0 && (
+                                <div className="flex justify-center py-6">
+                                    <AddButton label="+ Add Annuity" icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a6 6 0 100 12 6 6 0 000-12zm1 7H9V7h2v2z"/></svg>} onClick={() => {
+                                        const id = Date.now().toString();
+                                        const newAnnuity: Annuity = { id, owner: 'person1', name: 'New Annuity', monthlyAmount: 0, startAge: plan.person1.retirementAge, cola: 0, taxable: true };
+                                        addToList('annuities', newAnnuity);
+                                        setFocusTargetId(`annuities-name-${id}`);
+                                    }} />
                                 </div>
                             )}
                         </div>

@@ -59,6 +59,16 @@ export interface OtherIncome {
     taxable: boolean;
 }
 
+export interface Annuity {
+  id: string;
+  owner: 'person1' | 'person2';
+  name: string;
+  monthlyAmount: number;
+  startAge: number;
+  cola: number; // cost of living adjustment %
+  taxable: boolean;
+}
+
 export interface Gift {
   id: string;
   beneficiary: string; // name or description of beneficiary
@@ -97,6 +107,7 @@ export interface RetirementPlan {
   investmentAccounts: InvestmentAccount[];
   pensions: Pension[];
   otherIncomes: OtherIncome[];
+  annuities?: Annuity[];
   gifts?: Gift[];
   legacyDisbursements?: LegacyDisbursement[];
   expensePeriods: ExpensePeriod[];

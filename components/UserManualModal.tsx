@@ -56,14 +56,19 @@ const manualContent = [
         icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm-5-5a2 2 0 114 0 2 2 0 01-4 0z" /></svg>,
         content: (
              <>
-                <p>This is where you build the detailed picture of your finances. Use the <strong>+</strong> and <strong>🗑️</strong> icons to add or remove items in each list.</p>
+                <p>This is where you build the detailed picture of your finances. The UI groups items into tabs so you can focus on a single category at a time:</p>
                 <ul>
-                    <li><strong>Retirement Accounts:</strong> Includes 401(k)s, IRAs, etc. 'Match %' is the employer match based on your salary.</li>
-                     <li><strong>Investment Accounts:</strong> Taxable brokerage accounts.</li>
-                    <li><strong>Pensions & Other Income:</strong> Add any regular income streams you expect in retirement. COLA is the Cost-of-Living Adjustment.</li>
-                    <li><strong>Expenses:</strong> Plan your spending throughout retirement.</li>
+                    <li><strong>Accounts (tabs):</strong> Two tabs — <em>Retirement Accounts</em> and <em>Investment Accounts</em> — let you manage tax-advantaged and taxable accounts separately. Use the <strong>+</strong> pill in the tab panel to add a new account for that tab.</li>
+                    <li><strong>Pensions, Annuities & Other Income (tabs):</strong> The Income section uses tabs to separate <em>Pensions</em>, <em>Annuities</em> and <em>Other Incomes</em>. Annuities are a dedicated list for regular contract payments you expect to receive.</li>
+                    <li><strong>Expenses:</strong> Model different spending phases with Expense Periods (e.g., Go-Go, Slow-Go, No-Go).</li>
                 </ul>
-                <p className="mt-3 p-2 bg-indigo-50 border-l-4 border-indigo-400 rounded-r-md"><strong>Tip:</strong> Use multiple expense periods to model the "Go-Go" (active), "Slow-Go" (less active), and "No-Go" (late-stage) years of retirement with different spending levels.</p>
+                <p className="mt-3">Controls you should know about:</p>
+                <ul>
+                    <li><strong>+ Add</strong>: A compact pill-style add button appears in each tab panel (centered when the panel is empty). Clicking it creates a typed item and focuses the primary input for quick editing.</li>
+                    <li><strong>🗑️ Remove</strong>: Use the trash icon to remove items. Most lists require at least one item; the UI will prevent removing the final required item where appropriate.</li>
+                    <li><strong>Keyboard Navigation:</strong> Tablists support <code>Left</code>/<code>Right</code> arrow navigation and <code>Home</code>/<code>End</code> to jump to the first/last tab. After adding an item the form will move focus into the new row so you can type immediately.</li>
+                </ul>
+                <p className="mt-3 p-2 bg-indigo-50 border-l-4 border-indigo-400 rounded-r-md"><strong>Tip:</strong> Use the per-tab <strong>+ Add</strong> to keep items organized; for example, add pensions in the Pensions tab and annuities in the Annuities tab so similar income sources are grouped together.</p>
             </>
         )
     },
