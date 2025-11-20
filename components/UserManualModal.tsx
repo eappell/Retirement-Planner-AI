@@ -68,7 +68,13 @@ const manualContent = [
     {
         id: 'income',
         title: 'Income',
-        icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3"/></svg>,
+        icon: (
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-3.866 0-7 1.79-7 4s3.134 4 7 4 7-1.79 7-4-3.134-4-7-4z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12v4c0 2.21 3.134 4 7 4" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 0C9.239 4 7 5.343 7 7s2.239 3 5 3 5-1.343 5-3-2.239-3-5-3z" />
+            </svg>
+        ),
         content: (
             <>
                 <p>The Income section is tabbed so you can manage different income types separately.</p>
