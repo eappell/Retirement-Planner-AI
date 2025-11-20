@@ -207,7 +207,7 @@ const App: React.FC = () => {
     }, [updateScenarioName]);
     
     // --- Backup & Restore Handlers ---
-    const handleDownloadScenarios = () => {
+    const handleDownloadScenarios = async (): Promise<boolean> => {
         try {
             const jsonString = JSON.stringify(scenariosState, null, 2);
             const blob = new Blob([jsonString], { type: 'application/json' });
@@ -219,45 +219,53 @@ const App: React.FC = () => {
             link.click();
             document.body.removeChild(link);
             URL.revokeObjectURL(url);
+            return true;
         } catch (error) {
             console.error("Error downloading scenarios:", error);
             alert("Failed to download scenarios.");
+            return false;
         }
     };
 
-    const handleUploadScenarios = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            try {
-                const text = e.target?.result;
-                if (typeof text !== 'string') {
-                    throw new Error("Invalid file content");
-                }
-                const uploadedState = JSON.parse(text);
-
-                // Basic validation
-                if (uploadedState && uploadedState.scenarios && typeof uploadedState.activeScenarioId !== 'undefined') {
-                     if (window.confirm('Are you sure you want to upload this file? This will overwrite all your current scenarios.')) {
-                        uploadScenarios(uploadedState);
-                        clearCalculationResults();
-                        alert("Scenarios loaded successfully!");
-                     }
-                } else {
-                    throw new Error("Invalid scenario file format.");
-                }
-            } catch (error) {
-                console.error("Error uploading scenarios:", error);
-                alert("Failed to upload scenarios. Please make sure the file is a valid scenario backup.");
+    const handleUploadScenarios = useCallback((event: React.ChangeEvent<HTMLInputElement>): Promise<boolean> => {
+        return new Promise<boolean>((resolve) => {
+            const file = event.target.files?.[0];
+            if (!file) {
+                resolve(false);
+                return;
             }
-            // Reset file input value to allow re-uploading the same file
-            if (event.target) {
-                event.target.value = '';
-            }
-        };
-        reader.readAsText(file);
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const text = e.target?.result;
+                    if (typeof text !== 'string') {
+                        throw new Error("Invalid file content");
+                    }
+                    const uploadedState = JSON.parse(text);
+
+                    // Basic validation
+                    if (uploadedState && uploadedState.scenarios && typeof uploadedState.activeScenarioId !== 'undefined') {
+                         if (window.confirm('Are you sure you want to upload this file? This will overwrite all your current scenarios.')) {
+                            uploadScenarios(uploadedState);
+                            clearCalculationResults();
+                            alert("Scenarios loaded successfully!");
+                            resolve(true);
+                            return;
+                         }
+                    }
+                } catch (error) {
+                    console.error("Error uploading scenarios:", error);
+                    alert("Failed to upload scenarios. Please make sure the file is a valid scenario backup.");
+                }
+                // Reset file input value to allow re-uploading the same file
+                if (event.target) {
+                    event.target.value = '';
+                }
+                resolve(false);
+            };
+            reader.readAsText(file);
+        });
     }, [uploadScenarios, clearCalculationResults]);
 
     // Note: Social Security calculation is now handled by useSocialSecurityCalculation hook

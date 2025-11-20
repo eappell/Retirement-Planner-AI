@@ -11,8 +11,8 @@ interface HeaderProps {
     handleCopyScenario: () => void;
     handleDeleteScenario: () => void;
     handleUpdateScenarioName: (name: string) => void;
-    handleDownloadScenarios: () => void;
-    handleUploadScenarios: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    handleDownloadScenarios: () => Promise<boolean>;
+    handleUploadScenarios: (event: React.ChangeEvent<HTMLInputElement>) => Promise<boolean>;
     handleResetPlan: () => void;
     handlePrint: () => void;
     setIsManualOpen: (isOpen: boolean) => void;
@@ -50,18 +50,30 @@ export const Header: React.FC<HeaderProps> = ({
     const [toastMessage, setToastMessage] = useState<string>('');
     const [showToast, setShowToast] = useState<boolean>(false);
 
-    const handleUploadAndClose = (e: React.ChangeEvent<HTMLInputElement>) => {
-        handleUploadScenarios(e);
-        setIsScenarioMenuOpen(false);
-        setToastMessage('Scenarios uploaded');
-        setShowToast(true);
+    const handleUploadAndClose = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        try {
+            const success = await handleUploadScenarios(e);
+            setIsScenarioMenuOpen(false);
+            setToastMessage(success ? 'Scenarios uploaded' : 'Upload failed');
+            setShowToast(true);
+        } catch (err) {
+            setIsScenarioMenuOpen(false);
+            setToastMessage('Upload failed');
+            setShowToast(true);
+        }
     };
 
-    const handleDownloadAndClose = () => {
-        handleDownloadScenarios();
-        setIsScenarioMenuOpen(false);
-        setToastMessage('Scenarios downloaded');
-        setShowToast(true);
+    const handleDownloadAndClose = async () => {
+        try {
+            const success = await handleDownloadScenarios();
+            setIsScenarioMenuOpen(false);
+            setToastMessage(success ? 'Scenarios downloaded' : 'Download failed');
+            setShowToast(true);
+        } catch (err) {
+            setIsScenarioMenuOpen(false);
+            setToastMessage('Download failed');
+            setShowToast(true);
+        }
     };
 
     useEffect(() => {
