@@ -121,3 +121,9 @@ html, body {
 .theme-dark .user-manual-nav button .text-gray-600 {
   color: #ffffff !important;
 }
+
+/* AI insights paragraph spacing: give paragraphs breathing room */
+.ai-insights p {
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
