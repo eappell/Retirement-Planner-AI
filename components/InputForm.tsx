@@ -4,6 +4,7 @@ import { RetirementPlan, Person, PlanType, RetirementAccount, InvestmentAccount,
 import { InputSection } from './InputSection';
 import { NumberInput, SelectInput, TextInput } from './FormControls';
 import { STATES } from '../constants';
+import { validateAssetDefaults } from '../utils/assetValidation';
 
 type DynamicListKey = 'retirementAccounts' | 'investmentAccounts' | 'pensions' | 'annuities' | 'otherIncomes' | 'expensePeriods' | 'gifts' | 'legacyDisbursements';
 
@@ -157,7 +158,39 @@ export const InputForm: React.FC<InputFormProps> = ({
                                 <NumberInput label="Bonds: Expected Return" suffix="%" value={(plan.bondMean ?? 3)} onChange={e => handlePlanChange('bondMean', Number(e.target.value))} />
                                 <NumberInput label="Bonds: Volatility (std dev)" suffix="%" value={(plan.bondStd ?? 6)} onChange={e => handlePlanChange('bondStd', Number(e.target.value))} />
                             </div>
-                            <p className="text-xs text-gray-500 mt-2">These settings let you tweak the expected returns and volatilities used when calculating allocation-weighted returns for investment accounts. The plan-level Average Return still acts as a baseline and will bias these values so the overall portfolio still matches your `Avg. Return`.</p>
+                            {(() => {
+                                const sd = Number(plan.stockStd ?? 15);
+                                const bd = Number(plan.bondStd ?? 6);
+                                const sm = Number(plan.stockMean ?? 8);
+                                const bm = Number(plan.bondMean ?? 3);
+                                const issues = validateAssetDefaults({ stockMean: sm, bondMean: bm, stockStd: sd, bondStd: bd });
+
+                                return (
+                                    <>
+                                        <p className="text-xs text-gray-500 mt-2">These settings let you tweak the expected returns and volatilities used when calculating allocation-weighted returns for investment accounts. The plan-level Average Return still acts as a baseline and will bias these values so the overall portfolio still matches your `Avg. Return`.</p>
+                                        {issues.length > 0 && (
+                                            <div className="mt-2">
+                                                <p className="text-sm text-red-600 font-medium">Market assumptions warnings:</p>
+                                                <ul className="text-sm text-red-600 list-disc list-inside">
+                                                    {issues.map((x, i) => <li key={i}>{x}</li>)}
+                                                </ul>
+                                            </div>
+                                        )}
+                                        <div className="mt-3">
+                                            <button type="button" onClick={() => {
+                                                try {
+                                                    const assetDefaults = { stockMean: sm, stockStd: sd, bondMean: bm, bondStd: bd };
+                                                    localStorage.setItem('assetAssumptionDefaults', JSON.stringify(assetDefaults));
+                                                    window.dispatchEvent(new CustomEvent('app:toast', { detail: { message: 'Saved asset-assumption defaults' } }));
+                                                } catch (e) {
+                                                    console.error(e);
+                                                    window.dispatchEvent(new CustomEvent('app:toast', { detail: { message: 'Failed to save app defaults' } }));
+                                                }
+                                            }} className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-md text-sm">Save as App Defaults</button>
+                                        </div>
+                                    </>
+                                );
+                            })()}
                         </details>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 col-span-full">
