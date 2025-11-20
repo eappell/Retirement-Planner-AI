@@ -101,15 +101,18 @@ const Header: React.FC<HeaderProps> = ({
 
       <div className="flex items-center space-x-2">
         <button type="button" onClick={() => setIsManualOpen(true)} className="flex items-center space-x-2 text-sm text-gray-600 hover:text-brand-primary transition-colors font-medium p-2 rounded-md hover:bg-gray-100">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M4 2h9a2 2 0 012 2v12a1 1 0 01-1.447.894L11 15H6a2 2 0 01-2-2V4a2 2 0 012-2z"/></svg>
           <span>User Manual</span>
         </button>
 
         <button type="button" onClick={handlePrint} className="flex items-center space-x-2 text-sm text-gray-600 hover:text-brand-primary transition-colors font-medium p-2 rounded-md hover:bg-gray-100">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 9V2h12v7"/><rect x="6" y="13" width="12" height="8" rx="2" ry="2"/></svg>
           <span>Print</span>
         </button>
 
         <div className="relative" ref={scenarioMenuRef}>
           <button type="button" onClick={() => setIsScenarioMenuOpen(prev => !prev)} className="flex items-center space-x-2 text-sm text-gray-600 hover:text-brand-primary transition-colors font-medium p-2 rounded-md hover:bg-gray-100">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7h6l2 3h8v7a1 1 0 01-1 1H4a1 1 0 01-1-1V7z"/></svg>
             <span>Scenarios</span>
           </button>
 
@@ -132,9 +135,11 @@ const Header: React.FC<HeaderProps> = ({
                 <div className="col-span-full pt-2 border-t">
                   <div className="grid grid-cols-2 gap-2">
                     <button onClick={handleDownloadAndClose} className="flex items-center justify-center w-full px-4 py-2 text-sm rounded-md" style={{ backgroundColor: '#8595d4', color: '#ffffff' }}>
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M3 14a1 1 0 001 1h12a1 1 0 001-1v-2a1 1 0 10-2 0v1H5v-1a1 1 0 10-2 0v2z"/><path d="M7 7l3-3 3 3M10 4v9"/></svg>
                       <span>Download</span>
                     </button>
                     <label className="flex items-center justify-center w-full px-4 py-2 text-sm rounded-md cursor-pointer" style={{ backgroundColor: '#85d48d', color: '#ffffff' }}>
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M3 6a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 11-2 0V7H5v9h6a1 1 0 110 2H4a1 1 0 01-1-1V6z"/><path d="M9 7l3 3 3-3"/></svg>
                       <span>Upload</span>
                       <input type="file" onChange={handleUploadAndClose} accept=".retire" className="hidden" />
                     </label>
