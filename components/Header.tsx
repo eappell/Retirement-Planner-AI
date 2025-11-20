@@ -112,7 +112,7 @@ const Header: React.FC<HeaderProps> = ({
 
         <div className="relative" ref={scenarioMenuRef}>
           <button type="button" onClick={() => setIsScenarioMenuOpen(prev => !prev)} className="flex items-center space-x-2 text-sm text-gray-600 hover:text-brand-primary transition-colors font-medium p-2 rounded-md hover:bg-gray-100">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7h6l2 3h8v7a1 1 0 01-1 1H4a1 1 0 01-1-1V7z"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7h18M3 11h18M3 15h18"/></svg>
             <span>Scenarios</span>
           </button>
 
