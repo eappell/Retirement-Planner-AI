@@ -47,10 +47,28 @@ export const Header: React.FC<HeaderProps> = ({
         };
     }, []);
 
+    const [toastMessage, setToastMessage] = useState<string>('');
+    const [showToast, setShowToast] = useState<boolean>(false);
+
     const handleUploadAndClose = (e: React.ChangeEvent<HTMLInputElement>) => {
         handleUploadScenarios(e);
         setIsScenarioMenuOpen(false);
+        setToastMessage('Scenarios uploaded');
+        setShowToast(true);
     };
+
+    const handleDownloadAndClose = () => {
+        handleDownloadScenarios();
+        setIsScenarioMenuOpen(false);
+        setToastMessage('Scenarios downloaded');
+        setShowToast(true);
+    };
+
+    useEffect(() => {
+        if (!showToast) return;
+        const t = setTimeout(() => setShowToast(false), 3000);
+        return () => clearTimeout(t);
+    }, [showToast]);
 
     // download/upload handlers are called directly from the UI below
     
@@ -108,13 +126,13 @@ export const Header: React.FC<HeaderProps> = ({
                                     <div className="col-span-full pt-2 border-t">
                                         <div className="grid grid-cols-2 gap-2">
                                             <button
-                                                onClick={() => handleDownloadScenarios()}
-                                                className="flex items-center justify-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
+                                                onClick={handleDownloadAndClose}
+                                                className="flex items-center justify-center w-full px-4 py-2 text-sm rounded-md bg-blue-600 text-white hover:bg-blue-700"
                                             >
-                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
                                                 <span className="ml-3">Download</span>
                                             </button>
-                                            <label className="flex items-center justify-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer rounded-md">
+                                            <label className="flex items-center justify-center w-full px-4 py-2 text-sm bg-white border border-gray-200 rounded-md text-gray-700 hover:bg-gray-50 cursor-pointer">
                                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0l-4 4m4-4v12" /></svg>
                                                 <span className="ml-3">Upload</span>
                                                 <input
@@ -147,6 +165,16 @@ export const Header: React.FC<HeaderProps> = ({
                     <span>Reset Plan</span>
                 </button>
             </div>
+
+            {showToast && (
+                <div className="fixed right-4 top-4 z-50">
+                    <div role="status" aria-live="polite" className="bg-black bg-opacity-90 text-white text-sm px-3 py-2 rounded shadow">
+                        {toastMessage}
+                    </div>
+                </div>
+            )}
         </header>
     );
 };
+
+// Toast element is rendered at top-right via state in the component
