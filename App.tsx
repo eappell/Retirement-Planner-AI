@@ -353,6 +353,14 @@ const App: React.FC = () => {
             clearStorage();
             resetAllScenarios();
             clearCalculationResults();
+            try {
+                localStorage.removeItem('disclaimerAccepted_v1');
+            } catch (e) {
+                // ignore localStorage errors
+            }
+            // force the disclaimer to show and require acceptance again
+            setIsDisclaimerRequireAccept(true);
+            setIsDisclaimerOpen(true);
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     }, [clearStorage, resetAllScenarios, clearCalculationResults]);
