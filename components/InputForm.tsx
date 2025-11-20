@@ -198,14 +198,34 @@ export const InputForm: React.FC<InputFormProps> = ({
                     {/* Accounts - combined tabs for Retirement / Investment accounts */}
                     <InputSection title="Accounts" subtitle="Manage retirement and investment accounts in separate tabs." titleColorClass="text-cyan-600">
                         <div className="col-span-full">
-                            <div className="flex items-center space-x-2 mb-3">
-                                <button type="button" onClick={() => setAccountsTab('retirement')} className={`px-3 py-1 rounded-md text-sm ${accountsTab === 'retirement' ? 'bg-cyan-600 text-white' : 'bg-gray-100 text-gray-700'}`}>Retirement Accounts</button>
-                                <button type="button" onClick={() => setAccountsTab('investment')} className={`px-3 py-1 rounded-md text-sm ${accountsTab === 'investment' ? 'bg-teal-600 text-white' : 'bg-gray-100 text-gray-700'}`}>Investment Accounts</button>
+                            <div className="flex items-center space-x-6 mb-3" role="tablist" aria-label="Accounts Tabs">
+                                <button
+                                    type="button"
+                                    role="tab"
+                                    id="tab-retirement"
+                                    aria-selected={accountsTab === 'retirement' ? 'true' : 'false'}
+                                    aria-controls="panel-retirement"
+                                    onClick={() => setAccountsTab('retirement')}
+                                    className={`text-sm pb-2 ${accountsTab === 'retirement' ? 'border-b-2 border-cyan-600 text-cyan-700 font-medium' : 'border-b-2 border-transparent text-gray-600 hover:text-gray-800'}`}
+                                >
+                                    Retirement Accounts
+                                </button>
+                                <button
+                                    type="button"
+                                    role="tab"
+                                    id="tab-investment"
+                                    aria-selected={accountsTab === 'investment' ? 'true' : 'false'}
+                                    aria-controls="panel-investment"
+                                    onClick={() => setAccountsTab('investment')}
+                                    className={`text-sm pb-2 ${accountsTab === 'investment' ? 'border-b-2 border-teal-600 text-teal-700 font-medium' : 'border-b-2 border-transparent text-gray-600 hover:text-gray-800'}`}
+                                >
+                                    Investment Accounts
+                                </button>
                             </div>
 
                             {/* Retirement tab content */}
                             {accountsTab === 'retirement' && (
-                                <div className="space-y-2">
+                                <div id="panel-retirement" role="tabpanel" aria-labelledby="tab-retirement" className="space-y-2">
                                     {((plan.retirementAccounts || []) as any[]).map(item => (
                                         <div key={item.id} className="grid gap-x-4 items-end p-2 rounded-md bg-cyan-50/50 grid-cols-7">
                                             <SelectInput label="Owner" value={item.owner} onChange={e => handleDynamicListChange('retirementAccounts', item.id, 'owner', e.target.value)}>
@@ -246,7 +266,7 @@ export const InputForm: React.FC<InputFormProps> = ({
 
                             {/* Investment tab content */}
                             {accountsTab === 'investment' && (
-                                <div className="space-y-2">
+                                <div id="panel-investment" role="tabpanel" aria-labelledby="tab-investment" className="space-y-2">
                                     {((plan.investmentAccounts || []) as any[]).map(item => (
                                         <div key={item.id} className="grid gap-x-4 items-end p-2 rounded-md bg-teal-50/50 grid-cols-5">
                                             <NumberInput label="Balance" prefix="$" value={item.balance} onChange={e => handleDynamicListChange('investmentAccounts', item.id, 'balance', e.target.value)}/>
