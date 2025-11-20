@@ -254,7 +254,7 @@ export const UserManualModal: React.FC<UserManualModalProps> = ({ isOpen, onClos
                 {/* Body */}
                 <div className="flex-grow flex overflow-hidden">
                     {/* Left Navigation */}
-                    <nav className="w-1/3 flex-shrink-0 border-r bg-gray-50 p-4 overflow-y-auto">
+                    <nav className="w-1/3 flex-shrink-0 border-r bg-gray-50 p-4 overflow-y-auto user-manual-nav">
                         <ul className="space-y-2">
                             {manualContent.map(topic => (
                                 <li key={topic.id}>

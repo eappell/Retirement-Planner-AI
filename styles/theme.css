@@ -93,3 +93,15 @@ html, body {
 .user-manual-modal.open {
   transform: scale(1);
 }
+
+/* Improve left-nav text contrast in dark mode for the user manual */
+.theme-dark .user-manual-nav button {
+  color: #ffffff !important;
+}
+.theme-dark .user-manual-nav button:hover {
+  background-color: rgba(255,255,255,0.04) !important;
+}
+.theme-dark .user-manual-nav button .text-indigo-700,
+.theme-dark .user-manual-nav button .text-gray-600 {
+  color: #ffffff !important;
+}
