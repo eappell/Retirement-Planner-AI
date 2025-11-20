@@ -323,7 +323,7 @@ export const InputForm: React.FC<InputFormProps> = ({
 
                             {/* Retirement tab content */}
                             {accountsTab === 'retirement' && (
-                                <div id="panel-retirement" role="tabpanel" aria-labelledby="tab-retirement" className="relative space-y-2">
+                                <div id="panel-retirement" role="tabpanel" aria-labelledby="tab-retirement" className="relative pt-3 space-y-2">
                                     {((plan.retirementAccounts || []) as any[]).map(item => (
                                         <div key={item.id} className="grid gap-x-4 items-end p-2 rounded-md bg-cyan-50/50 grid-cols-7">
                                             <SelectInput label="Owner" value={item.owner} onChange={e => handleDynamicListChange('retirementAccounts', item.id, 'owner', e.target.value)}>
@@ -364,7 +364,7 @@ export const InputForm: React.FC<InputFormProps> = ({
 
                             {/* Investment tab content */}
                             {accountsTab === 'investment' && (
-                                <div id="panel-investment" role="tabpanel" aria-labelledby="tab-investment" className="relative space-y-2">
+                                <div id="panel-investment" role="tabpanel" aria-labelledby="tab-investment" className="relative pt-3 space-y-2">
                                     {((plan.investmentAccounts || []) as any[]).map(item => (
                                         <div key={item.id} className="grid gap-x-4 items-end p-2 rounded-md bg-teal-50/50 grid-cols-5">
                                             <NumberInput label="Balance" prefix="$" value={item.balance} onChange={e => handleDynamicListChange('investmentAccounts', item.id, 'balance', e.target.value)}/>
@@ -448,7 +448,7 @@ export const InputForm: React.FC<InputFormProps> = ({
 
                     {/* Pensions panel */}
                     {incomeTab === 'pensions' && (
-                        <div id="panel-pensions" role="tabpanel" aria-labelledby="tab-pensions" className="relative space-y-2">
+                        <div id="panel-pensions" role="tabpanel" aria-labelledby="tab-pensions" className="relative pt-3 space-y-2">
                             {((plan.pensions || []) as any[]).map(item => (
                                 <div key={item.id} className="grid gap-x-4 items-end p-2 rounded-md bg-sky-50/50 grid-cols-8">
                                     <NumberInput label="Monthly Benefit" prefix="$" value={item.monthlyBenefit} onChange={e => handleDynamicListChange('pensions', item.id, 'monthlyBenefit', e.target.value)}/>
@@ -488,7 +488,7 @@ export const InputForm: React.FC<InputFormProps> = ({
 
                     {/* Other Incomes panel */}
                     {incomeTab === 'other' && (
-                        <div id="panel-otherincomes" role="tabpanel" aria-labelledby="tab-otherincomes" className="relative space-y-2">
+                        <div id="panel-otherincomes" role="tabpanel" aria-labelledby="tab-otherincomes" className="relative pt-3 space-y-2">
                             {((plan.otherIncomes || []) as any[]).map(item => (
                                 <div key={item.id} className="grid gap-x-4 items-end p-2 rounded-md bg-lime-50/50 grid-cols-8">
                                     <NumberInput label="Monthly Amount" prefix="$" value={item.monthlyAmount} onChange={e => handleDynamicListChange('otherIncomes', item.id, 'monthlyAmount', e.target.value)}/>
@@ -584,7 +584,7 @@ export const InputForm: React.FC<InputFormProps> = ({
 
                     {/* Gifts panel */}
                     {estateTab === 'gifts' && (
-                        <div id="panel-gifts" role="tabpanel" aria-labelledby="tab-gifts" className="relative space-y-2">
+                        <div id="panel-gifts" role="tabpanel" aria-labelledby="tab-gifts" className="relative pt-3 space-y-2">
                             {((plan.gifts || []) as any[]).map(item => (
                                 <div key={item.id} className="grid gap-x-4 items-end p-2 rounded-md bg-purple-50/50 grid-cols-6">
                                     <div className="w-full">
@@ -644,7 +644,7 @@ export const InputForm: React.FC<InputFormProps> = ({
 
                     {/* Legacy panel */}
                     {estateTab === 'legacy' && (
-                        <div id="panel-legacy" role="tabpanel" aria-labelledby="tab-legacy" className="relative space-y-2">
+                        <div id="panel-legacy" role="tabpanel" aria-labelledby="tab-legacy" className="relative pt-3 space-y-2">
                             {(plan.legacyDisbursements || []).map((ld) => (
                                 <div key={ld.id} className="grid grid-cols-6 gap-x-4 items-end p-2 rounded-md bg-orange-50/50">
                                     <div className="col-span-2">
@@ -707,7 +707,7 @@ export const InputForm: React.FC<InputFormProps> = ({
 
                 return (
                     <InputSection key={section} title={section} subtitle={subtitles[section]} titleColorClass={colors[section]} gridCols={1}>
-                        <div className="relative col-span-full space-y-2">
+                        <div className="relative col-span-full pt-3 space-y-2">
                             {items.map((item) => (
                                 <div key={item.id} className={`grid gap-x-4 items-end p-2 rounded-md ${
                                     {'Retirement Accounts': 'bg-cyan-50/50 grid-cols-7', 'Investment Accounts': 'bg-teal-50/50 grid-cols-5', 'Expense Periods': 'bg-red-50/50 grid-cols-5', 'Legacy Disbursements': 'bg-orange-50/50 grid-cols-6'}[section]
