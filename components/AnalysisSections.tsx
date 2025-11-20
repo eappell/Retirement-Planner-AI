@@ -130,8 +130,8 @@ export const AnalysisSections: React.FC<AnalysisSectionsProps> = ({
                 </button>
                 {aiInsights && (
                     <div className="mt-4 p-4 border rounded-md bg-purple-50">
-                        <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{__html: markdownToHtml(aiInsights)}}></div>
-                    </div>
+                <div className="prose prose-sm max-w-none ai-insights" dangerouslySetInnerHTML={{__html: markdownToHtml(aiInsights)}}></div>
+                </div>
                 )}
                 </div>
             </InputSection>

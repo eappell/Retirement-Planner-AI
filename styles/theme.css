@@ -121,3 +121,41 @@ html, body {
 .theme-dark .user-manual-nav button .text-gray-600 {
   color: #ffffff !important;
 }
+
+/* AI insights paragraph spacing: give paragraphs breathing room */
+.ai-insights p {
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+/* Headings inside AI insights: make them stand out from body text */
+.ai-insights h1,
+.ai-insights h2,
+.ai-insights h3,
+.ai-insights h4 {
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+  color: var(--brand-text-primary);
+  line-height: 1.25;
+}
+
+.ai-insights h1 { font-size: 1.5rem; }
+.ai-insights h2 { font-size: 1.25rem; }
+.ai-insights h3 { font-size: 1.125rem; }
+.ai-insights h4 { font-size: 1rem; }
+
+/* Slightly smaller and muted for subheadings in the insights */
+.ai-insights h5,
+.ai-insights h6 {
+  margin-top: 0.75rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: var(--brand-text-secondary);
+}
+
+/* Ensure links inside insights are visible and underlined */
+.ai-insights a {
+  color: var(--brand-primary);
+  text-decoration: underline;
+}
