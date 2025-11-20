@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import AddButton from './AddButton';
 import { RetirementPlan, Person, PlanType, RetirementAccount, InvestmentAccount, Pension, OtherIncome, ExpensePeriod } from '../types';
 import { InputSection } from './InputSection';
 import { NumberInput, SelectInput, TextInput } from './FormControls';
@@ -356,11 +357,11 @@ export const InputForm: React.FC<InputFormProps> = ({
                                     ))}
                                     {(plan.retirementAccounts || []).length === 0 && (
                                         <div className="flex justify-center py-6">
-                                            <button onClick={() => {
+                                            <AddButton label="+ Add Retirement Account" onClick={() => {
                                                 const id = Date.now().toString();
                                                 addToList('retirementAccounts', { id, owner: 'person1', name: 'New Account', type: '401k', balance: 0, annualContribution: 0, match: 0 } as any);
                                                 setFocusTargetId(`retirementAccounts-name-${id}`);
-                                            }} className="inline-flex items-center px-3 py-1.5 rounded-full bg-brand-primary text-white text-sm shadow-sm hover:opacity-90">+ Add Retirement Account</button>
+                                            }} />
                                         </div>
                                     )}
                                 </div>
@@ -384,11 +385,11 @@ export const InputForm: React.FC<InputFormProps> = ({
                                     ))}
                                     {(plan.investmentAccounts || []).length === 0 && (
                                         <div className="flex justify-center py-6">
-                                            <button onClick={() => {
+                                            <AddButton label="+ Add Investment Account" onClick={() => {
                                                 const id = Date.now().toString();
                                                 addToList('investmentAccounts', { id, balance: 0, annualContribution: 0 } as any);
                                                 setFocusTargetId(`investmentAccounts-name-${id}`);
-                                            }} className="inline-flex items-center px-3 py-1.5 rounded-full bg-brand-primary text-white text-sm shadow-sm hover:opacity-90">+ Add Investment Account</button>
+                                            }} />
                                         </div>
                                     )}
                                 </div>
@@ -484,11 +485,11 @@ export const InputForm: React.FC<InputFormProps> = ({
                             ))}
                             {(plan.pensions || []).length === 0 && (
                                 <div className="flex justify-center py-6">
-                                    <button onClick={() => {
+                                    <AddButton label="+ Add Pension" onClick={() => {
                                         const id = Date.now().toString();
                                         addToList('pensions', { id, owner: 'person1', name: 'New Pension', monthlyBenefit: 0, startAge: plan.person1.retirementAge, cola: 0, survivorBenefit: 0, taxable: true } as any);
                                         setFocusTargetId(`pensions-name-${id}`);
-                                    }} className="inline-flex items-center px-3 py-1.5 rounded-full bg-brand-primary text-white text-sm shadow-sm hover:opacity-90">+ Add Pension</button>
+                                    }} />
                                 </div>
                             )}
                         </div>
@@ -524,11 +525,11 @@ export const InputForm: React.FC<InputFormProps> = ({
                             ))}
                             {(plan.otherIncomes || []).length === 0 && (
                                 <div className="flex justify-center py-6">
-                                    <button onClick={() => {
+                                    <AddButton label="+ Add Other Income" onClick={() => {
                                         const id = Date.now().toString();
                                         addToList('otherIncomes', { id, owner: 'person1', name: 'New Income', monthlyAmount: 0, startAge: plan.person1.retirementAge, endAge: plan.person1.lifeExpectancy, cola: 0, taxable: true } as any);
                                         setFocusTargetId(`otherIncomes-name-${id}`);
-                                    }} className="inline-flex items-center px-3 py-1.5 rounded-full bg-brand-primary text-white text-sm shadow-sm hover:opacity-90">+ Add Other Income</button>
+                                    }} />
                                 </div>
                             )}
                         </div>
@@ -648,7 +649,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                             ))}
                             {(plan.gifts || []).length === 0 && (
                                 <div className="flex justify-center py-6">
-                                    <button onClick={() => { const id = Date.now().toString(); addToList('gifts', { id, beneficiary: '', owner: 'person1', isAnnual: false, amount: 0, annualAmount: 0, age: plan.person1.currentAge, startAge: plan.person1.retirementAge, endAge: plan.person1.lifeExpectancy } as any); setFocusTargetId(`gift-beneficiary-${id}`); }} className="inline-flex items-center px-3 py-1.5 rounded-full bg-brand-primary text-white text-sm shadow-sm hover:opacity-90">+ Add Gift</button>
+                                    <AddButton label="+ Add Gift" onClick={() => { const id = Date.now().toString(); addToList('gifts', { id, beneficiary: '', owner: 'person1', isAnnual: false, amount: 0, annualAmount: 0, age: plan.person1.currentAge, startAge: plan.person1.retirementAge, endAge: plan.person1.lifeExpectancy } as any); setFocusTargetId(`gift-beneficiary-${id}`); }} />
                                 </div>
                             )}
                         </div>
@@ -679,7 +680,7 @@ export const InputForm: React.FC<InputFormProps> = ({
 
                             {(plan.legacyDisbursements || []).length === 0 && (
                                 <div className="flex justify-center py-6">
-                                    <button disabled={plan.dieWithZero} onClick={() => { const id = Date.now().toString(); addToList('legacyDisbursements', { id, beneficiary: '', beneficiaryType: 'person', percentage: 0 } as any); setFocusTargetId(`legacy-beneficiary-${id}`); }} className={`inline-flex items-center px-3 py-1.5 rounded-full ${plan.dieWithZero ? 'bg-gray-200 text-gray-500' : 'bg-brand-primary text-white hover:opacity-90'} text-sm font-semibold`}>+ Add Legacy</button>
+                                    <AddButton label="+ Add Legacy" disabled={plan.dieWithZero} onClick={() => { const id = Date.now().toString(); addToList('legacyDisbursements', { id, beneficiary: '', beneficiaryType: 'person', percentage: 0 } as any); setFocusTargetId(`legacy-beneficiary-${id}`); }} />
                                 </div>
                             )}
 
@@ -790,7 +791,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                             ))}
                             {items.length === 0 && listName === 'expensePeriods' && (
                                 <div className="flex justify-center py-6">
-                                    <button onClick={() => { const id = Date.now().toString(); addToList('expensePeriods', { id, monthlyAmount: 0, name: `Phase ${items.length + 1}`, startAge: plan.person1.retirementAge, startAgeRef: 'person1', endAge: plan.person1.lifeExpectancy, endAgeRef: 'person1' } as any); setFocusTargetId(`expensePeriods-name-${id}`); }} className="inline-flex items-center px-3 py-1.5 rounded-full bg-brand-primary text-white text-sm shadow-sm hover:opacity-90">+ Add Expense Period</button>
+                                    <AddButton label="+ Add Expense Period" onClick={() => { const id = Date.now().toString(); addToList('expensePeriods', { id, monthlyAmount: 0, name: `Phase ${items.length + 1}`, startAge: plan.person1.retirementAge, startAgeRef: 'person1', endAge: plan.person1.lifeExpectancy, endAgeRef: 'person1' } as any); setFocusTargetId(`expensePeriods-name-${id}`); }} />
                                 </div>
                             )}
                         </div>
