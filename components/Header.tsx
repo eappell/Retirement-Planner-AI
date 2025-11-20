@@ -107,10 +107,7 @@ const Header: React.FC<HeaderProps> = ({
           <span>User Manual</span>
         </button>
 
-        <button type="button" onClick={() => setIsDisclaimerOpen(true)} className="flex items-center space-x-2 text-sm text-gray-600 hover:text-red-600 transition-colors font-medium p-2 rounded-md hover:bg-gray-100" title="View disclaimer">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
-          <span>Disclaimer</span>
-        </button>
+        {/* Disclaimer button moved next to ThemeToggle (icon-only) */}
 
         <button type="button" onClick={handlePrint} className="flex items-center space-x-2 text-sm text-gray-600 hover:text-brand-primary transition-colors font-medium p-2 rounded-md hover:bg-gray-100">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 9V2h12v7"/><rect x="6" y="13" width="12" height="8" rx="2" ry="2"/></svg>
@@ -174,6 +171,15 @@ const Header: React.FC<HeaderProps> = ({
           )}
         </div>
 
+        <button
+          type="button"
+          onClick={() => setIsDisclaimerOpen(true, false)}
+          className="p-2 rounded-md text-gray-600 hover:text-red-600 hover:bg-gray-100 transition-colors"
+          title="View disclaimer"
+          aria-label="View disclaimer"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
+        </button>
         <ThemeToggle />
 
         <button type="button" onClick={handleResetPlan} className="flex items-center space-x-2 text-sm text-red-600 hover:text-red-800 transition-colors font-medium p-2 rounded-md hover:bg-red-100" title="Reset all data and scenarios">

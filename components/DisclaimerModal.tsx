@@ -25,10 +25,13 @@ export const DisclaimerModal: React.FC<DisclaimerModalProps> = ({ isOpen, requir
         </div>
 
         <div className="mt-6 flex justify-end space-x-2">
-          {!requireAccept && onClose && (
-            <button onClick={onClose} className="px-4 py-2 rounded-md border text-sm bg-gray-100 hover:bg-gray-200">Close</button>
+          {requireAccept ? (
+            // When acceptance is required (first-load), show only Accept
+            <button onClick={onAccept} className="px-4 py-2 rounded-md bg-brand-primary text-white text-sm hover:opacity-95">Accept</button>
+          ) : (
+            // When not required (header popover), show only Close
+            onClose && <button onClick={onClose} className="px-4 py-2 rounded-md border text-sm bg-gray-100 hover:bg-gray-200">Close</button>
           )}
-          <button onClick={onAccept} className="px-4 py-2 rounded-md bg-brand-primary text-white text-sm hover:opacity-95">Accept</button>
         </div>
       </div>
     </div>
