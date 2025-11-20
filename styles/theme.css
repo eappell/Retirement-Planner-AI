@@ -1,0 +1,31 @@
+:root {
+  --brand-background: #f1f5f9; /* slate-100 */
+  --brand-surface: #ffffff; /* white */
+  --brand-primary: #4f46e5; /* indigo-600 */
+  --brand-secondary: #0ea5e9; /* sky-500 */
+  --brand-text-primary: #1e293b; /* slate-800 */
+  --brand-text-secondary: #64748b; /* slate-500 */
+}
+
+.theme-dark {
+  --brand-background: #0f172a; /* slate-900 */
+  --brand-surface: #0b1220; /* near black */
+  --brand-primary: #6366f1; /* indigo-500 */
+  --brand-secondary: #60a5fa; /* sky-400 */
+  --brand-text-primary: #e6eef8; /* light text */
+  --brand-text-secondary: #9fb4d6; /* muted light */
+}
+
+/* Smooth transition for theme changes */
+html, body {
+  transition: background-color 200ms ease, color 200ms ease;
+}
+
+/* Ensure Tailwind utilities that rely on colors inherit from CSS variables */
+.bg-brand-background { background-color: var(--brand-background) !important; }
+.bg-brand-surface { background-color: var(--brand-surface) !important; }
+.text-brand-text-primary { color: var(--brand-text-primary) !important; }
+.text-brand-text-secondary { color: var(--brand-text-secondary) !important; }
+.text-brand-primary { color: var(--brand-primary) !important; }
+.bg-brand-primary { background-color: var(--brand-primary) !important; }
+.bg-brand-secondary { background-color: var(--brand-secondary) !important; }
