@@ -1,0 +1,86 @@
+:root {
+  --brand-background: #f1f5f9; /* slate-100 */
+  --brand-surface: #ffffff; /* white */
+  --brand-primary: #4f46e5; /* indigo-600 */
+  --brand-secondary: #0ea5e9; /* sky-500 */
+  --brand-text-primary: #1e293b; /* slate-800 */
+  --brand-text-secondary: #64748b; /* slate-500 */
+}
+
+.theme-dark {
+  --brand-background: #071025; /* darker slate */
+  --brand-surface: #0b2136; /* slightly lighter card surface */
+  --brand-primary: #6366f1; /* indigo-500 */
+  --brand-secondary: #60a5fa; /* sky-400 */
+  --brand-text-primary: #e6eef8; /* light text */
+  --brand-text-secondary: #9fb4d6; /* muted light */
+}
+
+/* Smooth transition for theme changes */
+html, body {
+  transition: background-color 200ms ease, color 200ms ease;
+}
+
+/* Ensure Tailwind utilities that rely on colors inherit from CSS variables */
+.bg-brand-background { background-color: var(--brand-background) !important; }
+.bg-brand-surface { background-color: var(--brand-surface) !important; }
+.text-brand-text-primary { color: var(--brand-text-primary) !important; }
+.text-brand-text-secondary { color: var(--brand-text-secondary) !important; }
+.text-brand-primary { color: var(--brand-primary) !important; }
+.bg-brand-primary { background-color: var(--brand-primary) !important; }
+.bg-brand-secondary { background-color: var(--brand-secondary) !important; }
+
+/* Dark mode tweaks: make card surfaces distinguishable from background */
+.theme-dark .bg-brand-surface,
+.theme-dark .bg-white {
+  background-color: var(--brand-surface) !important;
+}
+
+/* Lighten common "card" gray utilities slightly in dark mode so they stand out */
+.theme-dark .bg-gray-50 { background-color: rgba(255,255,255,0.03) !important; }
+.theme-dark .bg-gray-100 { background-color: rgba(255,255,255,0.04) !important; }
+.theme-dark .bg-gray-200 { background-color: rgba(255,255,255,0.06) !important; }
+
+/* Ensure items that use gray backgrounds keep readable labels in dark mode */
+.theme-dark .bg-gray-50,
+.theme-dark .bg-gray-100,
+.theme-dark .bg-gray-200,
+.theme-dark .bg-gray-300 {
+  color: var(--brand-text-primary) !important;
+}
+
+/* For elements that intentionally use gray backgrounds for neutral UI controls,
+   make their textual labels darker for contrast as requested (e.g., account buttons).
+   We set the label color to near-black on those gray backgrounds to improve legibility. */
+.theme-dark .bg-gray-200,
+.theme-dark .bg-gray-100 {
+  --card-label-color: #000000;
+}
+.theme-dark .bg-gray-200 .text-sm.font-medium,
+.theme-dark .bg-gray-100 .text-sm.font-medium,
+.theme-dark .bg-gray-200 label,
+.theme-dark .bg-gray-100 label {
+  color: var(--card-label-color) !important;
+}
+
+/* Unified section styling: make all section-like utility backgrounds match the
+   card surface and use white text for legibility in dark mode. This simplifies
+   per-color overrides and ensures consistent appearance across sections. */
+.theme-dark [class*="bg-"][class*="-50"],
+.theme-dark [class*="bg-"][class*="-100"],
+.theme-dark [class*="bg-"][class*="-200"] {
+  background-color: var(--brand-surface) !important;
+  color: #ffffff !important;
+  border-color: rgba(255,255,255,0.06) !important;
+}
+.theme-dark [class*="bg-"][class*="-50"] h3,
+.theme-dark [class*="bg-"][class*="-100"] h3,
+.theme-dark [class*="bg-"][class*="-200"] h3,
+.theme-dark [class*="bg-"][class*="-50"] label,
+.theme-dark [class*="bg-"][class*="-100"] label,
+.theme-dark [class*="bg-"][class*="-200"] label,
+.theme-dark [class*="bg-"][class*="-50"] .text-sm.font-medium,
+.theme-dark [class*="bg-"][class*="-100"] .text-sm.font-medium,
+.theme-dark [class*="bg-"][class*="-200"] .text-sm.font-medium {
+  color: #ffffff !important;
+}

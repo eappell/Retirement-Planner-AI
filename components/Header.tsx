@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Scenario } from '../types';
 import { SelectInput, TextInput } from './FormControls';
+import ThemeToggle from './ThemeToggle';
 
 interface HeaderProps {
     activeScenario: Scenario;
@@ -152,6 +153,7 @@ export const Header: React.FC<HeaderProps> = ({
                         </div>
                     )}
                 </div>
+                <ThemeToggle />
                     <button 
                     type="button" 
                     onClick={handleResetPlan} 

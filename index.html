@@ -12,17 +12,18 @@
         theme: {
           extend: {
             colors: {
-              'brand-background': '#f1f5f9', // slate-100
-              'brand-surface': '#ffffff',    // white
-              'brand-primary': '#4f46e5',   // indigo-600
-              'brand-secondary': '#0ea5e9',  // sky-500
-              'brand-text-primary': '#1e293b', // slate-800
-              'brand-text-secondary': '#64748b', // slate-500
+              'brand-background': 'var(--brand-background)',
+              'brand-surface': 'var(--brand-surface)',
+              'brand-primary': 'var(--brand-primary)',
+              'brand-secondary': 'var(--brand-secondary)',
+              'brand-text-primary': 'var(--brand-text-primary)',
+              'brand-text-secondary': 'var(--brand-text-secondary)',
             },
           },
         },
       };
     </script>
+    <link rel="stylesheet" href="/styles/theme.css" />
   <script type="importmap">
 {
   "imports": {

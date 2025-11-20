@@ -205,6 +205,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                     'Other Incomes': 'Add any other sources of income, like rental properties or part-time work.',
                     'Expense Periods': 'Model different spending levels for different phases of retirement.',
                     'Gifts': 'Add one-time or annual gifts to beneficiaries; affects cashflow and legacy.'
+                    , 'Legacy Disbursements': 'Allocate percentages of the final estate to beneficiaries.'
                 };
                     const colors: { [key: string]: string } = {
                     'Retirement Accounts': 'text-cyan-600',
@@ -212,7 +213,8 @@ export const InputForm: React.FC<InputFormProps> = ({
                     'Pensions': 'text-sky-600',
                     'Other Incomes': 'text-lime-600',
                     'Expense Periods': 'text-red-600',
-                    'Gifts': 'text-purple-600'
+                    'Gifts': 'text-purple-600',
+                    'Legacy Disbursements': 'text-orange-600'
                 };
                 
                 const addPension = () => {
@@ -237,7 +239,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                         <div className="col-span-full space-y-2">
                             {items.map((item) => (
                                 <div key={item.id} className={`grid gap-x-4 items-end p-2 rounded-md ${
-                                    {'Retirement Accounts': 'bg-cyan-50/50 grid-cols-7', 'Investment Accounts': 'bg-teal-50/50 grid-cols-5', 'Pensions': 'bg-sky-50/50 grid-cols-8', 'Other Incomes': 'bg-lime-50/50 grid-cols-8', 'Expense Periods': 'bg-red-50/50 grid-cols-5', 'Gifts': 'bg-purple-50/50 grid-cols-6'}[section]
+                                    {'Retirement Accounts': 'bg-cyan-50/50 grid-cols-7', 'Investment Accounts': 'bg-teal-50/50 grid-cols-5', 'Pensions': 'bg-sky-50/50 grid-cols-8', 'Other Incomes': 'bg-lime-50/50 grid-cols-8', 'Expense Periods': 'bg-red-50/50 grid-cols-5', 'Gifts': 'bg-purple-50/50 grid-cols-6', 'Legacy Disbursements': 'bg-orange-50/50 grid-cols-6'}[section]
                                 }`}> 
                                     {/* Common fields */}
                                     {listName !== 'expensePeriods' && listName !== 'gifts' && (
@@ -400,10 +402,10 @@ export const InputForm: React.FC<InputFormProps> = ({
             })}
 
             {/* Legacy Disbursements - separate section from Gifts */}
-            <InputSection title="Legacy Disbursements" subtitle="Allocate percentages of the final estate to beneficiaries. Disabled when Die With Zero is enabled.">
+            <InputSection title="Legacy Disbursements" subtitle="Allocate percentages of the final estate to beneficiaries. Disabled when Die With Zero is enabled." titleColorClass="text-orange-600">
                 <div className="col-span-full space-y-2">
                         {(plan.legacyDisbursements || []).map((ld) => (
-                        <div key={ld.id} className="grid grid-cols-6 gap-x-4 items-end p-2 rounded-md bg-amber-50/50">
+                        <div key={ld.id} className="grid grid-cols-6 gap-x-4 items-end p-2 rounded-md bg-orange-50/50">
                             <div className="col-span-2">
                                 <TextInput id={`legacy-beneficiary-${ld.id}`} label="Beneficiary" value={ld.beneficiary} disabled={plan.dieWithZero} onChange={e => handleDynamicListChange('legacyDisbursements', ld.id, 'beneficiary', e.target.value)} />
                             </div>

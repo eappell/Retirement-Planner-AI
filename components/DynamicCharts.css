@@ -20,3 +20,17 @@
   display: inline-block;
   margin-right: 0.375rem;
 }
+
+/* Dark mode: make axis text in the net worth chart white for legibility */
+.theme-dark .networth-chart text {
+  fill: #ffffff !important;
+  color: #ffffff !important;
+}
+
+/* Also style tooltip for dark mode */
+.theme-dark .tooltip-popup {
+  background: #0b2136 !important;
+  color: #e6eef8 !important;
+  border-color: rgba(255,255,255,0.06) !important;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.6) !important;
+}
