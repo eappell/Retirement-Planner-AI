@@ -30,6 +30,7 @@ export const InputForm: React.FC<InputFormProps> = ({
 }) => {
     const isCouple = plan.planType === PlanType.COUPLE;
     const [focusTargetId, setFocusTargetId] = useState<string | null>(null);
+    const [incomeTab, setIncomeTab] = useState<'pensions' | 'other'>('pensions');
     const [accountsTab, setAccountsTab] = useState<'retirement' | 'investment'>('retirement');
     useEffect(() => {
         if (!focusTargetId) return;
@@ -294,8 +295,117 @@ export const InputForm: React.FC<InputFormProps> = ({
                         </div>
                     </InputSection>
 
+            {/* Income - combined tabs for Pensions / Other Incomes */}
+            <InputSection title="Income" subtitle="Manage pensions and other income sources in tabs." titleColorClass="text-sky-600">
+                <div className="col-span-full">
+                    <div className="flex items-center space-x-6 mb-3" role="tablist" aria-label="Income Tabs">
+                        <button
+                            type="button"
+                            role="tab"
+                            id="tab-pensions"
+                            aria-selected={(incomeTab === 'pensions' ? 'true' : 'false') as 'true' | 'false'}
+                            aria-controls="panel-pensions"
+                            onClick={() => setIncomeTab('pensions')}
+                            className={`text-sm pb-2 ${incomeTab === 'pensions' ? 'border-b-2 border-sky-600 text-sky-700 font-medium' : 'border-b-2 border-transparent text-gray-600 hover:text-gray-800'}`}
+                        >
+                            Pensions
+                        </button>
+                        <button
+                            type="button"
+                            role="tab"
+                            id="tab-otherincomes"
+                            aria-selected={(incomeTab === 'other' ? 'true' : 'false') as 'true' | 'false'}
+                            aria-controls="panel-otherincomes"
+                            onClick={() => setIncomeTab('other')}
+                            className={`text-sm pb-2 ${incomeTab === 'other' ? 'border-b-2 border-lime-600 text-lime-700 font-medium' : 'border-b-2 border-transparent text-gray-600 hover:text-gray-800'}`}
+                        >
+                            Other Incomes
+                        </button>
+                    </div>
 
-            {['Pensions', 'Other Incomes', 'Expense Periods', 'Gifts'].map(section => {
+                    {/* Pensions panel */}
+                    {incomeTab === 'pensions' && (
+                        <div id="panel-pensions" role="tabpanel" aria-labelledby="tab-pensions" className="space-y-2">
+                            {((plan.pensions || []) as any[]).map(item => (
+                                <div key={item.id} className="grid gap-x-4 items-end p-2 rounded-md bg-sky-50/50 grid-cols-8">
+                                    <NumberInput label="Monthly Benefit" prefix="$" value={item.monthlyBenefit} onChange={e => handleDynamicListChange('pensions', item.id, 'monthlyBenefit', e.target.value)}/>
+                                    <NumberInput label="Start Age" value={item.startAge} onChange={e => handleDynamicListChange('pensions', item.id, 'startAge', e.target.value)}/>
+                                    <NumberInput label="COLA" suffix="%" value={item.cola} onChange={e => handleDynamicListChange('pensions', item.id, 'cola', e.target.value)}/>
+                                    <NumberInput label="Survivor" suffix="%" value={item.survivorBenefit} onChange={e => handleDynamicListChange('pensions', item.id, 'survivorBenefit', e.target.value)}/>
+                                    <div className="flex flex-col items-center justify-end h-full pb-1">
+                                        <label htmlFor={`taxable-${item.id}`} className="mb-1 text-sm font-medium text-brand-text-secondary">Taxable</label>
+                                        <input
+                                            type="checkbox"
+                                            id={`taxable-${item.id}`}
+                                            checked={item.taxable !== false}
+                                            onChange={e => handleDynamicListChange('pensions', item.id, 'taxable', e.target.checked)}
+                                            className="h-5 w-5 rounded text-brand-primary focus:ring-brand-primary"
+                                        />
+                                    </div>
+                                    <div className="flex items-end">
+                                        <ActionIcons onAdd={() => {
+                                            const id = Date.now().toString();
+                                            addToList('pensions', { id, owner: 'person1', name: 'New Pension', monthlyBenefit: 0, startAge: Math.min(plan.person1.retirementAge, isCouple ? plan.person2.retirementAge : Infinity), cola: 0, survivorBenefit: 0, taxable: true } as any);
+                                            setFocusTargetId(`pensions-name-${id}`);
+                                        }} onRemove={() => removeFromList('pensions', item.id)} canRemove={(plan.pensions || []).length > 0} />
+                                    </div>
+                                </div>
+                            ))}
+                            {(plan.pensions || []).length === 0 && (
+                                <div className="text-center py-2">
+                                    <button onClick={() => {
+                                        const id = Date.now().toString();
+                                        addToList('pensions', { id, owner: 'person1', name: 'New Pension', monthlyBenefit: 0, startAge: plan.person1.retirementAge, cola: 0, survivorBenefit: 0, taxable: true } as any);
+                                        setFocusTargetId(`pensions-name-${id}`);
+                                    }} className="text-sm text-brand-primary font-semibold hover:underline">+ Add Pension</button>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Other Incomes panel */}
+                    {incomeTab === 'other' && (
+                        <div id="panel-otherincomes" role="tabpanel" aria-labelledby="tab-otherincomes" className="space-y-2">
+                            {((plan.otherIncomes || []) as any[]).map(item => (
+                                <div key={item.id} className="grid gap-x-4 items-end p-2 rounded-md bg-lime-50/50 grid-cols-8">
+                                    <NumberInput label="Monthly Amount" prefix="$" value={item.monthlyAmount} onChange={e => handleDynamicListChange('otherIncomes', item.id, 'monthlyAmount', e.target.value)}/>
+                                    <NumberInput label="Start Age" value={item.startAge} onChange={e => handleDynamicListChange('otherIncomes', item.id, 'startAge', e.target.value)}/>
+                                    <NumberInput label="End Age" value={item.endAge} onChange={e => handleDynamicListChange('otherIncomes', item.id, 'endAge', e.target.value)}/>
+                                    <NumberInput label="COLA" suffix="%" value={item.cola} onChange={e => handleDynamicListChange('otherIncomes', item.id, 'cola', e.target.value)}/>
+                                    <div className="flex flex-col items-center justify-end h-full pb-1">
+                                        <label htmlFor={`taxable-${item.id}`} className="mb-1 text-sm font-medium text-brand-text-secondary">Taxable</label>
+                                        <input
+                                            type="checkbox"
+                                            id={`taxable-${item.id}`}
+                                            checked={item.taxable !== false}
+                                            onChange={e => handleDynamicListChange('otherIncomes', item.id, 'taxable', e.target.checked)}
+                                            className="h-5 w-5 rounded text-brand-primary focus:ring-brand-primary"
+                                        />
+                                    </div>
+                                    <div className="flex items-end">
+                                        <ActionIcons onAdd={() => {
+                                            const id = Date.now().toString();
+                                            addToList('otherIncomes', { id, owner: 'person1', name: 'New Income', monthlyAmount: 0, startAge: plan.person1.retirementAge, endAge: plan.person1.lifeExpectancy, cola: 0, taxable: true } as any);
+                                            setFocusTargetId(`otherIncomes-name-${id}`);
+                                        }} onRemove={() => removeFromList('otherIncomes', item.id)} canRemove={(plan.otherIncomes || []).length > 0} />
+                                    </div>
+                                </div>
+                            ))}
+                            {(plan.otherIncomes || []).length === 0 && (
+                                <div className="text-center py-2">
+                                    <button onClick={() => {
+                                        const id = Date.now().toString();
+                                        addToList('otherIncomes', { id, owner: 'person1', name: 'New Income', monthlyAmount: 0, startAge: plan.person1.retirementAge, endAge: plan.person1.lifeExpectancy, cola: 0, taxable: true } as any);
+                                        setFocusTargetId(`otherIncomes-name-${id}`);
+                                    }} className="text-sm text-brand-primary font-semibold hover:underline">+ Add Other Income</button>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
+            </InputSection>
+
+            {['Expense Periods', 'Gifts'].map(section => {
                 const listName = section.replace(' ', '').charAt(0).toLowerCase() + section.replace(' ', '').slice(1) as DynamicListKey;
                 const items = (plan[listName] as any[]) || [];
                 const subtitles: { [key: string]: string } = {
