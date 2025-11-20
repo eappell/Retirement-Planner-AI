@@ -59,7 +59,7 @@ const manualContent = [
                 <p>This is where you build the detailed picture of your finances. The UI groups items into tabs so you can focus on a single category at a time:</p>
                 <ul>
                     <li><strong>Accounts (tabs):</strong> Two tabs — <em>Retirement Accounts</em> and <em>Investment Accounts</em> — let you manage tax-advantaged and taxable accounts separately. Use the <strong>+</strong> pill in the tab panel to add a new account for that tab.</li>
-                    <li><strong>Pensions, Annuities & Other Income (tabs):</strong> The Income section uses tabs to separate <em>Pensions</em>, <em>Annuities</em> and <em>Other Incomes</em>. Annuities are a dedicated list for regular contract payments you expect to receive.</li>
+                    <li><strong>Pensions, Annuities & Other Income (tabs):</strong> The Income section uses tabs to separate <em>Pensions</em>, <em><span className="inline-flex items-center"><svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 text-indigo-600" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a6 6 0 100 12 6 6 0 000-12zm1 7H9V7h2v2z"/></svg> Annuities</span></em> and <em>Other Incomes</em>. Annuities are a dedicated list for regular contract payments you expect to receive.</li>
                     <li><strong>Expenses:</strong> Model different spending phases with Expense Periods (e.g., Go-Go, Slow-Go, No-Go).</li>
                 </ul>
                 <p className="mt-3">Controls you should know about:</p>
@@ -185,6 +185,24 @@ useEffect(() => {
             </>
         )
     }
+    ,
+    {
+        id: 'tabsAccessibility',
+        title: 'Tabs & Accessibility',
+        icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16"/></svg>,
+        content: (
+            <>
+                <p>The application groups related inputs into tabbed panels. These follow common ARIA patterns and support keyboard navigation.</p>
+                <ul>
+                    <li><strong>Arrow Keys:</strong> Use <code>Left</code> and <code>Right</code> to move between tabs in a tablist.</li>
+                    <li><strong>Home / End:</strong> Press <code>Home</code> to jump to the first tab and <code>End</code> to jump to the last tab.</li>
+                    <li><strong>Focus After Add:</strong> When you click the per-tab <strong>+ Add</strong> button the UI will create a typed item and move focus into the primary input so you can begin typing immediately.</li>
+                    <li><strong>Screen Readers:</strong> Tabs expose <code>role="tablist"</code>, each tab uses <code>role="tab"</code>, and panels use <code>role="tabpanel"</code> with <code>aria-controls</code>/<code>aria-labelledby</code> to connect tabs to panels.</li>
+                </ul>
+                <p className="mt-3 p-2 bg-indigo-50 border-l-4 border-indigo-400 rounded-r-md"><strong>Tip:</strong> Focused tab buttons receive visible focus and the active tab has <code>aria-selected="true"</code> for assistive tech compatibility.</p>
+            </>
+        )
+    }
 ];
 
 export const UserManualModal: React.FC<UserManualModalProps> = ({ isOpen, onClose }) => {
@@ -200,9 +218,8 @@ export const UserManualModal: React.FC<UserManualModalProps> = ({ isOpen, onClos
             onClick={onClose}
         >
             <div 
-                className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[640px] overflow-hidden flex flex-col transform transition-transform duration-300 scale-95"
+                className={`bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[640px] overflow-hidden flex flex-col transition-transform duration-300 user-manual-modal ${isOpen ? 'open' : ''}`}
                 onClick={e => e.stopPropagation()}
-                style={{ transform: isOpen ? 'scale(1)' : 'scale(0.95)' }}
             >
                 {/* Header */}
                 <div className="flex-shrink-0 flex justify-between items-center p-4 border-b bg-gray-50">

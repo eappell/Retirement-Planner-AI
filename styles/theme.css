@@ -84,3 +84,12 @@ html, body {
 .theme-dark [class*="bg-"][class*="-200"] .text-sm.font-medium {
   color: #ffffff !important;
 }
+
+/* User manual modal transform (moved from inline styles to CSS to satisfy linter) */
+.user-manual-modal {
+  transform: scale(0.95);
+  transition: transform 180ms ease;
+}
+.user-manual-modal.open {
+  transform: scale(1);
+}
