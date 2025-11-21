@@ -10,7 +10,7 @@ const initialPlanState: RetirementPlan = {
     { id: '1', owner: 'person1', name: '401k', balance: 500000, annualContribution: 10000, match: 5, type: '401k' }
   ],
   investmentAccounts: [
-    { id: '1', owner: 'person1', name: 'Brokerage', balance: 100000, annualContribution: 5000 }
+        { id: '1', owner: 'person1', name: 'Brokerage', balance: 100000, annualContribution: 5000, percentStocks: 60, percentBonds: 40 }
   ],
   pensions: [],
   otherIncomes: [],
@@ -137,8 +137,32 @@ export const useScenarioManagement = (initialState?: ScenariosState) => {
         });
     }, [getDefaultScenario]);
 
-    const uploadScenarios = useCallback((uploadedState: ScenariosState) => {
-        setScenariosState(uploadedState);
+    // Accept either the legacy ScenariosState shape or the new wrapped export:
+    // { scenariosState: ScenariosState, appSettings?: { assetAssumptionDefaults?: {...} } }
+    const uploadScenarios = useCallback((uploadedState: any) => {
+        if (!uploadedState) return;
+
+        // New wrapped format
+        if (uploadedState.scenariosState && uploadedState.scenariosState.scenarios) {
+            setScenariosState(uploadedState.scenariosState);
+            // Persist any app-level settings to localStorage so the app can pick them up
+            try {
+                if (uploadedState.appSettings && uploadedState.appSettings.assetAssumptionDefaults) {
+                    localStorage.setItem('assetAssumptionDefaults', JSON.stringify(uploadedState.appSettings.assetAssumptionDefaults));
+                }
+            } catch (e) {
+                // ignore storage errors
+            }
+            return;
+        }
+
+        // Legacy format (ScenariosState)
+        if (uploadedState.scenarios && typeof uploadedState.activeScenarioId !== 'undefined') {
+            setScenariosState(uploadedState as ScenariosState);
+            return;
+        }
+
+        // Unknown format: ignore
     }, []);
 
     return {

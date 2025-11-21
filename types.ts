@@ -35,6 +35,8 @@ export interface InvestmentAccount {
     name: string;
     balance: number;
     annualContribution: number;
+  percentStocks?: number; // allocation percent (0-100)
+  percentBonds?: number;  // allocation percent (0-100)
 }
 
 export interface Pension {
@@ -118,6 +120,11 @@ export interface RetirementPlan {
   state: string;
   inflationRate: number;
   avgReturn: number;
+  // Asset-class assumptions (percent values, e.g., 8 = 8%)
+  stockMean?: number;
+  stockStd?: number;
+  bondMean?: number;
+  bondStd?: number;
   annualWithdrawalRate: number;
   dieWithZero: boolean;
   legacyAmount: number;

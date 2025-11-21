@@ -6,6 +6,8 @@ import { ScrollToTopButton } from './components/ScrollToTopButton';
 import { PrintableReport } from './components/PrintableReport';
 // Import canonical Header implementation
 import Header from './components/Header';
+import AppSettingsModal from './components/AppSettingsModal';
+import Toast from './components/Toast';
 import { ResultsPanel } from './components/ResultsPanel';
 import { InputForm } from './components/InputForm';
 import { AnalysisSections } from './components/AnalysisSections';
@@ -17,6 +19,7 @@ import {
     useAIInsights,
     useSocialSecurityCalculation 
 } from './hooks';
+import { buildExport, parseUpload } from './utils/exportImport';
 
 
 const initialPlanState: RetirementPlan = {
@@ -90,6 +93,22 @@ const App: React.FC = () => {
     const [isManualOpen, setIsManualOpen] = useState(false);
     const [isDisclaimerOpen, setIsDisclaimerOpen] = useState(false);
     const [isDisclaimerRequireAccept, setIsDisclaimerRequireAccept] = useState(false);
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+    const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+    const showToast = (msg: string, ms = 2500) => {
+        setToastMessage(msg);
+        setTimeout(() => setToastMessage(null), ms);
+    };
+    // listen for cross-component toast events
+    useEffect(() => {
+        const handler = (e: any) => {
+            const m = e?.detail?.message;
+            if (m) showToast(m);
+        };
+        window.addEventListener('app:toast', handler as EventListener);
+        return () => window.removeEventListener('app:toast', handler as EventListener);
+    }, []);
     
     // --- Update Browser Title ---
     useEffect(() => {
@@ -227,7 +246,28 @@ const App: React.FC = () => {
     // --- Backup & Restore Handlers ---
     const handleDownloadScenarios = async (): Promise<boolean> => {
         try {
-            const jsonString = JSON.stringify(scenariosState, null, 2);
+            // Include app-level asset-assumption defaults in the exported file
+            const getStoredAssetDefaults = () => {
+                try {
+                    const raw = localStorage.getItem('assetAssumptionDefaults');
+                    if (raw) return JSON.parse(raw);
+                } catch (e) {
+                    // ignore
+                }
+                // Fallback to using the active plan's values if present
+                if (plan) {
+                    return {
+                        stockMean: (plan as any).stockMean ?? 8,
+                        stockStd: (plan as any).stockStd ?? 15,
+                        bondMean: (plan as any).bondMean ?? 3,
+                        bondStd: (plan as any).bondStd ?? 6,
+                    };
+                }
+                return { stockMean: 8, stockStd: 15, bondMean: 3, bondStd: 6 };
+            };
+
+            const exportObj = buildExport(scenariosState, getStoredAssetDefaults());
+            const jsonString = JSON.stringify(exportObj, null, 2);
             const blob = new Blob([jsonString], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
@@ -239,8 +279,8 @@ const App: React.FC = () => {
             URL.revokeObjectURL(url);
             return true;
         } catch (error) {
-            console.error("Error downloading scenarios:", error);
-            alert("Failed to download scenarios.");
+            console.error('Error downloading scenarios:', error);
+            showToast('Failed to download scenarios');
             return false;
         }
     };
@@ -248,38 +288,41 @@ const App: React.FC = () => {
     const handleUploadScenarios = useCallback((event: React.ChangeEvent<HTMLInputElement>): Promise<boolean> => {
         return new Promise<boolean>((resolve) => {
             const file = event.target.files?.[0];
-            if (!file) {
-                resolve(false);
-                return;
-            }
-
+            if (!file) { resolve(false); return; }
             const reader = new FileReader();
             reader.onload = (e) => {
                 try {
                     const text = e.target?.result;
-                    if (typeof text !== 'string') {
-                        throw new Error("Invalid file content");
-                    }
-                    const uploadedState = JSON.parse(text);
-
-                    // Basic validation
-                    if (uploadedState && uploadedState.scenarios && typeof uploadedState.activeScenarioId !== 'undefined') {
-                         if (window.confirm('Are you sure you want to upload this file? This will overwrite all your current scenarios.')) {
-                            uploadScenarios(uploadedState);
+                    if (typeof text !== 'string') throw new Error('Invalid file content');
+                    const uploaded = JSON.parse(text);
+                    const parsed = parseUpload(uploaded);
+                    if (parsed.type === 'wrapped') {
+                        const issues = parsed.issues || [];
+                        if (issues.length > 0) {
+                            const proceed = window.confirm(`The uploaded file contains asset-assumption defaults with potential issues:\n- ${issues.join('\n- ')}\n\nProceed and import anyway?`);
+                            if (!proceed) { resolve(false); return; }
+                        }
+                        if (window.confirm('Are you sure you want to upload this file? This will overwrite all your current scenarios.')) {
+                            try { if (parsed.assetDefaults) localStorage.setItem('assetAssumptionDefaults', JSON.stringify(parsed.assetDefaults)); } catch (e) { /* ignore */ }
+                            uploadScenarios({ scenariosState: parsed.scenariosState, appSettings: { assetAssumptionDefaults: parsed.assetDefaults } });
                             clearCalculationResults();
-                            alert("Scenarios loaded successfully!");
-                            resolve(true);
-                            return;
-                         }
+                            showToast('Scenarios loaded successfully');
+                            resolve(true); return;
+                        }
+                    }
+                    if (parsed.type === 'legacy') {
+                        if (window.confirm('Are you sure you want to upload this file? This will overwrite all your current scenarios.')) {
+                            uploadScenarios(parsed.scenariosState);
+                            clearCalculationResults();
+                            showToast('Scenarios loaded successfully');
+                            resolve(true); return;
+                        }
                     }
                 } catch (error) {
-                    console.error("Error uploading scenarios:", error);
-                    alert("Failed to upload scenarios. Please make sure the file is a valid scenario backup.");
+                    console.error('Error uploading scenarios:', error);
+                    showToast('Failed to upload scenarios. Please make sure the file is a valid scenario backup.');
                 }
-                // Reset file input value to allow re-uploading the same file
-                if (event.target) {
-                    event.target.value = '';
-                }
+                if (event.target) event.target.value = '';
                 resolve(false);
             };
             reader.readAsText(file);
@@ -382,7 +425,7 @@ const App: React.FC = () => {
         <div className="min-h-screen bg-brand-background text-brand-text-primary">
             <PrintableReport plan={plan} results={results} scenarioName={activeScenario.name} />
             <div className="print:hidden">
-                <Header
+                    <Header
                     activeScenario={activeScenario}
                     scenarios={scenarios}
                     handleSelectScenario={handleSelectScenario}
@@ -394,6 +437,8 @@ const App: React.FC = () => {
                     handleUploadScenarios={handleUploadScenarios}
                     handleResetPlan={handleResetPlan}
                     handlePrint={handlePrint}
+                    // expose settings opening
+                    onOpenSettings={() => setIsSettingsOpen(true)}
                     setIsManualOpen={setIsManualOpen}
                     setIsDisclaimerOpen={(open: boolean, requireAccept?: boolean) => {
                         setIsDisclaimerRequireAccept(Boolean(requireAccept));
@@ -440,6 +485,12 @@ const App: React.FC = () => {
                     }}
                     onClose={() => setIsDisclaimerOpen(false)}
                 />
+                <AppSettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} onSaveDefaults={(d) => {
+                    // persist and notify
+                    try { localStorage.setItem('assetAssumptionDefaults', JSON.stringify(d)); } catch (e) { /* ignore */ }
+                    showToast('Saved app defaults');
+                }} />
+                <Toast message={toastMessage} />
                 <ScrollToTopButton />
             </div>
         </div>

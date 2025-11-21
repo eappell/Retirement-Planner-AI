@@ -77,6 +77,12 @@ export const runSimulation = (plan: RetirementPlan, volatility?: number): Calcul
     const avgReturn = plan.avgReturn / 100;
     const stdDev = volatility ? volatility / 100 : 0;
 
+    // Simple asset-class defaults (annualized, fractions)
+    const STOCK_MEAN_DEFAULT = 0.08; // 8% expected stock return
+    const STOCK_STD_DEFAULT = 0.15; // 15% stock volatility
+    const BOND_MEAN_DEFAULT = 0.03; // 3% expected bond return
+    const BOND_STD_DEFAULT = 0.06; // 6% bond volatility
+
     const startAge = Math.min(plan.person1.currentAge, isCouple ? plan.person2.currentAge : Infinity);
     const endAge = Math.max(plan.person1.lifeExpectancy, isCouple ? plan.person2.lifeExpectancy : 0);
     const simulationYears = endAge - startAge;
@@ -115,6 +121,33 @@ export const runSimulation = (plan: RetirementPlan, volatility?: number): Calcul
             let totalGiftThisYear = 0;
 
             const currentYearReturn = volatility ? randomNormal(avgReturn, stdDev) : avgReturn;
+            // Determine asset-class means and volatilities biased by plan.avgReturn and optionally by plan-level overrides
+            // Compute portfolio-weighted stock pct using current balances as weights (fallback to simple average)
+            const totalInvBal = investmentAccounts.reduce((s, a) => s + (a.balance || 0), 0);
+            let portfolioStocksPct = 0;
+            if (totalInvBal > 0) {
+                const stocksWeight = investmentAccounts.reduce((s, a) => s + ((a.balance || 0) * ((a.percentStocks ?? 60) / 100)), 0);
+                portfolioStocksPct = stocksWeight / totalInvBal;
+            } else {
+                // fallback: average percentStocks
+                const n = investmentAccounts.length || 1;
+                portfolioStocksPct = (investmentAccounts.reduce((s, a) => s + (a.percentStocks ?? 60), 0) / n) / 100;
+            }
+
+            const desiredAvg = plan.avgReturn / 100;
+            const baseStock = (plan.stockMean !== undefined ? plan.stockMean / 100 : STOCK_MEAN_DEFAULT);
+            const baseBond = (plan.bondMean !== undefined ? plan.bondMean / 100 : BOND_MEAN_DEFAULT);
+            const portfolioBaseAvg = portfolioStocksPct * baseStock + (1 - portfolioStocksPct) * baseBond;
+            const delta = desiredAvg - portfolioBaseAvg;
+            const stockMean = baseStock + delta;
+            const bondMean = baseBond + delta;
+
+            const stockStd = (plan.stockStd !== undefined ? plan.stockStd / 100 : STOCK_STD_DEFAULT);
+            const bondStd = (plan.bondStd !== undefined ? plan.bondStd / 100 : BOND_STD_DEFAULT);
+
+            // Asset-class returns for this year (used to weight by allocations)
+            const stockReturn = volatility ? randomNormal(stockMean, stdDev || stockStd) : stockMean;
+            const bondReturn = volatility ? randomNormal(bondMean, stdDev || bondStd) : bondMean;
 
             if (p1Alive && currentAge1 >= RMD_START_AGE) {
                 const rmdFactor = RMD_UNIFORM_LIFETIME_TABLE[currentAge1] || 1;
@@ -140,7 +173,11 @@ export const runSimulation = (plan: RetirementPlan, volatility?: number): Calcul
                 if (ownerAge < owner.retirementAge) {
                     acc.balance += acc.annualContribution;
                 }
-                acc.balance *= (1 + currentYearReturn);
+                // Compute allocation-weighted return based on account-level percentStocks/percentBonds
+                const stocksPct = (acc.percentStocks !== undefined) ? Number(acc.percentStocks) / 100 : 0.6;
+                const bondsPct = (acc.percentBonds !== undefined) ? Number(acc.percentBonds) / 100 : (1 - stocksPct);
+                const accountReturn = (stocksPct * stockReturn) + (bondsPct * bondReturn);
+                acc.balance *= (1 + accountReturn);
             });
 
             const isP1Retired = currentAge1 >= plan.person1.retirementAge;
