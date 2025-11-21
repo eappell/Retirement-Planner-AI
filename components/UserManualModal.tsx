@@ -157,8 +157,6 @@ const manualContent = [
             </>
         )
     },
-    
-    ,
     {
         id: 'tabsAccessibility',
         title: 'Tabs & Accessibility',
