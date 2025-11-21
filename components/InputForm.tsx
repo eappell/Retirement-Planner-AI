@@ -619,6 +619,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                     {/* Pensions panel */}
                     {incomeTab === 'pensions' && (
                         <div id="panel-pensions" role="tabpanel" aria-labelledby="tab-pensions" className="relative pt-3 space-y-2">
+                            <p className="text-sm text-gray-500">Enter your monthly pre-tax income (gross)</p>
                             {((plan.pensions || []) as Pension[]).map(item => (
                                 <div key={item.id} className="grid gap-x-4 items-end p-2 rounded-md bg-sky-50/50 grid-cols-8">
                                     <NumberInput label="Monthly Benefit" prefix="$" value={item.monthlyBenefit} onChange={e => handleDynamicListChange('pensions', item.id, 'monthlyBenefit', e.target.value)}/>
@@ -661,6 +662,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                     {/* Annuities panel */}
                     {incomeTab === 'annuities' && (
                         <div id="panel-annuities" role="tabpanel" aria-labelledby="tab-annuities" className="relative pt-3 space-y-2">
+                            <p className="text-sm text-gray-500">Enter your monthly pre-tax income (gross)</p>
                             {((plan.annuities || []) as Annuity[]).map(item => (
                                 <div key={item.id} className="grid gap-x-4 items-end p-2 rounded-md bg-indigo-50/50 grid-cols-8">
                                     <NumberInput label="Monthly Amount" prefix="$" value={item.monthlyAmount} onChange={e => handleDynamicListChange('annuities', item.id, 'monthlyAmount', e.target.value)}/>
@@ -702,6 +704,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                     {/* Other Incomes panel */}
                     {incomeTab === 'other' && (
                         <div id="panel-otherincomes" role="tabpanel" aria-labelledby="tab-otherincomes" className="relative pt-3 space-y-2">
+                            <p className="text-sm text-gray-500">Enter your monthly pre-tax income (gross)</p>
                             {((plan.otherIncomes || []) as OtherIncome[]).map(item => (
                                 <div key={item.id} className="grid gap-x-4 items-end p-2 rounded-md bg-lime-50/50 grid-cols-8">
                                     <NumberInput label="Monthly Amount" prefix="$" value={item.monthlyAmount} onChange={e => handleDynamicListChange('otherIncomes', item.id, 'monthlyAmount', e.target.value)}/>
