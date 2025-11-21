@@ -178,6 +178,18 @@ const Header: React.FC<HeaderProps> = ({
                 <div className="col-span-full pt-2">
                   <p className="text-xs text-gray-500">This data is stored in your browser. If you clear your browser cache without saving the scenarios file, you <strong className="text-red-600">WILL LOSE</strong> your scenarios. Use the Backup feature to download your scenarios file to save all your hard work.</p>
                 </div>
+                <div className="col-span-full pt-4">
+                  <button
+                    onClick={() => {
+                      setIsScenarioMenuOpen(false);
+                      handleResetPlan();
+                    }}
+                    className="w-full inline-flex items-center justify-center px-4 py-3 bg-red-600 text-white text-sm font-semibold rounded-md hover:bg-red-700 transition-colors"
+                  >
+                    <XCircleIcon className="h-5 w-5 mr-2" aria-hidden="true" />
+                    Reset All Data
+                  </button>
+                </div>
               </div>
             </div>
           )}
@@ -200,10 +212,7 @@ const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
 
-        <button type="button" onClick={handleResetPlan} aria-label="Reset Plan" title="Reset all data and scenarios" className="group relative p-2 rounded-md text-red-600 hover:text-red-800 transition-colors hover:bg-red-100">
-          <XCircleIcon className="h-5 w-5" aria-hidden="true" />
-          <span className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-40 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-none">Reset</span>
-        </button>
+        {/* Reset moved to Scenario Manager popover */}
       </div>
 
       {showToast && (
