@@ -338,8 +338,8 @@ const IncomeBreakdownChart: React.FC<{ projectionData: YearlyProjection[] }> = (
 
     return (
         <div>
-            <h4 className="font-semibold text-center mb-2">Income Breakdown (First Year of Retirement)</h4>
-            <div className="w-full bg-gray-200 rounded-full h-8 flex overflow-hidden">
+            <h4 className="font-semibold text-center mb-2 text-brand-text-primary">Income Breakdown (First Year of Retirement)</h4>
+            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-8 flex overflow-hidden">
                 {incomeSources.map(source => (
                     <div 
                         key={source.label}
@@ -349,7 +349,7 @@ const IncomeBreakdownChart: React.FC<{ projectionData: YearlyProjection[] }> = (
                     ></div>
                 ))}
             </div>
-            <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs mt-2">
+            <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs mt-2 text-brand-text-secondary">
                 {incomeSources.map(source => (
                      <span key={source.label} className="flex items-center">
                         <div className={`w-3 h-3 rounded-full ${source.color} mr-1.5`}></div>
