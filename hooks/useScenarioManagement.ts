@@ -24,6 +24,8 @@ const initialPlanState: RetirementPlan = {
   annualWithdrawalRate: 4,
   dieWithZero: false,
   legacyAmount: 0,
+    useFatTails: true,
+    fatTailDf: 4,
 };
 
 /**

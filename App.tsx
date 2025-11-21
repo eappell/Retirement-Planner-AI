@@ -485,9 +485,18 @@ const App: React.FC = () => {
                     }}
                     onClose={() => setIsDisclaimerOpen(false)}
                 />
-                <AppSettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} onSaveDefaults={(d) => {
+                <AppSettingsModal isOpen={isSettingsOpen} plan={plan} onClose={() => setIsSettingsOpen(false)} onSaveDefaults={(d) => {
                     // persist and notify
                     try { localStorage.setItem('assetAssumptionDefaults', JSON.stringify(d)); } catch (e) { /* ignore */ }
+                    // apply defaults to the active plan so UI mirrors settings immediately
+                    if (d) {
+                        if (typeof d.stockMean !== 'undefined') handlePlanChange('stockMean', d.stockMean as any);
+                        if (typeof d.stockStd !== 'undefined') handlePlanChange('stockStd', d.stockStd as any);
+                        if (typeof d.bondMean !== 'undefined') handlePlanChange('bondMean', d.bondMean as any);
+                        if (typeof d.bondStd !== 'undefined') handlePlanChange('bondStd', d.bondStd as any);
+                        if (typeof d.useFatTails !== 'undefined') handlePlanChange('useFatTails', d.useFatTails as any);
+                        if (typeof d.fatTailDf !== 'undefined') handlePlanChange('fatTailDf', d.fatTailDf as any);
+                    }
                     showToast('Saved app defaults');
                 }} />
                 <Toast message={toastMessage} />

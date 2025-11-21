@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { NumberInput } from './FormControls';
+import { RetirementPlan } from '../types';
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
   onSaveDefaults: (d: { stockMean: number; stockStd: number; bondMean: number; bondStd: number; useFatTails?: boolean; fatTailDf?: number }) => void;
+  plan?: RetirementPlan | null;
 }
 
-const AppSettingsModal: React.FC<Props> = ({ isOpen, onClose, onSaveDefaults }) => {
+const AppSettingsModal: React.FC<Props> = ({ isOpen, onClose, onSaveDefaults, plan = null }) => {
   const [stockMean, setStockMean] = useState<number>(8);
   const [stockStd, setStockStd] = useState<number>(15);
   const [bondMean, setBondMean] = useState<number>(3);
   const [bondStd, setBondStd] = useState<number>(6);
-  const [useFatTails, setUseFatTails] = useState<boolean>(false);
+  const [useFatTails, setUseFatTails] = useState<boolean>(true);
   const [fatTailDf, setFatTailDf] = useState<number>(4);
 
   useEffect(() => {
@@ -21,17 +23,27 @@ const AppSettingsModal: React.FC<Props> = ({ isOpen, onClose, onSaveDefaults }) 
       const raw = localStorage.getItem('assetAssumptionDefaults');
       if (raw) {
         const parsed = JSON.parse(raw);
-        setStockMean(parsed.stockMean ?? 8);
-        setStockStd(parsed.stockStd ?? 15);
-        setBondMean(parsed.bondMean ?? 3);
-        setBondStd(parsed.bondStd ?? 6);
-        setUseFatTails(parsed.useFatTails ?? false);
-        setFatTailDf(parsed.fatTailDf ?? 4);
+        setStockMean(parsed.stockMean ?? (plan?.stockMean ?? 8));
+        setStockStd(parsed.stockStd ?? (plan?.stockStd ?? 15));
+        setBondMean(parsed.bondMean ?? (plan?.bondMean ?? 3));
+        setBondStd(parsed.bondStd ?? (plan?.bondStd ?? 6));
+        setUseFatTails(parsed.useFatTails ?? (plan?.useFatTails ?? true));
+        setFatTailDf(parsed.fatTailDf ?? (plan?.fatTailDf ?? 4));
+        return;
+      }
+      // No stored defaults: initialize from active plan if available
+      if (plan) {
+        setStockMean(plan.stockMean ?? 8);
+        setStockStd(plan.stockStd ?? 15);
+        setBondMean(plan.bondMean ?? 3);
+        setBondStd(plan.bondStd ?? 6);
+        setUseFatTails(plan.useFatTails ?? true);
+        setFatTailDf(plan.fatTailDf ?? 4);
       }
     } catch (e) {
       // ignore
     }
-  }, [isOpen]);
+  }, [isOpen, plan]);
 
   if (!isOpen) return null;
 

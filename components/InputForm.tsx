@@ -3,7 +3,6 @@ import AddButton from './AddButton';
 import { RetirementPlan, Person, PlanType, RetirementAccount, InvestmentAccount, Pension, OtherIncome, Annuity, ExpensePeriod, Gift, LegacyDisbursement } from '../types';
 import { InputSection } from './InputSection';
 import { NumberInput, SelectInput, TextInput } from './FormControls';
-const FatTailDemo = React.lazy(() => import('./FatTailDemo'));
 import { STATES } from '../constants';
 import { validateAssetDefaults } from '../utils/assetValidation';
 
@@ -194,7 +193,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                         </div>
                     </div>
 
-                    <p className="text-xs text-gray-500 mt-2">When <strong>Use fat-tailed returns</strong> is enabled, projections sample yearly asset returns from a Student's t-distribution (lower degrees of freedom -> fatter tails). This increases the probability of large shocks (both positive and negative) versus a normal distribution — use with care. Typical df values: 3–6 for noticeably fat tails; df &gt; 30 approximates normal.</p>
+                    <p className="text-xs text-gray-500 mt-2">When <strong>Use fat-tailed returns</strong> is enabled, projections sample yearly asset returns from a Student's t-distribution (lower degrees of freedom to fatter tails). This increases the probability of large shocks (both positive and negative) versus a normal distribution — use with care. Typical df values: 3–6 for noticeably fat tails; df greater than 30 approximates normal.</p>
 
                     {(() => {
                         const sd = Number(plan.stockStd ?? 15);
@@ -230,13 +229,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                         );
                     })()}
                 </details>
-                <div className="col-span-full">
-                    {/* Fat tail visual demo */}
-                    {/* Lazy-load small visual demonstration component to keep file size small */}
-                    <React.Suspense fallback={<div className="text-sm text-gray-500">Loading demo...</div>}>
-                        <FatTailDemo df={plan.fatTailDf ?? 4} std={(plan.stockStd ?? 15) / 100} />
-                    </React.Suspense>
-                </div>
+                {/* Fat-tail demo removed per user request */}
 
             </InputSection>
 
