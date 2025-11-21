@@ -326,11 +326,11 @@ const IncomeBreakdownChart: React.FC<{ projectionData: YearlyProjection[] }> = (
     if (!firstRetirementYearData) return <p>No retirement income to display.</p>;
     
     const incomeSources = [
-        { label: 'Withdrawals', value: firstRetirementYearData.withdrawal || 0, color: 'bg-indigo-500' },
-        { label: 'Social Security', value: firstRetirementYearData.socialSecurityIncome || 0, color: 'bg-blue-500' },
-        { label: 'Pensions', value: firstRetirementYearData.pensionIncome || 0, color: 'bg-sky-500' },
-        { label: 'Other Income', value: firstRetirementYearData.otherIncome || 0, color: 'bg-teal-500' },
-        { label: 'Gifts', value: firstRetirementYearData.gifts || 0, color: 'bg-amber-400' },
+        { label: 'Withdrawals', value: firstRetirementYearData.withdrawal || 0, color: '#6366f1' },
+        { label: 'Social Security', value: firstRetirementYearData.socialSecurityIncome || 0, color: '#3b82f6' },
+        { label: 'Pensions', value: firstRetirementYearData.pensionIncome || 0, color: '#0ea5e9' },
+        { label: 'Other Income', value: firstRetirementYearData.otherIncome || 0, color: '#14b8a6' },
+        { label: 'Gifts', value: firstRetirementYearData.gifts || 0, color: '#fbbf24' },
     ].filter(s => s.value > 0);
 
     const totalIncome = incomeSources.reduce((sum, s) => sum + s.value, 0);
@@ -343,8 +343,12 @@ const IncomeBreakdownChart: React.FC<{ projectionData: YearlyProjection[] }> = (
                 {incomeSources.map(source => (
                     <div 
                         key={source.label}
-                        className={`${source.color} transition-all duration-500`}
-                        style={{ width: `${(source.value / totalIncome) * 100}%`, minWidth: '2px' }}
+                        className="transition-all duration-500"
+                        style={{ 
+                            width: `${(source.value / totalIncome) * 100}%`, 
+                            minWidth: '2px',
+                            backgroundColor: source.color
+                        }}
                         title={`${source.label}: ${formatCurrencyShort(source.value)}`}
                     ></div>
                 ))}
@@ -352,7 +356,7 @@ const IncomeBreakdownChart: React.FC<{ projectionData: YearlyProjection[] }> = (
             <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs mt-2 text-brand-text-secondary">
                 {incomeSources.map(source => (
                      <span key={source.label} className="flex items-center">
-                        <div className={`w-3 h-3 rounded-full ${source.color} mr-1.5`}></div>
+                        <div className="w-3 h-3 rounded-full mr-1.5" style={{ backgroundColor: source.color }}></div>
                         {source.label} ({((source.value / totalIncome) * 100).toFixed(0)}%)
                     </span>
                 ))}
