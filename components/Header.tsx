@@ -2,7 +2,8 @@ import React from 'react';
 import { Scenario } from '../types';
 import { SelectInput, TextInput } from './FormControls';
 import ThemeToggle from './ThemeToggle';
-import { BookOpenIcon, PrinterIcon, Cog6ToothIcon, Bars3Icon, ArrowDownTrayIcon, ArrowUpTrayIcon, InformationCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
+import { Bars3Icon, ArrowDownTrayIcon, ArrowUpTrayIcon, InformationCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
+import { BookOpenIcon, PrinterIcon, Cog6ToothIcon } from '@heroicons/react/24/solid';
 
 interface HeaderProps {
   activeScenario: Scenario;
