@@ -22,7 +22,11 @@ export const InputSection: React.FC<InputSectionProps> = ({ title, subtitle, tit
     }
     if (key.includes('social')) {
       return (
-        <span className="inline-flex items-center justify-center mr-2 px-2 py-0.5 rounded-full bg-blue-600 text-white text-[12px] font-semibold" aria-hidden="true">SS</span>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="h-6 w-6 mr-2 text-blue-600" aria-hidden="true" focusable="false">
+          {/* Police-style badge shape with central star */}
+          <path fill="currentColor" d="M12 2l2.1 3.6L18 7l-2 2 .5 4.5L12 12.8 7.5 13.5 8 9 6 7l3.9-1.4L12 2z" />
+          <path fill="currentColor" d="M12 13.2l3.4 1.8-.6 2.7L12 16.5l-2.8 1.2-.6-2.7L12 13.2z" opacity="0.95" />
+        </svg>
       );
     }
     if (key.includes('person') || key.includes('person1') || key.includes('person2')) {
