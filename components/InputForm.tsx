@@ -306,7 +306,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                 )}
             </div>
 
-            <InputSection title="Social Security" subtitle="Estimate benefits based on current salary and your planned claiming age.">
+            <InputSection title="Social Security" subtitle="Estimate benefits based on current salary and your planned claiming age." titleColorClass="text-[#D4AF37]">
                     <div className={`col-span-full grid grid-cols-1 ${isCouple ? 'md:grid-cols-2' : ''} gap-6`}>
                         <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
                             <h3 className="font-semibold text-blue-800 mb-3 flex items-center">
