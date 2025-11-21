@@ -180,6 +180,9 @@ export interface TaxBracket {
 export interface MonteCarloResult {
     successRate: number;
     outcomes: number[];
+  // Metadata about sampling used for this run
+  useFatTails?: boolean;
+  fatTailDf?: number;
 }
 
 // --- Scenario Management Types ---

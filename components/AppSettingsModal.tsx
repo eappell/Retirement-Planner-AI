@@ -4,7 +4,7 @@ import { NumberInput } from './FormControls';
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  onSaveDefaults: (d: { stockMean: number; stockStd: number; bondMean: number; bondStd: number }) => void;
+  onSaveDefaults: (d: { stockMean: number; stockStd: number; bondMean: number; bondStd: number; useFatTails?: boolean; fatTailDf?: number }) => void;
 }
 
 const AppSettingsModal: React.FC<Props> = ({ isOpen, onClose, onSaveDefaults }) => {
@@ -12,6 +12,8 @@ const AppSettingsModal: React.FC<Props> = ({ isOpen, onClose, onSaveDefaults }) 
   const [stockStd, setStockStd] = useState<number>(15);
   const [bondMean, setBondMean] = useState<number>(3);
   const [bondStd, setBondStd] = useState<number>(6);
+  const [useFatTails, setUseFatTails] = useState<boolean>(false);
+  const [fatTailDf, setFatTailDf] = useState<number>(4);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -23,6 +25,8 @@ const AppSettingsModal: React.FC<Props> = ({ isOpen, onClose, onSaveDefaults }) 
         setStockStd(parsed.stockStd ?? 15);
         setBondMean(parsed.bondMean ?? 3);
         setBondStd(parsed.bondStd ?? 6);
+        setUseFatTails(parsed.useFatTails ?? false);
+        setFatTailDf(parsed.fatTailDf ?? 4);
       }
     } catch (e) {
       // ignore
@@ -42,6 +46,11 @@ const AppSettingsModal: React.FC<Props> = ({ isOpen, onClose, onSaveDefaults }) 
           <NumberInput label="Stocks: Volatility (std dev)" suffix="%" value={stockStd} onChange={e => setStockStd(Number(e.target.value))} />
           <NumberInput label="Bonds: Expected Return" suffix="%" value={bondMean} onChange={e => setBondMean(Number(e.target.value))} />
           <NumberInput label="Bonds: Volatility (std dev)" suffix="%" value={bondStd} onChange={e => setBondStd(Number(e.target.value))} />
+            <div className="flex items-center space-x-3">
+              <input id="defaults-use-fat" type="checkbox" checked={useFatTails} onChange={e => setUseFatTails(e.target.checked)} className="h-4 w-4 rounded text-brand-primary focus:ring-brand-primary" />
+              <label htmlFor="defaults-use-fat" className="text-sm font-medium">Default: Use fat-tailed returns</label>
+            </div>
+            <NumberInput label="Default fat-tail df" value={fatTailDf} onChange={e => setFatTailDf(Number(e.target.value))} />
         </div>
 
         <div className="mt-4 flex items-center justify-end space-x-2">
@@ -51,7 +60,7 @@ const AppSettingsModal: React.FC<Props> = ({ isOpen, onClose, onSaveDefaults }) 
             onClose();
           }}>Clear Defaults</button>
           <button type="button" className="px-3 py-1.5 rounded-md bg-brand-primary text-white hover:opacity-95" onClick={() => {
-            const d = { stockMean, stockStd, bondMean, bondStd };
+            const d = { stockMean, stockStd, bondMean, bondStd, useFatTails, fatTailDf };
             try { localStorage.setItem('assetAssumptionDefaults', JSON.stringify(d)); } catch (e) { /* ignore */ }
             onSaveDefaults(d);
             onClose();

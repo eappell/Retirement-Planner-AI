@@ -3,6 +3,7 @@ import AddButton from './AddButton';
 import { RetirementPlan, Person, PlanType, RetirementAccount, InvestmentAccount, Pension, OtherIncome, Annuity, ExpensePeriod, Gift, LegacyDisbursement } from '../types';
 import { InputSection } from './InputSection';
 import { NumberInput, SelectInput, TextInput } from './FormControls';
+const FatTailDemo = React.lazy(() => import('./FatTailDemo'));
 import { STATES } from '../constants';
 import { validateAssetDefaults } from '../utils/assetValidation';
 
@@ -216,7 +217,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                                 <div className="mt-3">
                                     <button type="button" onClick={() => {
                                         try {
-                                            const assetDefaults = { stockMean: sm, stockStd: sd, bondMean: bm, bondStd: bd };
+                                            const assetDefaults = { stockMean: sm, stockStd: sd, bondMean: bm, bondStd: bd, useFatTails: !!plan.useFatTails, fatTailDf: plan.fatTailDf ?? 4 };
                                             localStorage.setItem('assetAssumptionDefaults', JSON.stringify(assetDefaults));
                                             window.dispatchEvent(new CustomEvent('app:toast', { detail: { message: 'Saved asset-assumption defaults' } }));
                                         } catch (e) {
@@ -229,6 +230,13 @@ export const InputForm: React.FC<InputFormProps> = ({
                         );
                     })()}
                 </details>
+                <div className="col-span-full">
+                    {/* Fat tail visual demo */}
+                    {/* Lazy-load small visual demonstration component to keep file size small */}
+                    <React.Suspense fallback={<div className="text-sm text-gray-500">Loading demo...</div>}>
+                        <FatTailDemo df={plan.fatTailDf ?? 4} std={(plan.stockStd ?? 15) / 100} />
+                    </React.Suspense>
+                </div>
 
             </InputSection>
 

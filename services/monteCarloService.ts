@@ -26,5 +26,7 @@ export const runMonteCarloSimulation = (
     return {
         successRate: (successfulRuns / numSimulations) * 100,
         outcomes: finalNetWorths,
+        useFatTails: plan.useFatTails,
+        fatTailDf: plan.fatTailDf,
     };
 };
