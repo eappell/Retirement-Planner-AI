@@ -41,7 +41,13 @@ export const InputSection: React.FC<InputSectionProps> = ({ title, subtitle, tit
     }
     if (key.includes('income') || key.includes('pension') || key.includes('annuit')) {
       return (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-amber-600" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 1.343-3 3v6h6v-6c0-1.657-1.343-3-3-3z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 20h14"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-green-600" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          {/* Stack of money: layered rounded rectangles with a dollar mark */}
+          <rect x="2" y="6" rx="2" width="20" height="12" fill="currentColor" opacity="0.9" />
+          <rect x="3.5" y="8" rx="1.5" width="17" height="8" fill="#ffffff" />
+          <rect x="4.5" y="9.5" rx="1" width="15" height="5" fill="#e6f9ef" />
+          <text x="12" y="12.8" textAnchor="middle" fontSize="8" fontWeight="700" fill="currentColor">$</text>
+        </svg>
       );
     }
     if (key.includes('annual')) {
