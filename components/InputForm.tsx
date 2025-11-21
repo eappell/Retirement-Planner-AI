@@ -175,7 +175,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                     <NumberInput label="Withdrawal Rate" suffix="%" value={plan.annualWithdrawalRate} onChange={e => handlePlanChange('annualWithdrawalRate', Number(e.target.value))} disabled={plan.dieWithZero}/>
                 </div>
                 <details className="mt-3 col-span-full">
-                    <summary className="cursor-pointer text-sm font-medium text-gray-700">Advanced Market Assumptions</summary>
+                    <summary className="cursor-pointer text-sm font-medium text-brand-text-primary">Advanced Market Assumptions</summary>
                     <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 mt-3">
                         <NumberInput label="Stocks: Expected Return" suffix="%" value={(plan.stockMean ?? 8)} onChange={e => handlePlanChange('stockMean', Number(e.target.value))} />
                         <NumberInput label="Stocks: Volatility (std dev)" suffix="%" value={(plan.stockStd ?? 15)} onChange={e => handlePlanChange('stockStd', Number(e.target.value))} />
@@ -367,7 +367,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                                         id="tab-retirement"
                                         aria-controls="panel-retirement"
                                         onClick={() => setAccountsTab('retirement')}
-                                        className={`text-sm pb-2 ${'border-b-2 border-transparent text-gray-600 hover:text-gray-800'}`}
+                                        className={`text-sm pb-2 ${'border-b-2 border-transparent text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200'}`}
                                     >
                                         Retirement Accounts
                                     </button>
@@ -391,7 +391,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                                         id="tab-investment"
                                         aria-controls="panel-investment"
                                         onClick={() => setAccountsTab('investment')}
-                                        className={`text-sm pb-2 ${'border-b-2 border-transparent text-gray-600 hover:text-gray-800'}`}
+                                        className={`text-sm pb-2 ${'border-b-2 border-transparent text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200'}`}
                                     >
                                         Investment Accounts
                                     </button>
@@ -451,18 +451,12 @@ export const InputForm: React.FC<InputFormProps> = ({
                                 <div id="panel-investment" role="tabpanel" aria-labelledby="tab-investment" className="relative pt-3 space-y-2">
                                     {(() => {
                                         const invs = (plan.investmentAccounts || []) as InvestmentAccount[];
-                                        const anyInvalid = invs.some(i => (Number(i.percentStocks || 0) + Number(i.percentBonds || 0)) !== 100);
                                         return (
                                             <>
-                                                {anyInvalid && <p className="text-sm text-red-600 mb-2">One or more investment accounts have allocations that do not total 100%.</p>}
                                                 {invs.map(item => {
-                                                    const stocks = Number(item.percentStocks || 0);
-                                                    const bonds = Number(item.percentBonds || 0);
-                                                    const total = stocks + bonds;
-                                                    const invalid = total !== 100;
                                                     return (
                                                         <React.Fragment key={item.id}>
-                                                                <div className={`grid gap-x-4 items-end p-2 rounded-md ${invalid ? 'bg-teal-50/60' : 'bg-teal-50/50'} grid-cols-9`}>
+                                                                <div className="grid gap-x-4 items-end p-2 rounded-md bg-teal-50/50 grid-cols-9">
                                                                     <SelectInput label="Owner" value={item.owner || 'person1'} onChange={e => handleDynamicListChange('investmentAccounts', item.id, 'owner', e.target.value)}>
                                                                         <option value="person1">{plan.person1.name}</option>
                                                                         {isCouple && <option value="person2">{plan.person2.name}</option>}
@@ -514,11 +508,6 @@ export const InputForm: React.FC<InputFormProps> = ({
                                                                     }} onRemove={() => removeFromList('investmentAccounts', item.id)} canRemove={(plan.investmentAccounts || []).length > 1} />
                                                                 </div>
                                                             </div>
-                                                            {invalid && (
-                                                                <div className="col-span-full px-2">
-                                                                    <p className="text-sm text-red-600 mt-1">Allocation totals must equal 100% (currently {total}%). Please adjust % Stocks and % Bonds.</p>
-                                                                </div>
-                                                            )}
                                                         </React.Fragment>
                                                     );
                                                 })}
@@ -567,7 +556,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                                 id="tab-pensions"
                                 aria-controls="panel-pensions"
                                 onClick={() => setIncomeTab('pensions')}
-                                className={`text-sm pb-2 ${'border-b-2 border-transparent text-gray-600 hover:text-gray-800'}`}
+                                className={`text-sm pb-2 ${'border-b-2 border-transparent text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200'}`}
                             >
                                 Pensions
                             </button>
@@ -591,7 +580,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                                 id="tab-annuities"
                                 aria-controls="panel-annuities"
                                 onClick={() => setIncomeTab('annuities')}
-                                className={`text-sm pb-2 ${'border-b-2 border-transparent text-gray-600 hover:text-gray-800'}`}
+                                className={`text-sm pb-2 ${'border-b-2 border-transparent text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200'}`}
                             >
                                 Annuities
                             </button>
@@ -615,7 +604,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                                 id="tab-otherincomes"
                                 aria-controls="panel-otherincomes"
                                 onClick={() => setIncomeTab('other')}
-                                className={`text-sm pb-2 ${'border-b-2 border-transparent text-gray-600 hover:text-gray-800'}`}
+                                className={`text-sm pb-2 ${'border-b-2 border-transparent text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200'}`}
                             >
                                 Other Incomes
                             </button>
@@ -788,7 +777,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                                 id="tab-gifts"
                                 aria-controls="panel-gifts"
                                 onClick={() => setEstateTab('gifts')}
-                                className={`text-sm pb-2 ${'border-b-2 border-transparent text-gray-600 hover:text-gray-800'}`}
+                                className={`text-sm pb-2 ${'border-b-2 border-transparent text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200'}`}
                             >
                                 Gifts
                             </button>
@@ -812,7 +801,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                                 id="tab-legacy"
                                 aria-controls="panel-legacy"
                                 onClick={() => setEstateTab('legacy')}
-                                className={`text-sm pb-2 ${'border-b-2 border-transparent text-gray-600 hover:text-gray-800'}`}
+                                className={`text-sm pb-2 ${'border-b-2 border-transparent text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200'}`}
                             >
                                 Legacy
                             </button>

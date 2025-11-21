@@ -80,19 +80,19 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ onRunS
                                 <h4 className="font-semibold text-center mb-4 text-gray-700">Range of Final Net Worth Outcomes</h4>
                                 <div className="grid grid-cols-3 gap-4 text-center">
                                     <div>
-                                        <p className="text-sm font-medium text-red-600">10th Percentile</p>
-                                        <p className="text-xs text-gray-500 mb-1">Worst Case</p>
-                                        <p className="font-bold text-xl text-red-800 mt-1">{formatCurrencyShort(pessimisticValue)}</p>
+                                        <p className="text-sm font-medium text-red-700 dark:text-red-400">10th Percentile</p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Worst Case</p>
+                                        <p className="font-bold text-2xl text-red-700 dark:text-red-300 mt-1">{formatCurrencyShort(pessimisticValue)}</p>
                                     </div>
                                     <div>
-                                        <p className="text-sm font-medium text-gray-600">50th Percentile</p>
-                                        <p className="text-xs text-gray-500 mb-1">Median</p>
-                                        <p className="font-bold text-xl text-gray-800 mt-1">{formatCurrencyShort(medianValue)}</p>
+                                        <p className="text-sm font-medium text-blue-700 dark:text-gray-300">50th Percentile</p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Median</p>
+                                        <p className="font-bold text-2xl text-blue-700 dark:text-gray-200 mt-1">{formatCurrencyShort(medianValue)}</p>
                                     </div>
                                     <div>
-                                        <p className="text-sm font-medium text-green-600">90th Percentile</p>
-                                        <p className="text-xs text-gray-500 mb-1">Best Case</p>
-                                        <p className="font-bold text-xl text-green-800 mt-1">{formatCurrencyShort(optimisticValue)}</p>
+                                        <p className="text-sm font-medium text-green-700 dark:text-green-400">90th Percentile</p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Best Case</p>
+                                        <p className="font-bold text-2xl text-green-700 dark:text-green-300 mt-1">{formatCurrencyShort(optimisticValue)}</p>
                                     </div>
                                 </div>
                                 <p className="text-xs text-gray-500 text-center mt-4">Distribution of final net worth across {validOutcomes.length} simulations with {volatility}% market volatility.</p>
@@ -169,9 +169,9 @@ const MonteCarloChart: React.FC<{ series: Array<{ year: number; age1?: number; p
                     const val = maxVal * t;
                     const yy = y(val);
                     return (
-                        <g key={t} className="text-xs text-gray-500">
-                            <line x1={pad.left} x2={width - pad.right} y1={yy} y2={yy} stroke="#f3f4f6" />
-                            <text x={pad.left - 8} y={yy + 4} textAnchor="end">{formatCurrencyShort(val)}</text>
+                        <g key={t}>
+                            <line x1={pad.left} x2={width - pad.right} y1={yy} y2={yy} className="stroke-gray-200 dark:stroke-gray-600" />
+                            <text x={pad.left - 8} y={yy + 4} textAnchor="end" className="text-xs fill-gray-600 dark:fill-gray-400">{formatCurrencyShort(val)}</text>
                         </g>
                     );
                 })}
@@ -186,7 +186,7 @@ const MonteCarloChart: React.FC<{ series: Array<{ year: number; age1?: number; p
 
                 {/* X axis labels (years) */}
                 {series.map((s, i) => ({ s, i })).filter(({ i }) => i % Math.ceil(series.length / 6) === 0).map(({ s, i }) => (
-                    <text key={i} x={x(i)} y={height - pad.bottom + 16} textAnchor="middle" className="text-xs text-gray-500">{s.year}</text>
+                    <text key={i} x={x(i)} y={height - pad.bottom + 16} textAnchor="middle" className="text-xs fill-gray-600 dark:fill-gray-400">{s.year}</text>
                 ))}
 
                 {/* interactive overlay for hover */}

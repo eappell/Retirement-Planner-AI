@@ -122,6 +122,84 @@ html, body {
   color: #ffffff !important;
 }
 
+/* Monte Carlo outcomes - prevent generic override, maintain specific colors */
+.bg-gray-50 .text-red-700 {
+  color: #b91c1c !important;
+}
+.bg-gray-50 .text-blue-700 {
+  color: #1d4ed8 !important;
+}
+.bg-gray-50 .text-green-700 {
+  color: #15803d !important;
+}
+.theme-dark .bg-gray-50 .text-red-400,
+.theme-dark .bg-gray-50 .text-red-300 {
+  color: #f87171 !important;
+}
+.theme-dark .bg-gray-50 .text-gray-300,
+.theme-dark .bg-gray-50 .text-gray-200 {
+  color: #d1d5db !important;
+}
+.theme-dark .bg-gray-50 .text-green-400,
+.theme-dark .bg-gray-50 .text-green-300 {
+  color: #4ade80 !important;
+}
+
+/* Indicator card icons - override dark mode to use brand purple */
+.theme-dark .rounded-full.bg-green-500,
+.theme-dark .rounded-full.bg-indigo-500,
+.theme-dark .rounded-full.bg-red-500,
+.theme-dark .rounded-full.bg-yellow-500 {
+  background-color: #6366f1 !important;
+}
+
+/* Projection table - prevent dark mode override on table rows */
+table tr.bg-gray-50 {
+  background-color: #f9fafb !important;
+  color: #1f2937 !important;
+}
+.theme-dark table tr.bg-gray-50 {
+  background-color: #1f2937 !important;
+  color: #e5e7eb !important;
+}
+
+/* Projection table colored columns - override the generic bg-*-50 rules */
+.projection-col-gifts {
+  background-color: #fef9c3 !important;
+  color: #713f12 !important;
+}
+.theme-dark .projection-col-gifts {
+  background-color: #713f12 !important;
+  color: #fde047 !important;
+}
+
+.projection-col-income {
+  background-color: #dbeafe !important;
+  color: #1e3a8a !important;
+}
+.theme-dark .projection-col-income {
+  background-color: #1e3a8a !important;
+  color: #bfdbfe !important;
+}
+
+.projection-col-tax {
+  background-color: #fee2e2 !important;
+  color: #7f1d1d !important;
+}
+.theme-dark .projection-col-tax {
+  background-color: #7f1d1d !important;
+  color: #fecaca !important;
+}
+
+.projection-col-netincome {
+  background-color: #dcfce7 !important;
+  color: #14532d !important;
+}
+.theme-dark .projection-col-netincome {
+  background-color: #14532d !important;
+  color: #bbf7d0 !important;
+}
+
 /* AI insights paragraph spacing: give paragraphs breathing room */
 .ai-insights p {
   margin-bottom: 1rem;
