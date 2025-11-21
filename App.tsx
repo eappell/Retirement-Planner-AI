@@ -6,7 +6,6 @@ import { ScrollToTopButton } from './components/ScrollToTopButton';
 import { PrintableReport } from './components/PrintableReport';
 // Import canonical Header implementation
 import Header from './components/Header';
-import AppSettingsModal from './components/AppSettingsModal';
 import Toast from './components/Toast';
 import { ResultsPanel } from './components/ResultsPanel';
 import { InputForm } from './components/InputForm';
@@ -93,7 +92,6 @@ const App: React.FC = () => {
     const [isManualOpen, setIsManualOpen] = useState(false);
     const [isDisclaimerOpen, setIsDisclaimerOpen] = useState(false);
     const [isDisclaimerRequireAccept, setIsDisclaimerRequireAccept] = useState(false);
-    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [toastMessage, setToastMessage] = useState<string | null>(null);
 
     const showToast = (msg: string, ms = 2500) => {
@@ -437,8 +435,20 @@ const App: React.FC = () => {
                     handleUploadScenarios={handleUploadScenarios}
                     handleResetPlan={handleResetPlan}
                     handlePrint={handlePrint}
-                    // expose settings opening
-                    onOpenSettings={() => setIsSettingsOpen(true)}
+                        onSaveDefaults={(d) => {
+                            try { localStorage.setItem('assetAssumptionDefaults', JSON.stringify(d)); } catch (e) { /* ignore */ }
+                            // apply defaults to the active plan so UI mirrors settings immediately
+                            if (d) {
+                                if (typeof d.stockMean !== 'undefined') handlePlanChange('stockMean', d.stockMean as any);
+                                if (typeof d.stockStd !== 'undefined') handlePlanChange('stockStd', d.stockStd as any);
+                                if (typeof d.bondMean !== 'undefined') handlePlanChange('bondMean', d.bondMean as any);
+                                if (typeof d.bondStd !== 'undefined') handlePlanChange('bondStd', d.bondStd as any);
+                                if (typeof d.useFatTails !== 'undefined') handlePlanChange('useFatTails', d.useFatTails as any);
+                                if (typeof d.fatTailDf !== 'undefined') handlePlanChange('fatTailDf', d.fatTailDf as any);
+                            }
+                            showToast('Saved app defaults');
+                        }}
+                    plan={plan}
                     setIsManualOpen={setIsManualOpen}
                     setIsDisclaimerOpen={(open: boolean, requireAccept?: boolean) => {
                         setIsDisclaimerRequireAccept(Boolean(requireAccept));
@@ -485,20 +495,7 @@ const App: React.FC = () => {
                     }}
                     onClose={() => setIsDisclaimerOpen(false)}
                 />
-                <AppSettingsModal isOpen={isSettingsOpen} plan={plan} onClose={() => setIsSettingsOpen(false)} onSaveDefaults={(d) => {
-                    // persist and notify
-                    try { localStorage.setItem('assetAssumptionDefaults', JSON.stringify(d)); } catch (e) { /* ignore */ }
-                    // apply defaults to the active plan so UI mirrors settings immediately
-                    if (d) {
-                        if (typeof d.stockMean !== 'undefined') handlePlanChange('stockMean', d.stockMean as any);
-                        if (typeof d.stockStd !== 'undefined') handlePlanChange('stockStd', d.stockStd as any);
-                        if (typeof d.bondMean !== 'undefined') handlePlanChange('bondMean', d.bondMean as any);
-                        if (typeof d.bondStd !== 'undefined') handlePlanChange('bondStd', d.bondStd as any);
-                        if (typeof d.useFatTails !== 'undefined') handlePlanChange('useFatTails', d.useFatTails as any);
-                        if (typeof d.fatTailDf !== 'undefined') handlePlanChange('fatTailDf', d.fatTailDf as any);
-                    }
-                    showToast('Saved app defaults');
-                }} />
+                
                 <Toast message={toastMessage} />
                 <ScrollToTopButton />
             </div>

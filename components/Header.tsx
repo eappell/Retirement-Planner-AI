@@ -2,6 +2,7 @@ import React from 'react';
 import { Scenario } from '../types';
 import { SelectInput, TextInput } from './FormControls';
 import ThemeToggle from './ThemeToggle';
+import AppSettingsMenu from './AppSettingsMenu';
 import { 
   QuestionMarkCircleIcon, 
   PrinterIcon, 
@@ -29,7 +30,8 @@ interface HeaderProps {
   handlePrint: () => void;
   setIsManualOpen: (isOpen: boolean) => void;
   setIsDisclaimerOpen: (isOpen: boolean, requireAccept?: boolean) => void;
-  onOpenSettings: () => void;
+  onSaveDefaults: (d: { stockMean: number; stockStd: number; bondMean: number; bondStd: number; useFatTails?: boolean; fatTailDf?: number }) => void;
+  plan?: any;
 }
 
 const Header: React.FC<HeaderProps> = ({
@@ -46,15 +48,21 @@ const Header: React.FC<HeaderProps> = ({
   handlePrint,
   setIsManualOpen,
   setIsDisclaimerOpen,
-  onOpenSettings,
+  onSaveDefaults,
+  plan,
 }) => {
   const [isScenarioMenuOpen, setIsScenarioMenuOpen] = React.useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = React.useState(false);
   const scenarioMenuRef = React.useRef<HTMLDivElement | null>(null);
+  const settingsRef = React.useRef<HTMLDivElement | null>(null);
 
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (scenarioMenuRef.current && !scenarioMenuRef.current.contains(event.target as Node)) {
         setIsScenarioMenuOpen(false);
+      }
+      if (settingsRef.current && !settingsRef.current.contains(event.target as Node)) {
+        setIsSettingsOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -180,14 +188,19 @@ const Header: React.FC<HeaderProps> = ({
           )}
         </div>
 
+        <div className="relative" ref={settingsRef}>
+          <button type="button" onClick={() => setIsSettingsOpen(prev => !prev)} title="App Settings" aria-label="App Settings" className="group relative p-2 rounded-md text-gray-600 hover:text-brand-primary hover:bg-gray-100 transition-colors">
+            <AdjustmentsHorizontalIcon className="h-5 w-5" aria-hidden="true" />
+            <span className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-40 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-none">Settings</span>
+          </button>
+          {isSettingsOpen && (
+            <AppSettingsMenu onSaveDefaults={(d) => { onSaveDefaults(d); setIsSettingsOpen(false); }} onClose={() => setIsSettingsOpen(false)} plan={plan} />
+          )}
+        </div>
+
         <button type="button" onClick={handlePrint} aria-label="Print" title="Print" className="group relative p-2 rounded-md text-gray-600 hover:text-brand-primary hover:bg-gray-100 transition-colors">
           <PrinterIcon className="h-5 w-5" aria-hidden="true" />
           <span className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-40 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-none">Print</span>
-        </button>
-
-        <button type="button" onClick={onOpenSettings} title="App Settings" aria-label="App Settings" className="group relative p-2 rounded-md text-gray-600 hover:text-brand-primary hover:bg-gray-100 transition-colors">
-          <AdjustmentsHorizontalIcon className="h-5 w-5" aria-hidden="true" />
-          <span className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-40 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-none">Settings</span>
         </button>
 
         <button type="button" onClick={() => setIsManualOpen(true)} aria-label="Open User Manual" title="User Manual" className="group relative p-2 rounded-md text-gray-600 hover:text-brand-primary hover:bg-gray-100 transition-colors">
