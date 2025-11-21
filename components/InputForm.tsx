@@ -622,7 +622,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                             <p className="text-sm text-gray-500">Enter your monthly pre-tax income (gross)</p>
                             {((plan.pensions || []) as Pension[]).map(item => (
                                 <div key={item.id} className="grid gap-x-4 items-end p-2 rounded-md bg-sky-50/50 grid-cols-8">
-                                    <NumberInput label="Monthly Benefit" prefix="$" value={item.monthlyBenefit} onChange={e => handleDynamicListChange('pensions', item.id, 'monthlyBenefit', e.target.value)}/>
+                                        <NumberInput id={`pensions-monthlyBenefit-${item.id}`} label="Monthly Benefit" prefix="$" value={item.monthlyBenefit} onChange={e => handleDynamicListChange('pensions', item.id, 'monthlyBenefit', e.target.value)}/>
                                     <NumberInput label="Start Age" value={item.startAge} onChange={e => handleDynamicListChange('pensions', item.id, 'startAge', e.target.value)}/>
                                     <NumberInput label="COLA" suffix="%" value={item.cola} onChange={e => handleDynamicListChange('pensions', item.id, 'cola', e.target.value)}/>
                                     <NumberInput label="Survivor" suffix="%" value={item.survivorBenefit} onChange={e => handleDynamicListChange('pensions', item.id, 'survivorBenefit', e.target.value)}/>
@@ -641,18 +641,18 @@ export const InputForm: React.FC<InputFormProps> = ({
                                             const id = Date.now().toString();
                                             const newPension: Pension = { id, owner: 'person1', name: 'New Pension', monthlyBenefit: 0, startAge: Math.min(plan.person1.retirementAge, isCouple ? plan.person2.retirementAge : Infinity), cola: 0, survivorBenefit: 0, taxable: true };
                                             addToList('pensions', newPension);
-                                            setFocusTargetId(`pensions-name-${id}`);
+                                            setFocusTargetId(`pensions-monthlyBenefit-${id}`);
                                         }} onRemove={() => removeFromList('pensions', item.id)} canRemove={(plan.pensions || []).length > 0} />
                                     </div>
                                 </div>
                             ))}
                             {(plan.pensions || []).length === 0 && (
                                 <div className="flex justify-center py-6">
-                                    <AddButton label="+ Add Pension" icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zm1 8.414V6a1 1 0 10-2 0v5a1 1 0 00.293.707l3 3a1 1 0 101.414-1.414L11 10.414z" /></svg>} onClick={() => {
+                                            <AddButton label="+ Add Pension" icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zm1 8.414V6a1 1 0 10-2 0v5a1 1 0 00.293.707l3 3a1 1 0 101.414-1.414L11 10.414z" /></svg>} onClick={() => {
                                             const id = Date.now().toString();
                                             const newPension: Pension = { id, owner: 'person1', name: 'New Pension', monthlyBenefit: 0, startAge: plan.person1.retirementAge, cola: 0, survivorBenefit: 0, taxable: true };
                                             addToList('pensions', newPension);
-                                            setFocusTargetId(`pensions-name-${id}`);
+                                            setFocusTargetId(`pensions-monthlyBenefit-${id}`);
                                         }} />
                                 </div>
                             )}
@@ -665,7 +665,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                             <p className="text-sm text-gray-500">Enter your monthly pre-tax income (gross)</p>
                             {((plan.annuities || []) as Annuity[]).map(item => (
                                 <div key={item.id} className="grid gap-x-4 items-end p-2 rounded-md bg-indigo-50/50 grid-cols-8">
-                                    <NumberInput label="Monthly Amount" prefix="$" value={item.monthlyAmount} onChange={e => handleDynamicListChange('annuities', item.id, 'monthlyAmount', e.target.value)}/>
+                                    <NumberInput id={`annuities-monthlyAmount-${item.id}`} label="Monthly Amount" prefix="$" value={item.monthlyAmount} onChange={e => handleDynamicListChange('annuities', item.id, 'monthlyAmount', e.target.value)}/>
                                     <NumberInput label="Start Age" value={item.startAge} onChange={e => handleDynamicListChange('annuities', item.id, 'startAge', e.target.value)}/>
                                     <NumberInput label="COLA" suffix="%" value={item.cola} onChange={e => handleDynamicListChange('annuities', item.id, 'cola', e.target.value)}/>
                                     <div className="flex flex-col items-center justify-end h-full pb-1">
@@ -683,18 +683,18 @@ export const InputForm: React.FC<InputFormProps> = ({
                                             const id = Date.now().toString();
                                             const newAnnuity: Annuity = { id, owner: 'person1', name: 'New Annuity', monthlyAmount: 0, startAge: plan.person1.retirementAge, cola: 0, taxable: true };
                                             addToList('annuities', newAnnuity);
-                                            setFocusTargetId(`annuities-name-${id}`);
+                                            setFocusTargetId(`annuities-monthlyAmount-${id}`);
                                         }} onRemove={() => removeFromList('annuities', item.id)} canRemove={(plan.annuities || []).length > 0} />
                                     </div>
                                 </div>
                             ))}
                             {(plan.annuities || []).length === 0 && (
                                 <div className="flex justify-center py-6">
-                                    <AddButton label="+ Add Annuity" icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a6 6 0 100 12 6 6 0 000-12zm1 7H9V7h2v2z"/></svg>} onClick={() => {
+                                            <AddButton label="+ Add Annuity" icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a6 6 0 100 12 6 6 0 000-12zm1 7H9V7h2v2z"/></svg>} onClick={() => {
                                         const id = Date.now().toString();
                                         const newAnnuity: Annuity = { id, owner: 'person1', name: 'New Annuity', monthlyAmount: 0, startAge: plan.person1.retirementAge, cola: 0, taxable: true };
                                         addToList('annuities', newAnnuity);
-                                        setFocusTargetId(`annuities-name-${id}`);
+                                        setFocusTargetId(`annuities-monthlyAmount-${id}`);
                                     }} />
                                 </div>
                             )}
@@ -707,7 +707,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                             <p className="text-sm text-gray-500">Enter your monthly pre-tax income (gross)</p>
                             {((plan.otherIncomes || []) as OtherIncome[]).map(item => (
                                 <div key={item.id} className="grid gap-x-4 items-end p-2 rounded-md bg-lime-50/50 grid-cols-8">
-                                    <NumberInput label="Monthly Amount" prefix="$" value={item.monthlyAmount} onChange={e => handleDynamicListChange('otherIncomes', item.id, 'monthlyAmount', e.target.value)}/>
+                                    <NumberInput id={`otherIncomes-monthlyAmount-${item.id}`} label="Monthly Amount" prefix="$" value={item.monthlyAmount} onChange={e => handleDynamicListChange('otherIncomes', item.id, 'monthlyAmount', e.target.value)}/>
                                     <NumberInput label="Start Age" value={item.startAge} onChange={e => handleDynamicListChange('otherIncomes', item.id, 'startAge', e.target.value)}/>
                                     <NumberInput label="End Age" value={item.endAge} onChange={e => handleDynamicListChange('otherIncomes', item.id, 'endAge', e.target.value)}/>
                                     <NumberInput label="COLA" suffix="%" value={item.cola} onChange={e => handleDynamicListChange('otherIncomes', item.id, 'cola', e.target.value)}/>
@@ -726,18 +726,18 @@ export const InputForm: React.FC<InputFormProps> = ({
                                             const id = Date.now().toString();
                                             const newOther: OtherIncome = { id, owner: 'person1', name: 'New Income', monthlyAmount: 0, startAge: plan.person1.retirementAge, endAge: plan.person1.lifeExpectancy, cola: 0, taxable: true };
                                             addToList('otherIncomes', newOther);
-                                            setFocusTargetId(`otherIncomes-name-${id}`);
+                                            setFocusTargetId(`otherIncomes-monthlyAmount-${id}`);
                                         }} onRemove={() => removeFromList('otherIncomes', item.id)} canRemove={(plan.otherIncomes || []).length > 0} />
                                     </div>
                                 </div>
                             ))}
                             {(plan.otherIncomes || []).length === 0 && (
                                 <div className="flex justify-center py-6">
-                                    <AddButton label="+ Add Other Income" icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zM10 6a2 2 0 100 4 2 2 0 000-4zM8 12v2h4v-2H8z" /></svg>} onClick={() => {
+                                            <AddButton label="+ Add Other Income" icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zM10 6a2 2 0 100 4 2 2 0 000-4zM8 12v2h4v-2H8z" /></svg>} onClick={() => {
                                             const id = Date.now().toString();
                                             const newOther: OtherIncome = { id, owner: 'person1', name: 'New Income', monthlyAmount: 0, startAge: plan.person1.retirementAge, endAge: plan.person1.lifeExpectancy, cola: 0, taxable: true };
                                             addToList('otherIncomes', newOther);
-                                            setFocusTargetId(`otherIncomes-name-${id}`);
+                                            setFocusTargetId(`otherIncomes-monthlyAmount-${id}`);
                                         }} />
                                 </div>
                             )}
