@@ -149,50 +149,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                 title="Plan Information"
                 subtitle="Set the high-level assumptions for your retirement plan."
             >
-                    <div className="col-span-full">
-                        <details className="mt-3">
-                            <summary className="cursor-pointer text-sm font-medium text-gray-700">Advanced Market Assumptions</summary>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
-                                <NumberInput label="Stocks: Expected Return" suffix="%" value={(plan.stockMean ?? 8)} onChange={e => handlePlanChange('stockMean', Number(e.target.value))} />
-                                <NumberInput label="Stocks: Volatility (std dev)" suffix="%" value={(plan.stockStd ?? 15)} onChange={e => handlePlanChange('stockStd', Number(e.target.value))} />
-                                <NumberInput label="Bonds: Expected Return" suffix="%" value={(plan.bondMean ?? 3)} onChange={e => handlePlanChange('bondMean', Number(e.target.value))} />
-                                <NumberInput label="Bonds: Volatility (std dev)" suffix="%" value={(plan.bondStd ?? 6)} onChange={e => handlePlanChange('bondStd', Number(e.target.value))} />
-                            </div>
-                            {(() => {
-                                const sd = Number(plan.stockStd ?? 15);
-                                const bd = Number(plan.bondStd ?? 6);
-                                const sm = Number(plan.stockMean ?? 8);
-                                const bm = Number(plan.bondMean ?? 3);
-                                const issues = validateAssetDefaults({ stockMean: sm, bondMean: bm, stockStd: sd, bondStd: bd });
-
-                                return (
-                                    <>
-                                        <p className="text-xs text-gray-500 mt-2">These settings let you tweak the expected returns and volatilities used when calculating allocation-weighted returns for investment accounts. The plan-level Average Return still acts as a baseline and will bias these values so the overall portfolio still matches your `Avg. Return`.</p>
-                                        {issues.length > 0 && (
-                                            <div className="mt-2">
-                                                <p className="text-sm text-red-600 font-medium">Market assumptions warnings:</p>
-                                                <ul className="text-sm text-red-600 list-disc list-inside">
-                                                    {issues.map((x, i) => <li key={i}>{x}</li>)}
-                                                </ul>
-                                            </div>
-                                        )}
-                                        <div className="mt-3">
-                                            <button type="button" onClick={() => {
-                                                try {
-                                                    const assetDefaults = { stockMean: sm, stockStd: sd, bondMean: bm, bondStd: bd };
-                                                    localStorage.setItem('assetAssumptionDefaults', JSON.stringify(assetDefaults));
-                                                    window.dispatchEvent(new CustomEvent('app:toast', { detail: { message: 'Saved asset-assumption defaults' } }));
-                                                } catch (e) {
-                                                    console.error(e);
-                                                    window.dispatchEvent(new CustomEvent('app:toast', { detail: { message: 'Failed to save app defaults' } }));
-                                                }
-                                            }} className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-md text-sm">Save as App Defaults</button>
-                                        </div>
-                                    </>
-                                );
-                            })()}
-                        </details>
-                    </div>
+                    {/* Advanced Market Assumptions moved below person fields for better flow */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 col-span-full">
                     <div className="flex flex-col space-y-2 h-full">
                         {(Object.values(PlanType) as PlanType[]).map(type => (
@@ -261,6 +218,51 @@ export const InputForm: React.FC<InputFormProps> = ({
                     Calculates the maximum withdrawal to end with your target legacy, overriding the fixed withdrawal rate.
                 </p>
             </div>
+
+            <InputSection title="Advanced Market Assumptions" subtitle="Tweak expected returns and volatilities used for allocation-weighted returns.">
+                <div className="col-span-full">
+                    <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                        <NumberInput label="Stocks: Expected Return" suffix="%" value={(plan.stockMean ?? 8)} onChange={e => handlePlanChange('stockMean', Number(e.target.value))} />
+                        <NumberInput label="Stocks: Volatility (std dev)" suffix="%" value={(plan.stockStd ?? 15)} onChange={e => handlePlanChange('stockStd', Number(e.target.value))} />
+                        <NumberInput label="Bonds: Expected Return" suffix="%" value={(plan.bondMean ?? 3)} onChange={e => handlePlanChange('bondMean', Number(e.target.value))} />
+                        <NumberInput label="Bonds: Volatility (std dev)" suffix="%" value={(plan.bondStd ?? 6)} onChange={e => handlePlanChange('bondStd', Number(e.target.value))} />
+                    </div>
+
+                    {(() => {
+                        const sd = Number(plan.stockStd ?? 15);
+                        const bd = Number(plan.bondStd ?? 6);
+                        const sm = Number(plan.stockMean ?? 8);
+                        const bm = Number(plan.bondMean ?? 3);
+                        const issues = validateAssetDefaults({ stockMean: sm, bondMean: bm, stockStd: sd, bondStd: bd });
+
+                        return (
+                            <>
+                                <p className="text-xs text-gray-500 mt-2">These settings let you tweak the expected returns and volatilities used when calculating allocation-weighted returns for investment accounts. The plan-level Average Return still acts as a baseline and will bias these values so the overall portfolio still matches your `Avg. Return`.</p>
+                                {issues.length > 0 && (
+                                    <div className="mt-2">
+                                        <p className="text-sm text-red-600 font-medium">Market assumptions warnings:</p>
+                                        <ul className="text-sm text-red-600 list-disc list-inside">
+                                            {issues.map((x, i) => <li key={i}>{x}</li>)}
+                                        </ul>
+                                    </div>
+                                )}
+                                <div className="mt-3">
+                                    <button type="button" onClick={() => {
+                                        try {
+                                            const assetDefaults = { stockMean: sm, stockStd: sd, bondMean: bm, bondStd: bd };
+                                            localStorage.setItem('assetAssumptionDefaults', JSON.stringify(assetDefaults));
+                                            window.dispatchEvent(new CustomEvent('app:toast', { detail: { message: 'Saved asset-assumption defaults' } }));
+                                        } catch (e) {
+                                            console.error(e);
+                                            window.dispatchEvent(new CustomEvent('app:toast', { detail: { message: 'Failed to save app defaults' } }));
+                                        }
+                                    }} className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-md text-sm">Save as App Defaults</button>
+                                </div>
+                            </>
+                        );
+                    })()}
+                </div>
+            </InputSection>
             
             <div className={`grid grid-cols-1 ${isCouple ? 'md:grid-cols-2' : ''} gap-6`}>
                 <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
