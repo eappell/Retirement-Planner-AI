@@ -174,7 +174,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                     <NumberInput label="Avg. Return" suffix="%" value={plan.avgReturn} onChange={e => handlePlanChange('avgReturn', Number(e.target.value))}/>
                     <NumberInput label="Withdrawal Rate" suffix="%" value={plan.annualWithdrawalRate} onChange={e => handlePlanChange('annualWithdrawalRate', Number(e.target.value))} disabled={plan.dieWithZero}/>
                 </div>
-                <details className="mt-3">
+                <details className="mt-3 col-span-full">
                     <summary className="cursor-pointer text-sm font-medium text-gray-700">Advanced Market Assumptions</summary>
                     <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 mt-3">
                         <NumberInput label="Stocks: Expected Return" suffix="%" value={(plan.stockMean ?? 8)} onChange={e => handlePlanChange('stockMean', Number(e.target.value))} />
