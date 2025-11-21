@@ -120,9 +120,8 @@ const Header: React.FC<HeaderProps> = ({
         </button>
 
         <button type="button" onClick={onOpenSettings} title="App Settings" aria-label="App Settings" className="group relative p-2 rounded-md text-gray-600 hover:text-brand-primary hover:bg-gray-100 transition-colors">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 8a4 4 0 100 8 4 4 0 000-8z" />
-            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 12a7.5 7.5 0 00-.14-1.34l1.3-1.01a.75.75 0 00.18-.96l-1.23-2.12a.75.75 0 00-.9-.33l-1.53.62a7.5 7.5 0 00-1.16-.67l-.23-1.65A.75.75 0 0013.8 2h-2.6a.75.75 0 00-.74.63l-.23 1.65c-.4.18-.78.4-1.15.66l-1.53-.62a.75.75 0 00-.9.33L2.2 8.7a.75.75 0 00.18.96l1.3 1.01c-.08.44-.12.9-.12 1.34s.04.9.12 1.34l-1.3 1.01a.75.75 0 00-.18.96l1.23 2.12c.2.35.6.51.97.39l1.53-.62c.36.27.75.49 1.15.67l.23 1.65c.08.4.44.69.85.69h2.6c.41 0 .77-.29.85-.69l.23-1.65c.4-.18.79-.4 1.16-.67l1.53.62c.36.14.77-.04.97-.39l1.23-2.12a.75.75 0 00-.18-.96l-1.3-1.01c.08-.44.12-.9.12-1.34z" />
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 512 512" fill="currentColor" aria-hidden="true">
+            <path d="M487.4 315.7l-42.6-24.6c2.6-13.5 2.6-27.4 0-41l42.6-24.6c8.7-5 12.4-15.9 8.7-25.5l-44.8-102.6c-3.7-9.5-13.7-15.6-23.6-13.9l-50.1 9.9c-11-9.2-23-17.5-35.8-24.6L294.9.7c-7.9-4.5-18.5-.7-23.1 8.2l-58.6 101.3c-12.8 7.1-24.8 15.4-35.8 24.6L86.9 123.9c-9.9-1.7-19.9 4.4-23.6 13.9L18.5 239.4c-3.7 9.6 0 20.5 8.7 25.5l42.6 24.6c-2.6 13.5-2.6 27.4 0 41L27.2 335c-8.7 5-12.4 15.9-8.7 25.5l44.8 102.6c3.7 9.5 13.7 15.6 23.6 13.9l50.1-9.9c11 9.2 23 17.5 35.8 24.6l58.6 101.3c4.6 8.1 15.2 11.9 23.2 7.3l75.3-47.6c12.9-9.3 24.9-17.6 35.8-26.8l50.1 9.9c9.9 1.7 19.9-4.4 23.6-13.9l44.8-102.6c3.7-9.6 0-20.5-8.7-25.5zM256 336a80 80 0 1 1 0-160 80 80 0 0 1 0 160z" />
           </svg>
           <span className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-40 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-none">Settings</span>
         </button>
@@ -202,7 +201,9 @@ const Header: React.FC<HeaderProps> = ({
         </div>
 
         <button type="button" onClick={handleResetPlan} aria-label="Reset Plan" title="Reset all data and scenarios" className="group relative p-2 rounded-md text-red-600 hover:text-red-800 transition-colors hover:bg-red-100">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 6h18M8 6v12a2 2 0 002 2h4a2 2 0 002-2V6"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 11v6m4-6v6"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 512 512" fill="currentColor" aria-hidden="true">
+            <path d="M256 8C119.043 8 8 119.043 8 256s111.043 248 248 248 248-111.043 248-248S392.957 8 256 8zm99.03 324.971L324.971 375.03 256 306.059 187.029 375.03 136.97 324.971 205.941 256 136.97 187.029 187.029 136.97 256 205.941 324.971 136.97 375.03 187.029 306.059 256 375.03 324.971z" />
+          </svg>
           <span className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-40 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-none">Reset</span>
         </button>
       </div>
