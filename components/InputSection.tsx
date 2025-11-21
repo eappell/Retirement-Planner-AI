@@ -1,5 +1,6 @@
 import React from 'react';
 import useTheme from '../hooks/useTheme';
+import { SectionIcon } from './SectionIcon';
 
 interface InputSectionProps {
   title: React.ReactNode;
@@ -12,77 +13,6 @@ interface InputSectionProps {
 
 export const InputSection: React.FC<InputSectionProps> = ({ title, subtitle, titleColorClass = 'text-brand-text-primary', children, actions, gridCols = 3 }) => {
   const { theme } = useTheme();
-  const getIconForTitle = (t: React.ReactNode) => {
-    if (typeof t !== 'string') return null;
-    const key = t.toLowerCase();
-    if (key.includes('plan')) {
-      return (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-brand-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m2 0a2 2 0 012 2v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4a2 2 0 012-2h2"/></svg>
-      );
-    }
-    if (key.includes('social')) {
-      return (
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="h-6 w-6 mr-2" aria-hidden="true" focusable="false">
-          {/* Gold police-style badge with subtle inner star */}
-          <path fill="#D4AF37" d="M12 2l3 2 3 1 1 3-1 3 1 3-1 3-3 1-3 2-3-2-3-1-1-3 1-3-1-3 1-3 3-1 3-2z" />
-          <path fill="#B8860B" d="M12 7.2l1 2 2.2.3-1.6 1.4.4 2.2L12 13.2l-1.9 1-0.4-2.2L8.1 10.9 10.3 10.6 12 7.2z" />
-        </svg>
-      );
-    }
-    if (key.includes('person') || key.includes('person1') || key.includes('person2')) {
-      return (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-gray-700" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-      );
-    }
-    if (key.includes('account')) {
-      return (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-cyan-600" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7h18v10a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V5a4 4 0 018 0v2"/></svg>
-      );
-    }
-    if (key.includes('estate') || key.includes('legacy') || key.includes('gift') || key.includes('gifts')) {
-      return (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-purple-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
-          {/* Improved house icon: roof, body, door, and window */}
-          <path d="M3 11.5 L12 4 L21 11.5" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
-          <path d="M5 11.5 V19 a1 1 0 0 0 1 1 h12 a1 1 0 0 0 1-1 V11.5" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
-          <rect x="10" y="14" width="4" height="5" rx="0.5" fill="currentColor" />
-          <path d="M8 14 v-2 h2 v2" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      );
-    }
-    if (key.includes('income') || key.includes('pension') || key.includes('annuit')) {
-      return (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-green-600" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          {/* Stack of money: layered rounded rectangles with a dollar mark */}
-          <rect x="2" y="6" rx="2" width="20" height="12" fill="currentColor" opacity="0.9" />
-          <rect x="3.5" y="8" rx="1.5" width="17" height="8" fill="#ffffff" />
-          <rect x="4.5" y="9.5" rx="1" width="15" height="5" fill="#e6f9ef" />
-          <text x="12" y="12.8" textAnchor="middle" fontSize="8" fontWeight="700" fill="currentColor">$</text>
-        </svg>
-      );
-    }
-    if (key.includes('annual')) {
-      // Excel-style table icon for annual projection sections
-      return (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-green-600" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <rect x="3" y="4" width="18" height="16" rx="1" ry="1" strokeWidth={1.5} />
-          <path d="M3 9h18" strokeWidth={1.5} />
-          <path d="M9 4v16" strokeWidth={1.5} />
-        </svg>
-      );
-    }
-    if (key.includes('charts') || key.includes('analysis') || key.includes('projection') || key.includes('monte')) {
-      return (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-yellow-600" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3v18h18"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 13l3-3 4 4 5-7"/></svg>
-      );
-    }
-    // default generic icon
-    return (
-      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-brand-text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16"/></svg>
-    );
-  };
-
-  const icon = getIconForTitle(title);
 
   const isAnnual = typeof title === 'string' && title.toLowerCase().includes('annual');
   const effectiveTitleClass = theme === 'dark' && isAnnual ? 'text-white' : titleColorClass;
@@ -91,7 +21,7 @@ export const InputSection: React.FC<InputSectionProps> = ({ title, subtitle, tit
     <div className="bg-brand-surface p-6 rounded-lg shadow-sm mb-6">
       <div className="flex justify-between items-start border-b border-gray-200 pb-3 mb-4">
         <div>
-            <h3 className={`text-xl font-bold ${effectiveTitleClass} flex items-center`}>{icon}<span>{title}</span></h3>
+            <h3 className={`text-xl font-bold ${effectiveTitleClass} flex items-center`}><SectionIcon title={title} titleColorClass={titleColorClass} /><span>{title}</span></h3>
             {subtitle && <p className="text-sm text-brand-text-secondary mt-1">{subtitle}</p>}
         </div>
         {actions && <div className="flex-shrink-0 ml-4">{actions}</div>}
