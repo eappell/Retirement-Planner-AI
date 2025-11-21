@@ -105,23 +105,27 @@ const Header: React.FC<HeaderProps> = ({
 
       <div className="flex items-center space-x-2">
         <button type="button" onClick={() => setIsManualOpen(true)} aria-label="Open User Manual" title="User Manual" className="group relative p-2 rounded-md text-gray-600 hover:text-brand-primary hover:bg-gray-100 transition-colors">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 20l8-4V6a2 2 0 00-2-2c-2 0-4 1-6 1s-4-1-6-1A2 2 0 002 6v10l8 4z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13.494" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3 5.5a2 2 0 012-2h3.5a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2v-12z" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M21 5.5a2 2 0 00-2-2h-3.5a2 2 0 00-2 2v12a2 2 0 002 2H19a2 2 0 002-2v-12z" />
+          </svg>
           <span className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-40 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-none">User Manual</span>
         </button>
 
         <button type="button" onClick={handlePrint} aria-label="Print" title="Print" className="group relative p-2 rounded-md text-gray-600 hover:text-brand-primary hover:bg-gray-100 transition-colors">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
-            <rect x="5" y="7" width="14" height="6" rx="1.5" strokeWidth={2} />
-            <rect x="7" y="13" width="10" height="5" rx="1" strokeWidth={2} />
-            <rect x="9" y="3" width="6" height="6" rx="0.5" strokeWidth={2} />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20h6" />
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+            <rect x="6" y="9" width="12" height="6" rx="2" strokeLinecap="round" strokeLinejoin="round" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 13v5a1 1 0 001 1h10a1 1 0 001-1v-5" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 9V6a3 3 0 013-3h0a3 3 0 013 3v3" />
           </svg>
           <span className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-40 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-none">Print</span>
         </button>
 
         <button type="button" onClick={onOpenSettings} title="App Settings" aria-label="App Settings" className="group relative p-2 rounded-md text-gray-600 hover:text-brand-primary hover:bg-gray-100 transition-colors">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 512 512" fill="currentColor" aria-hidden="true">
-            <path d="M487.4 315.7l-42.6-24.6c2.6-13.5 2.6-27.4 0-41l42.6-24.6c8.7-5 12.4-15.9 8.7-25.5l-44.8-102.6c-3.7-9.5-13.7-15.6-23.6-13.9l-50.1 9.9c-11-9.2-23-17.5-35.8-24.6L294.9.7c-7.9-4.5-18.5-.7-23.1 8.2l-58.6 101.3c-12.8 7.1-24.8 15.4-35.8 24.6L86.9 123.9c-9.9-1.7-19.9 4.4-23.6 13.9L18.5 239.4c-3.7 9.6 0 20.5 8.7 25.5l42.6 24.6c-2.6 13.5-2.6 27.4 0 41L27.2 335c-8.7 5-12.4 15.9-8.7 25.5l44.8 102.6c3.7 9.5 13.7 15.6 23.6 13.9l50.1-9.9c11 9.2 23 17.5 35.8 24.6l58.6 101.3c4.6 8.1 15.2 11.9 23.2 7.3l75.3-47.6c12.9-9.3 24.9-17.6 35.8-26.8l50.1 9.9c9.9 1.7 19.9-4.4 23.6-13.9l44.8-102.6c3.7-9.6 0-20.5-8.7-25.5zM256 336a80 80 0 1 1 0-160 80 80 0 0 1 0 160z" />
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l.149.458a1 1 0 00.95.69h.48c.969 0 1.371 1.24.588 1.81l-.39.28a1 1 0 00-.364 1.118l.15.46c.3.92-.755 1.688-1.54 1.16l-.41-.3a1 1 0 00-1.176 0l-.41.3c-.785.528-1.84-.24-1.54-1.16l.15-.46a1 1 0 00-.364-1.118l-.39-.28C6.9 6.345 7.302 5.105 8.27 5.105h.48a1 1 0 00.95-.69l.149-.458z" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 8.5a3.5 3.5 0 100 7 3.5 3.5 0 000-7z" />
           </svg>
           <span className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-40 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-none">Settings</span>
         </button>
@@ -163,15 +167,23 @@ const Header: React.FC<HeaderProps> = ({
 
                 <div className="col-span-full pt-2 border-t">
                   <div className="grid grid-cols-2 gap-2">
-                    <button onClick={handleDownloadAndClose} className="flex items-center justify-center w-full px-4 py-2 text-sm rounded-md btn-download">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v9m0 0l3-3m-3 3l-3-3"/><rect x="3" y="19" width="18" height="2" rx="1"/></svg>
-                      <span>Download</span>
-                    </button>
-                    <label className="flex items-center justify-center w-full px-4 py-2 text-sm rounded-md cursor-pointer btn-upload">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 21V12m0 0l-3 3m3-3l3 3"/><rect x="3" y="3" width="18" height="2" rx="1"/></svg>
-                      <span>Upload</span>
-                      <input type="file" onChange={handleUploadAndClose} accept=".retire" className="hidden" />
-                    </label>
+                            <button onClick={handleDownloadAndClose} className="flex items-center justify-center w-full px-4 py-2 text-sm rounded-md btn-download">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v13" />
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 9.75L12 13.5l3.75-3.75" />
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 19.5h13.5" />
+                              </svg>
+                              <span>Download</span>
+                            </button>
+                            <label className="flex items-center justify-center w-full px-4 py-2 text-sm rounded-md cursor-pointer btn-upload">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 21V8" />
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 14.25L12 10.5l3.75 3.75" />
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 4.5h13.5" />
+                              </svg>
+                              <span>Upload</span>
+                              <input type="file" onChange={handleUploadAndClose} accept=".retire" className="hidden" />
+                            </label>
                   </div>
                 </div>
 
@@ -190,7 +202,11 @@ const Header: React.FC<HeaderProps> = ({
           title="View disclaimer"
           aria-label="View disclaimer"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 16h.01" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 2a10 10 0 100 20 10 10 0 000-20z" />
+            </svg>
           <span className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-40 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-none">Disclaimer</span>
         </button>
         <div className="inline-block">
