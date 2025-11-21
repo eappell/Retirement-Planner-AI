@@ -2,8 +2,18 @@ import React from 'react';
 import { Scenario } from '../types';
 import { SelectInput, TextInput } from './FormControls';
 import ThemeToggle from './ThemeToggle';
-import { Bars3Icon, ArrowDownTrayIcon, ArrowUpTrayIcon, InformationCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
-import { BookOpenIcon, PrinterIcon, Cog6ToothIcon } from '@heroicons/react/24/solid';
+import { 
+  QuestionMarkCircleIcon, 
+  PrinterIcon, 
+  AdjustmentsHorizontalIcon, 
+  Square3Stack3DIcon,
+  ShieldExclamationIcon, 
+  SunIcon, 
+  MoonIcon, 
+  XCircleIcon,
+  ArrowDownTrayIcon, 
+  ArrowUpTrayIcon 
+} from '@heroicons/react/24/outline';
 
 interface HeaderProps {
   activeScenario: Scenario;
@@ -107,7 +117,7 @@ const Header: React.FC<HeaderProps> = ({
 
       <div className="flex items-center space-x-2">
         <button type="button" onClick={() => setIsManualOpen(true)} aria-label="Open User Manual" title="User Manual" className="group relative p-2 rounded-md text-gray-600 hover:text-brand-primary hover:bg-gray-100 transition-colors">
-          <BookOpenIcon className="h-5 w-5" aria-hidden="true" />
+          <QuestionMarkCircleIcon className="h-5 w-5" aria-hidden="true" />
           <span className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-40 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-none">User Manual</span>
         </button>
 
@@ -117,13 +127,13 @@ const Header: React.FC<HeaderProps> = ({
         </button>
 
         <button type="button" onClick={onOpenSettings} title="App Settings" aria-label="App Settings" className="group relative p-2 rounded-md text-gray-600 hover:text-brand-primary hover:bg-gray-100 transition-colors">
-          <Cog6ToothIcon className="h-5 w-5" aria-hidden="true" />
+          <AdjustmentsHorizontalIcon className="h-5 w-5" aria-hidden="true" />
           <span className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-40 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-none">Settings</span>
         </button>
 
         <div className="relative" ref={scenarioMenuRef}>
           <button type="button" onClick={() => setIsScenarioMenuOpen(prev => !prev)} className="group relative p-2 rounded-md text-gray-600 hover:text-brand-primary hover:bg-gray-100 transition-colors">
-            <Bars3Icon className="h-5 w-5 text-gray-700" aria-hidden="true" />
+            <Square3Stack3DIcon className="h-5 w-5 text-gray-700" aria-hidden="true" />
             <span className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-40 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-none">Scenarios</span>
           </button>
 
@@ -180,7 +190,7 @@ const Header: React.FC<HeaderProps> = ({
           title="View disclaimer"
           aria-label="View disclaimer"
         >
-          <InformationCircleIcon className="h-5 w-5" aria-hidden="true" />
+          <ShieldExclamationIcon className="h-5 w-5" aria-hidden="true" />
           <span className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-40 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-none">Disclaimer</span>
         </button>
         <div className="inline-block">
