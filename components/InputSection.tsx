@@ -22,10 +22,10 @@ export const InputSection: React.FC<InputSectionProps> = ({ title, subtitle, tit
     }
     if (key.includes('social')) {
       return (
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="h-6 w-6 mr-2 text-blue-600" aria-hidden="true" focusable="false">
-          {/* Police-style badge shape with central star */}
-          <path fill="currentColor" d="M12 2l2.1 3.6L18 7l-2 2 .5 4.5L12 12.8 7.5 13.5 8 9 6 7l3.9-1.4L12 2z" />
-          <path fill="currentColor" d="M12 13.2l3.4 1.8-.6 2.7L12 16.5l-2.8 1.2-.6-2.7L12 13.2z" opacity="0.95" />
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="h-6 w-6 mr-2" aria-hidden="true" focusable="false">
+          {/* Gold police-style badge with subtle inner star */}
+          <path fill="#D4AF37" d="M12 2l3 2 3 1 1 3-1 3 1 3-1 3-3 1-3 2-3-2-3-1-1-3 1-3-1-3 1-3 3-1 3-2z" />
+          <path fill="#B8860B" d="M12 7.2l1 2 2.2.3-1.6 1.4.4 2.2L12 13.2l-1.9 1-0.4-2.2L8.1 10.9 10.3 10.6 12 7.2z" />
         </svg>
       );
     }
