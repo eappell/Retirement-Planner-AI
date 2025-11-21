@@ -34,3 +34,25 @@
   border-color: rgba(255,255,255,0.06) !important;
   box-shadow: 0 6px 18px rgba(0,0,0,0.6) !important;
 }
+
+/* Keep net worth chart visually compact */
+.networth-chart {
+  max-height: 200px;
+}
+
+/* Smaller area chart styling */
+.small-area-chart {
+  max-height: 140px;
+}
+
+.small-area-chart text {
+  font-size: 10px;
+  fill: #6b7280; /* gray-500 */
+}
+
+/* Tooltip offsets for charts (use CSS variables to allow positioning without inline styles) */
+.chart-tooltip {
+  position: absolute;
+  pointer-events: none;
+  transform: translate(var(--tp-x, 0), var(--tp-y, 0));
+}

@@ -23,10 +23,6 @@ export const ThemeProvider: React.FC<React.PropsWithChildren<{}>> = ({ children 
     } catch (e) {
       // ignore localStorage errors
     }
-
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      setTheme('dark');
-    }
   }, []);
 
   useEffect(() => {
