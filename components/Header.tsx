@@ -120,9 +120,9 @@ const Header: React.FC<HeaderProps> = ({
         </button>
 
         <button type="button" onClick={onOpenSettings} title="App Settings" aria-label="App Settings" className="group relative p-2 rounded-md text-gray-600 hover:text-brand-primary hover:bg-gray-100 transition-colors">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8a4 4 0 100 8 4 4 0 000-8z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06A2 2 0 115.28 17.9l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09c.67 0 1.25-.41 1.51-1a1.65 1.65 0 00-.33-1.82L4.3 6.8A2 2 0 116.9 4.28l.06.06a1.65 1.65 0 001.82.33c.59-.27 1.2-.22 1.8.05l.08.03A7.5 7.5 0 0112 6.5c.9 0 1.78.12 2.6.35.59.27 1.21.32 1.8.05.68-.32 1.5-.02 1.96.45l.06.06a2 2 0 11-2.83 2.83l-.06-.06c-.37-.37-.56-.38-.94-.09-.45.34-.79.79-1.03 1.29-.16.32-.12.7.1.99l.06.06A2 2 0 0119.4 15z" />
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a1.75 1.75 0 012.04 0l.67.48c.6.43 1.3.65 2.03.64l1.06-.02a1.75 1.75 0 011.73 1.09l.27.77c.23.66.68 1.21 1.27 1.6l.59.39a1.75 1.75 0 01.52 2.33l-.43.76c-.35.62-.52 1.33-.49 2.04l.03 1.06a1.75 1.75 0 01-1.09 1.73l-.77.27a3.5 3.5 0 00-1.6 1.27l-.39.59a1.75 1.75 0 01-2.33.52l-.76-.43a1.75 1.75 0 00-2.04-.49l-1.06.03a1.75 1.75 0 01-1.73-1.09l-.27-.77a3.5 3.5 0 00-1.27-1.6l-.59-.39a1.75 1.75 0 01-.52-2.33l.43-.76a1.75 1.75 0 00.49-2.04l-.03-1.06A1.75 1.75 0 018.5 4.8l.77-.27a3.5 3.5 0 001.6-1.27l.39-.59a1.75 1.75 0 012.33-.52l.76.43z" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 15.75a3.75 3.75 0 100-7.5 3.75 3.75 0 000 7.5z" />
           </svg>
           <span className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-40 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-none">Settings</span>
         </button>
