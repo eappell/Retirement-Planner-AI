@@ -42,8 +42,11 @@ export const InputSection: React.FC<InputSectionProps> = ({ title, subtitle, tit
     if (key.includes('estate') || key.includes('legacy') || key.includes('gift') || key.includes('gifts')) {
       return (
         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-purple-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 11.5L12 4l9 7.5V20a1 1 0 01-1 1h-5v-5H9v5H4a1 1 0 01-1-1v-8.5z" />
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 21v-6h6v6" />
+          {/* Improved house icon: roof, body, door, and window */}
+          <path d="M3 11.5 L12 4 L21 11.5" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M5 11.5 V19 a1 1 0 0 0 1 1 h12 a1 1 0 0 0 1-1 V11.5" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+          <rect x="10" y="14" width="4" height="5" rx="0.5" fill="currentColor" />
+          <path d="M8 14 v-2 h2 v2" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       );
     }
