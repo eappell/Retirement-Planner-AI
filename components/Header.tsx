@@ -2,6 +2,7 @@ import React from 'react';
 import { Scenario } from '../types';
 import { SelectInput, TextInput } from './FormControls';
 import ThemeToggle from './ThemeToggle';
+import { BookOpenIcon, PrinterIcon, Cog6ToothIcon, Bars3Icon, ArrowDownTrayIcon, ArrowUpTrayIcon, InformationCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
 
 interface HeaderProps {
   activeScenario: Scenario;
@@ -105,39 +106,23 @@ const Header: React.FC<HeaderProps> = ({
 
       <div className="flex items-center space-x-2">
         <button type="button" onClick={() => setIsManualOpen(true)} aria-label="Open User Manual" title="User Manual" className="group relative p-2 rounded-md text-gray-600 hover:text-brand-primary hover:bg-gray-100 transition-colors">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13.494" />
-            <path strokeLinecap="round" strokeLinejoin="round" d="M3 5.5a2 2 0 012-2h3.5a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2v-12z" />
-            <path strokeLinecap="round" strokeLinejoin="round" d="M21 5.5a2 2 0 00-2-2h-3.5a2 2 0 00-2 2v12a2 2 0 002 2H19a2 2 0 002-2v-12z" />
-          </svg>
+          <BookOpenIcon className="h-5 w-5" aria-hidden="true" />
           <span className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-40 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-none">User Manual</span>
         </button>
 
         <button type="button" onClick={handlePrint} aria-label="Print" title="Print" className="group relative p-2 rounded-md text-gray-600 hover:text-brand-primary hover:bg-gray-100 transition-colors">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden="true">
-            <rect x="6" y="9" width="12" height="6" rx="2" strokeLinecap="round" strokeLinejoin="round" />
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6 13v5a1 1 0 001 1h10a1 1 0 001-1v-5" />
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 9V6a3 3 0 013-3h0a3 3 0 013 3v3" />
-          </svg>
+          <PrinterIcon className="h-5 w-5" aria-hidden="true" />
           <span className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-40 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-none">Print</span>
         </button>
 
         <button type="button" onClick={onOpenSettings} title="App Settings" aria-label="App Settings" className="group relative p-2 rounded-md text-gray-600 hover:text-brand-primary hover:bg-gray-100 transition-colors">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l.149.458a1 1 0 00.95.69h.48c.969 0 1.371 1.24.588 1.81l-.39.28a1 1 0 00-.364 1.118l.15.46c.3.92-.755 1.688-1.54 1.16l-.41-.3a1 1 0 00-1.176 0l-.41.3c-.785.528-1.84-.24-1.54-1.16l.15-.46a1 1 0 00-.364-1.118l-.39-.28C6.9 6.345 7.302 5.105 8.27 5.105h.48a1 1 0 00.95-.69l.149-.458z" />
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 8.5a3.5 3.5 0 100 7 3.5 3.5 0 000-7z" />
-          </svg>
+          <Cog6ToothIcon className="h-5 w-5" aria-hidden="true" />
           <span className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-40 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-none">Settings</span>
         </button>
 
         <div className="relative" ref={scenarioMenuRef}>
           <button type="button" onClick={() => setIsScenarioMenuOpen(prev => !prev)} className="group relative p-2 rounded-md text-gray-600 hover:text-brand-primary hover:bg-gray-100 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
-              <rect x="3" y="4" width="18" height="6" rx="1" ry="1" />
-              <rect x="3" y="13" width="18" height="6" rx="1" ry="1" />
-              <path d="M7 7v2" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
-              <path d="M7 16v1" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
-            </svg>
+            <Bars3Icon className="h-5 w-5 text-gray-700" aria-hidden="true" />
             <span className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-40 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-none">Scenarios</span>
           </button>
 
@@ -168,19 +153,11 @@ const Header: React.FC<HeaderProps> = ({
                 <div className="col-span-full pt-2 border-t">
                   <div className="grid grid-cols-2 gap-2">
                             <button onClick={handleDownloadAndClose} className="flex items-center justify-center w-full px-4 py-2 text-sm rounded-md btn-download">
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden="true">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v13" />
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 9.75L12 13.5l3.75-3.75" />
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 19.5h13.5" />
-                              </svg>
+                              <ArrowDownTrayIcon className="h-4 w-4 mr-2" aria-hidden="true" />
                               <span>Download</span>
                             </button>
                             <label className="flex items-center justify-center w-full px-4 py-2 text-sm rounded-md cursor-pointer btn-upload">
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden="true">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 21V8" />
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 14.25L12 10.5l3.75 3.75" />
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 4.5h13.5" />
-                              </svg>
+                              <ArrowUpTrayIcon className="h-4 w-4 mr-2" aria-hidden="true" />
                               <span>Upload</span>
                               <input type="file" onChange={handleUploadAndClose} accept=".retire" className="hidden" />
                             </label>
@@ -202,11 +179,7 @@ const Header: React.FC<HeaderProps> = ({
           title="View disclaimer"
           aria-label="View disclaimer"
         >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4" />
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 16h.01" />
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 2a10 10 0 100 20 10 10 0 000-20z" />
-            </svg>
+          <InformationCircleIcon className="h-5 w-5" aria-hidden="true" />
           <span className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-40 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-none">Disclaimer</span>
         </button>
         <div className="inline-block">
@@ -217,9 +190,7 @@ const Header: React.FC<HeaderProps> = ({
         </div>
 
         <button type="button" onClick={handleResetPlan} aria-label="Reset Plan" title="Reset all data and scenarios" className="group relative p-2 rounded-md text-red-600 hover:text-red-800 transition-colors hover:bg-red-100">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 512 512" fill="currentColor" aria-hidden="true">
-            <path d="M256 8C119.043 8 8 119.043 8 256s111.043 248 248 248 248-111.043 248-248S392.957 8 256 8zm99.03 324.971L324.971 375.03 256 306.059 187.029 375.03 136.97 324.971 205.941 256 136.97 187.029 187.029 136.97 256 205.941 324.971 136.97 375.03 187.029 306.059 256 375.03 324.971z" />
-          </svg>
+          <XCircleIcon className="h-5 w-5" aria-hidden="true" />
           <span className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-40 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-none">Reset</span>
         </button>
       </div>
