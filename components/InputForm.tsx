@@ -310,8 +310,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                     <div className={`col-span-full grid grid-cols-1 ${isCouple ? 'md:grid-cols-2' : ''} gap-6`}>
                         <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
                             <h3 className="font-semibold text-blue-800 mb-3 flex items-center">
-                                <span className="inline-flex items-center justify-center mr-2 px-2 py-0.5 rounded-full bg-blue-600 text-white text-[10px] font-semibold" aria-hidden="true">SS</span>
-                                <span className="sr-only">Social Security</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-blue-700" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
                                 {plan.person1.name}
                             </h3>
                             <div className="grid grid-cols-2 gap-4">
@@ -325,8 +324,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                         {isCouple && (
                             <div className="bg-rose-50 p-4 rounded-lg border border-rose-200">
                                 <h3 className="font-semibold text-rose-800 mb-3 flex items-center">
-                                    <span className="inline-flex items-center justify-center mr-2 px-2 py-0.5 rounded-full bg-rose-600 text-white text-[10px] font-semibold" aria-hidden="true">SS</span>
-                                    <span className="sr-only">Social Security</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-rose-700" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
                                     {plan.person2.name}
                                 </h3>
                                 <div className="grid grid-cols-2 gap-4">

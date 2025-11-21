@@ -20,7 +20,12 @@ export const InputSection: React.FC<InputSectionProps> = ({ title, subtitle, tit
         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-brand-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m2 0a2 2 0 012 2v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4a2 2 0 012-2h2"/></svg>
       );
     }
-    if (key.includes('person') || key.includes('social') || key.includes('person1') || key.includes('person2')) {
+    if (key.includes('social')) {
+      return (
+        <span className="inline-flex items-center justify-center mr-2 px-2 py-0.5 rounded-full bg-blue-600 text-white text-[12px] font-semibold" aria-hidden="true">SS</span>
+      );
+    }
+    if (key.includes('person') || key.includes('person1') || key.includes('person2')) {
       return (
         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-gray-700" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
       );
