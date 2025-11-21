@@ -1,4 +1,4 @@
-import { RetirementPlan } from '../types';
+import { RetirementPlan, MonteCarloResult } from '../types';
 import { runSimulation } from './simulationService';
 
 export const runMonteCarloSimulation = (
@@ -76,3 +76,40 @@ export const runMonteCarloSimulation = (
         runoutProbByYear,
     } as any;
 };
+
+    // Async wrapper that will attempt to offload heavy aggregation to a Web Worker when
+    // running in a browser environment that supports it. Falls back to the synchronous
+    // `runMonteCarloSimulation` implementation above.
+    export const runMonteCarloSimulationAsync = async (
+        plan: RetirementPlan,
+        numSimulations: number,
+        volatility: number
+    ): Promise<MonteCarloResult> => {
+        if (typeof Worker !== 'undefined') {
+            return await new Promise<MonteCarloResult>((resolve, reject) => {
+                try {
+                    const worker = new Worker(new URL('../workers/monteCarloWorker.ts', import.meta.url), { type: 'module' });
+
+                    worker.onmessage = (e: MessageEvent<any>) => {
+                        if (e.data?.type === 'complete') {
+                            worker.terminate();
+                            resolve(e.data);
+                        }
+                    };
+
+                    worker.onerror = (err) => {
+                        worker.terminate();
+                        reject(err);
+                    };
+
+                    worker.postMessage({ type: 'start', plan, numSimulations, volatility });
+                } catch (err) {
+                    reject(err);
+                }
+            });
+        }
+
+        // Fallback: synchronous (main-thread) approach
+        const sync = runMonteCarloSimulation(plan, numSimulations, volatility) as any;
+        return Promise.resolve(sync as MonteCarloResult);
+    };

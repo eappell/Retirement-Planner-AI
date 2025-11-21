@@ -36,7 +36,7 @@ export const useMonteCarloWorker = () => {
         workerRef.current = worker;
 
         worker.onmessage = (e: MessageEvent<MonteCarloWorkerResponse>) => {
-            const { type, progress: workerProgress, successRate, outcomes } = e.data;
+            const { type, progress: workerProgress, successRate, outcomes, percentileSeries, runoutProbByYear, useFatTails, fatTailDf } = e.data;
 
             if (type === 'progress' && workerProgress !== undefined) {
                 setProgress(workerProgress);
@@ -44,7 +44,11 @@ export const useMonteCarloWorker = () => {
                 setResults({
                     successRate,
                     outcomes,
-                });
+                    percentileSeries,
+                    runoutProbByYear,
+                    useFatTails,
+                    fatTailDf,
+                } as any);
                 setIsLoading(false);
                 setProgress(100);
                 worker.terminate();
