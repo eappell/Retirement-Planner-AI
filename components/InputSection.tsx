@@ -35,6 +35,16 @@ export const InputSection: React.FC<InputSectionProps> = ({ title, subtitle, tit
         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-amber-600" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 1.343-3 3v6h6v-6c0-1.657-1.343-3-3-3z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 20h14"/></svg>
       );
     }
+    if (key.includes('annual')) {
+      // Excel-style table icon for annual projection sections
+      return (
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-green-600" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <rect x="3" y="4" width="18" height="16" rx="1" ry="1" strokeWidth={1.5} />
+          <path d="M3 9h18" strokeWidth={1.5} />
+          <path d="M9 4v16" strokeWidth={1.5} />
+        </svg>
+      );
+    }
     if (key.includes('charts') || key.includes('analysis') || key.includes('projection') || key.includes('monte')) {
       return (
         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-yellow-600" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3v18h18"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 13l3-3 4 4 5-7"/></svg>

@@ -117,9 +117,10 @@ const NetWorthScenarioChart: React.FC<{ scenarioData: ScenarioData[]; giftsByYea
 
     if (scenarioData.length < 2) return null;
 
-    const width = 500;
-    const height = 250;
-    const padding = { top: 20, right: 20, bottom: 30, left: 60 };
+    // Compact chart sizing for a tighter layout
+    const width = 420;
+    const height = 180;
+    const padding = { top: 16, right: 12, bottom: 26, left: 50 };
 
     const maxNetWorth = Math.max(...scenarioData.map(d => d.optimistic));
     const minYear = scenarioData[0].year;
@@ -158,7 +159,7 @@ const NetWorthScenarioChart: React.FC<{ scenarioData: ScenarioData[]; giftsByYea
     
     return (
         <div>
-            <h4 className="font-semibold text-center mb-2">Projected Net Worth Scenarios</h4>
+            <h4 className="font-semibold text-center mb-2 text-sm">Projected Net Worth Scenarios</h4>
             <div className="relative">
                  <svg viewBox={`0 0 ${width} ${height}`} className="w-full networth-chart">
                     {/* Y Axis */}
@@ -185,9 +186,9 @@ const NetWorthScenarioChart: React.FC<{ scenarioData: ScenarioData[]; giftsByYea
                     </g>
 
                     {/* Lines */}
-                    <path d={createPath('pessimistic')} fill="none" stroke="#fca5a5" strokeWidth="2" strokeDasharray="4" />
-                    <path d={createPath('average')} fill="none" stroke="#6366f1" strokeWidth="2" />
-                    <path d={createPath('optimistic')} fill="none" stroke="#22c55e" strokeWidth="2" strokeDasharray="4" />
+                    <path d={createPath('pessimistic')} fill="none" stroke="#fca5a5" strokeWidth="1.5" strokeDasharray="4" />
+                    <path d={createPath('average')} fill="none" stroke="#6366f1" strokeWidth="1.8" />
+                    <path d={createPath('optimistic')} fill="none" stroke="#22c55e" strokeWidth="1.5" strokeDasharray="4" />
 
                     {/* Interactive overlay */}
                     <rect 
@@ -222,11 +223,98 @@ const NetWorthScenarioChart: React.FC<{ scenarioData: ScenarioData[]; giftsByYea
                     </div>
                 )}
             </div>
-             <div className="flex justify-center space-x-4 text-xs mt-2">
+            <div className="flex justify-center space-x-4 text-xs mt-2">
                 <span className="flex items-center"><div className="w-8 h-0.5 bg-green-500/50 border-y border-dashed border-green-500 mr-2"></div>Optimistic (+2%)</span>
                 <span className="flex items-center"><div className="w-8 h-0.5 bg-indigo-500 mr-2"></div>Average</span>
                 <span className="flex items-center"><div className="w-8 h-0.5 bg-red-400/50 border-y border-dashed border-red-400 mr-2"></div>Pessimistic (-2%)</span>
             </div>
+        </div>
+    );
+};
+
+// --- Compact Average Area Chart (lightweight, no external deps) ---
+const AverageAreaChart: React.FC<{ scenarioData: ScenarioData[] }> = ({ scenarioData }) => {
+    if (!scenarioData || scenarioData.length < 2) return null;
+
+    const w = 420;
+    const h = 120;
+    const pad = { top: 8, right: 8, bottom: 20, left: 36 };
+
+    const maxVal = Math.max(...scenarioData.map(d => d.average));
+    const minYear = scenarioData[0].year;
+    const maxYear = scenarioData[scenarioData.length - 1].year;
+
+    const x = (year: number) => pad.left + (year - minYear) / (maxYear - minYear) * (w - pad.left - pad.right);
+    const y = (val: number) => h - pad.bottom - (val / maxVal) * (h - pad.top - pad.bottom);
+
+    const linePath = scenarioData.map((d, i) => `${i === 0 ? 'M' : 'L'} ${x(d.year)} ${y(d.average)}`).join(' ');
+    const areaPath = `${scenarioData.map((d, i) => `${i === 0 ? 'M' : 'L'} ${x(d.year)} ${y(d.average)}`).join(' ')} L ${x(maxYear)} ${h - pad.bottom} L ${x(minYear)} ${h - pad.bottom} Z`;
+
+    const [tooltip, setTooltip] = React.useState<{ x: number; y: number; data: ScenarioData } | null>(null);
+
+    const handleMouseMove = (e: React.MouseEvent<SVGRectElement>) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        if (!rect.width) return;
+        const svgX = (e.clientX - rect.left) * (w / rect.width);
+        const chartAreaWidth = w - pad.left - pad.right;
+        const positionInChart = svgX - pad.left;
+        const ratio = Math.max(0, Math.min(1, positionInChart / chartAreaWidth));
+        const yearIndex = Math.round(ratio * (scenarioData.length - 1));
+        const dataPoint = scenarioData[yearIndex];
+        if (dataPoint) {
+            setTooltip({ x: (e.clientX - rect.left), y: (e.clientY - rect.top), data: dataPoint });
+        }
+    };
+
+    return (
+        <div className="relative">
+            <h4 className="font-semibold text-center mb-2 text-sm">Avg Net Worth Trend (Area)</h4>
+            <svg viewBox={`0 0 ${w} ${h}`} className="w-full small-area-chart">
+                <defs>
+                    <linearGradient id="avgGrad" x1="0" x2="0" y1="0" y2="1">
+                        <stop offset="0%" stopColor="#6366f1" stopOpacity={0.18} />
+                        <stop offset="100%" stopColor="#6366f1" stopOpacity={0.02} />
+                    </linearGradient>
+                </defs>
+                {/* area */}
+                <path d={areaPath} fill="url(#avgGrad)" stroke="none" />
+                {/* line */}
+                <path d={linePath} fill="none" stroke="#6366f1" strokeWidth={1.5} />
+
+                {/* X axis labels */}
+                {scenarioData.filter((_, i) => i % Math.ceil(scenarioData.length / 4) === 0).map(d => (
+                    <text key={d.year} x={x(d.year)} y={h - pad.bottom + 14} textAnchor="middle" className="text-xs text-gray-500">{d.year}</text>
+                ))}
+
+                {/* interactive overlay */}
+                <rect
+                    x={pad.left}
+                    y={pad.top}
+                    width={w - pad.left - pad.right}
+                    height={h - pad.top - pad.bottom}
+                    fill="transparent"
+                    onMouseMove={handleMouseMove}
+                    onMouseLeave={() => setTooltip(null)}
+                />
+
+                {/* marker */}
+                {tooltip && (
+                    <g transform={`translate(${x(tooltip.data.year)}, 0)`}> 
+                        <line y1={pad.top} y2={h - pad.bottom} stroke="#9ca3af" strokeDasharray="4" />
+                        <circle cx={0} cy={y(tooltip.data.average)} r={3} fill="#6366f1" />
+                    </g>
+                )}
+            </svg>
+
+            {tooltip && (
+                <div
+                    className="tooltip-popup chart-tooltip"
+                    style={{ ['--tp-x' as any]: `${tooltip.x + 10}px`, ['--tp-y' as any]: `${tooltip.y - 40}px` }}
+                >
+                    <p className="font-bold mb-1">{tooltip.data.year}</p>
+                    <p>Avg Net Worth: {formatCurrencyShort(tooltip.data.average)}</p>
+                </div>
+            )}
         </div>
     );
 };
@@ -292,9 +380,16 @@ export const DynamicCharts: React.FC<DynamicChartsProps> = ({ projectionData, pl
     });
 
     return (
-        <div className="space-y-8">
-            <NetWorthScenarioChart scenarioData={scenarioData} giftsByYear={giftsByYear} />
-            <IncomeBreakdownChart projectionData={retirementProjections} />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="col-span-1">
+                <NetWorthScenarioChart scenarioData={scenarioData} giftsByYear={giftsByYear} />
+            </div>
+            <div className="col-span-1">
+                <AverageAreaChart scenarioData={scenarioData} />
+            </div>
+            <div className="col-span-1 sm:col-span-2">
+                <IncomeBreakdownChart projectionData={retirementProjections} />
+            </div>
         </div>
     );
 };

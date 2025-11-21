@@ -148,6 +148,7 @@ export const AnalysisSections: React.FC<AnalysisSectionsProps> = ({
                     onRunSimulation={handleRunSimulation}
                     results={monteCarloResults}
                     isLoading={isMcLoading}
+                    plan={plan}
                 />
             </div>
         </InputSection>

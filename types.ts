@@ -183,6 +183,10 @@ export interface MonteCarloResult {
   // Metadata about sampling used for this run
   useFatTails?: boolean;
   fatTailDf?: number;
+  // Percentile series over time (e.g., 10th/50th/90th percentiles per year)
+  percentileSeries?: Array<{ year: number; age1?: number; p10: number; p50: number; p90: number }>;
+  // Probability of running out by year (percentage 0-100)
+  runoutProbByYear?: Array<{ year: number; age1?: number; runoutPct: number }>;
 }
 
 // --- Scenario Management Types ---
