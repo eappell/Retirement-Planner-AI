@@ -339,12 +339,12 @@ const IncomeBreakdownChart: React.FC<{ projectionData: YearlyProjection[] }> = (
     return (
         <div>
             <h4 className="font-semibold text-center mb-2 text-brand-text-primary">Income Breakdown (First Year of Retirement)</h4>
-            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-8 flex overflow-hidden">
+            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-8 flex overflow-hidden border-2 border-gray-300 dark:border-gray-600">
                 {incomeSources.map(source => (
                     <div 
                         key={source.label}
                         className={`${source.color} transition-all duration-500`}
-                        style={{ width: `${(source.value / totalIncome) * 100}%` }}
+                        style={{ width: `${(source.value / totalIncome) * 100}%`, minWidth: '2px' }}
                         title={`${source.label}: ${formatCurrencyShort(source.value)}`}
                     ></div>
                 ))}
