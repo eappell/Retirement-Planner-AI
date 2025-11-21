@@ -38,8 +38,8 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ onRunS
             )}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
                 <div className="flex flex-col">
-                    <label className="mb-1 text-sm font-medium text-brand-text-secondary">Simulations</label>
-                    <select value={numSimulations} onChange={e => setNumSimulations(Number(e.target.value))} className="w-full px-2 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-brand-primary focus:border-transparent bg-white text-sm">
+                    <label htmlFor="mc-simulations" className="mb-1 text-sm font-medium text-brand-text-secondary">Simulations</label>
+                    <select id="mc-simulations" aria-label="Number of simulations" value={numSimulations} onChange={e => setNumSimulations(Number(e.target.value))} className="w-full px-2 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-brand-primary focus:border-transparent bg-white text-sm">
                         <option value={100}>100</option>
                         <option value={500}>500</option>
                         <option value={1000}>1,000</option>
@@ -48,9 +48,9 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ onRunS
                     </select>
                 </div>
                 <div className="flex flex-col">
-                    <label className="mb-1 text-sm font-medium text-brand-text-secondary">Market Volatility (Std. Dev.)</label>
+                    <label htmlFor="mc-volatility" className="mb-1 text-sm font-medium text-brand-text-secondary">Market Volatility (Std. Dev.)</label>
                     <div className="flex items-center">
-                        <input type="number" value={volatility} onChange={e => setVolatility(Number(e.target.value))} className="w-full px-2 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-brand-primary focus:border-transparent bg-white text-sm" />
+                        <input id="mc-volatility" aria-label="Market volatility percentage" type="number" value={volatility} onChange={e => setVolatility(Number(e.target.value))} className="w-full px-2 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-brand-primary focus:border-transparent bg-white text-sm" />
                         <span className="text-gray-500 ml-2">%</span>
                     </div>
                 </div>

@@ -8,7 +8,7 @@ export const ThemeToggle: React.FC = () => {
     <button
       type="button"
       onClick={toggleTheme}
-      aria-pressed={theme === 'dark' ? 'true' : 'false'}
+      aria-pressed={theme === 'dark'}
       title={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
       className="p-2 rounded-md text-brand-text-primary hover:text-brand-primary transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-primary"
     >
