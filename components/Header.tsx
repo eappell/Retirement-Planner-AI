@@ -116,21 +116,6 @@ const Header: React.FC<HeaderProps> = ({
       </div>
 
       <div className="flex items-center space-x-2">
-        <button type="button" onClick={() => setIsManualOpen(true)} aria-label="Open User Manual" title="User Manual" className="group relative p-2 rounded-md text-gray-600 hover:text-brand-primary hover:bg-gray-100 transition-colors">
-          <QuestionMarkCircleIcon className="h-5 w-5" aria-hidden="true" />
-          <span className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-40 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-none">User Manual</span>
-        </button>
-
-        <button type="button" onClick={handlePrint} aria-label="Print" title="Print" className="group relative p-2 rounded-md text-gray-600 hover:text-brand-primary hover:bg-gray-100 transition-colors">
-          <PrinterIcon className="h-5 w-5" aria-hidden="true" />
-          <span className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-40 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-none">Print</span>
-        </button>
-
-        <button type="button" onClick={onOpenSettings} title="App Settings" aria-label="App Settings" className="group relative p-2 rounded-md text-gray-600 hover:text-brand-primary hover:bg-gray-100 transition-colors">
-          <AdjustmentsHorizontalIcon className="h-5 w-5" aria-hidden="true" />
-          <span className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-40 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-none">Settings</span>
-        </button>
-
         <div className="relative" ref={scenarioMenuRef}>
           <button type="button" onClick={() => setIsScenarioMenuOpen(prev => !prev)} className="group relative p-2 rounded-md text-gray-600 hover:text-brand-primary hover:bg-gray-100 transition-colors">
             <Square3Stack3DIcon className="h-5 w-5" aria-hidden="true" />
@@ -195,6 +180,28 @@ const Header: React.FC<HeaderProps> = ({
           )}
         </div>
 
+        <button type="button" onClick={handlePrint} aria-label="Print" title="Print" className="group relative p-2 rounded-md text-gray-600 hover:text-brand-primary hover:bg-gray-100 transition-colors">
+          <PrinterIcon className="h-5 w-5" aria-hidden="true" />
+          <span className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-40 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-none">Print</span>
+        </button>
+
+        <button type="button" onClick={onOpenSettings} title="App Settings" aria-label="App Settings" className="group relative p-2 rounded-md text-gray-600 hover:text-brand-primary hover:bg-gray-100 transition-colors">
+          <AdjustmentsHorizontalIcon className="h-5 w-5" aria-hidden="true" />
+          <span className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-40 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-none">Settings</span>
+        </button>
+
+        <button type="button" onClick={() => setIsManualOpen(true)} aria-label="Open User Manual" title="User Manual" className="group relative p-2 rounded-md text-gray-600 hover:text-brand-primary hover:bg-gray-100 transition-colors">
+          <QuestionMarkCircleIcon className="h-5 w-5" aria-hidden="true" />
+          <span className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-40 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-none">User Manual</span>
+        </button>
+
+        <div className="inline-block">
+          <div className="group relative inline-block">
+            <ThemeToggle />
+            <span className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-40 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-none">Toggle theme</span>
+          </div>
+        </div>
+
         <button
           type="button"
           onClick={() => setIsDisclaimerOpen(true, false)}
@@ -205,12 +212,6 @@ const Header: React.FC<HeaderProps> = ({
           <ShieldExclamationIcon className="h-5 w-5" aria-hidden="true" />
           <span className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-40 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-none">Disclaimer</span>
         </button>
-        <div className="inline-block">
-          <div className="group relative inline-block">
-            <ThemeToggle />
-            <span className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-40 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-none">Toggle theme</span>
-          </div>
-        </div>
 
         {/* Reset moved to Scenario Manager popover */}
       </div>
