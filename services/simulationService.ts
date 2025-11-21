@@ -14,6 +14,34 @@ const randomNormal = (mean: number, stdDev: number): number => {
     return z0 * stdDev + mean;
 };
 
+// Helper to get a random sample from a Student's t-distribution with given df,
+// scaled to have the desired standard deviation (stdDev) and mean.
+const randomStudentT = (mean: number, stdDev: number, df: number): number => {
+    // If df <= 2 variance is infinite; fallback to normal
+    if (!df || df <= 2) return randomNormal(mean, stdDev);
+
+    // generate z ~ N(0,1)
+    const z = randomNormal(0, 1);
+    // generate v ~ Chi-square(df) by summing squares of df standard normals
+    let v = 0;
+    for (let i = 0; i < Math.floor(df); i++) {
+        const n = randomNormal(0, 1);
+        v += n * n;
+    }
+    // For non-integer df we approximate by adding fractional contribution
+    const frac = df - Math.floor(df);
+    if (frac > 0) {
+        const n = randomNormal(0, 1);
+        v += frac * (n * n);
+    }
+
+    const t = z / Math.sqrt(v / df);
+    // Student-t variance = df / (df - 2) for df > 2
+    const theoreticalStd = Math.sqrt(df / (df - 2));
+    const scale = stdDev / theoreticalStd;
+    return mean + t * scale;
+};
+
 // Helper to calculate summary statistics from a projection array
 const calculateSummary = (projections: YearlyProjection[], plan: RetirementPlan): CalculationResult => {
     const isCouple = plan.planType === PlanType.COUPLE;
@@ -146,8 +174,17 @@ export const runSimulation = (plan: RetirementPlan, volatility?: number): Calcul
             const bondStd = (plan.bondStd !== undefined ? plan.bondStd / 100 : BOND_STD_DEFAULT);
 
             // Asset-class returns for this year (used to weight by allocations)
-            const stockReturn = volatility ? randomNormal(stockMean, stdDev || stockStd) : stockMean;
-            const bondReturn = volatility ? randomNormal(bondMean, stdDev || bondStd) : bondMean;
+            // Sample asset-class returns; if fat tails enabled, use Student's t sampling
+            const df = (plan.fatTailDf && plan.fatTailDf > 2) ? plan.fatTailDf : 4;
+            const useT = !!plan.useFatTails;
+            const stockSampleStd = volatility ? stdDev : stockStd;
+            const bondSampleStd = volatility ? stdDev : bondStd;
+            const stockReturn = volatility
+                ? (useT ? randomStudentT(stockMean, stockSampleStd, df) : randomNormal(stockMean, stockSampleStd))
+                : (useT ? randomStudentT(stockMean, stockStd, df) : stockMean);
+            const bondReturn = volatility
+                ? (useT ? randomStudentT(bondMean, bondSampleStd, df) : randomNormal(bondMean, bondSampleStd))
+                : (useT ? randomStudentT(bondMean, bondStd, df) : bondMean);
 
             if (p1Alive && currentAge1 >= RMD_START_AGE) {
                 const rmdFactor = RMD_UNIFORM_LIFETIME_TABLE[currentAge1] || 1;

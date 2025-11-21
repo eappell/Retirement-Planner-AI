@@ -125,6 +125,10 @@ export interface RetirementPlan {
   stockStd?: number;
   bondMean?: number;
   bondStd?: number;
+  // Enable fat-tailed return sampling (Student's t) in Monte Carlo projections
+  useFatTails?: boolean;
+  // Degrees of freedom for Student's t (must be >2 for finite variance). Lower -> fatter tails.
+  fatTailDf?: number;
   annualWithdrawalRate: number;
   dieWithZero: boolean;
   legacyAmount: number;

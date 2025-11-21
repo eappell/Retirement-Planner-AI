@@ -183,6 +183,18 @@ export const InputForm: React.FC<InputFormProps> = ({
                         <NumberInput label="Bonds: Volatility (std dev)" suffix="%" value={(plan.bondStd ?? 6)} onChange={e => handlePlanChange('bondStd', Number(e.target.value))} />
                     </div>
 
+                    <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
+                        <div className="flex items-center space-x-3">
+                            <input id="useFatTails" type="checkbox" checked={!!plan.useFatTails} onChange={e => handlePlanChange('useFatTails', e.target.checked as any)} className="h-4 w-4 rounded text-brand-primary focus:ring-brand-primary" />
+                            <label htmlFor="useFatTails" className="text-sm font-medium">Use fat-tailed returns</label>
+                        </div>
+                        <div className="flex items-center space-x-3">
+                            <NumberInput label="Tail degrees of freedom (df)" value={plan.fatTailDf ?? 4} onChange={e => handlePlanChange('fatTailDf', Number(e.target.value))} />
+                        </div>
+                    </div>
+
+                    <p className="text-xs text-gray-500 mt-2">When <strong>Use fat-tailed returns</strong> is enabled, projections sample yearly asset returns from a Student's t-distribution (lower degrees of freedom -> fatter tails). This increases the probability of large shocks (both positive and negative) versus a normal distribution — use with care. Typical df values: 3–6 for noticeably fat tails; df &gt; 30 approximates normal.</p>
+
                     {(() => {
                         const sd = Number(plan.stockStd ?? 15);
                         const bd = Number(plan.bondStd ?? 6);
