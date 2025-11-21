@@ -39,6 +39,14 @@ export const InputSection: React.FC<InputSectionProps> = ({ title, subtitle, tit
         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-cyan-600" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7h18v10a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V5a4 4 0 018 0v2"/></svg>
       );
     }
+    if (key.includes('estate') || key.includes('legacy') || key.includes('gift') || key.includes('gifts')) {
+      return (
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-purple-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 11.5L12 4l9 7.5V20a1 1 0 01-1 1h-5v-5H9v5H4a1 1 0 01-1-1v-8.5z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 21v-6h6v6" />
+        </svg>
+      );
+    }
     if (key.includes('income') || key.includes('pension') || key.includes('annuit')) {
       return (
         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-green-600" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
