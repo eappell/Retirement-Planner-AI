@@ -76,7 +76,7 @@ export const ProjectionTable: React.FC<ProjectionTableProps> = React.memo(({ dat
                 <td className="p-2 text-right projection-col-tax">{formatCurrency(row.federalTax / 12)}</td>
                 <td className="p-2 text-right projection-col-tax">{formatCurrency(row.stateTax / 12)}</td>
                 <td className="p-2 text-right font-semibold projection-col-netincome">{formatCurrency(row.netIncome / 12)}</td>
-                <td className={`p-2 text-right ${row.surplus >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>{formatCurrency(row.surplus / 12)}</td>
+                <td className={`p-2 text-right ${row.surplus >= 0 ? 'text-green-700 dark:text-green-200' : 'text-red-600 dark:text-red-400'}`}>{formatCurrency(row.surplus / 12)}</td>
                 <td className="p-2 text-right font-bold text-brand-primary">{formatCurrency(row.netWorth)}</td>
             </tr>
         );
