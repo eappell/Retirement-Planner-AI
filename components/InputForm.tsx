@@ -184,9 +184,7 @@ export const InputForm: React.FC<InputFormProps> = ({
 
                         {/* Place the tail df directly under Stocks volatility (sm:col-start-2) */}
                         <div className="sm:col-start-2">
-                            <div className="w-36">
-                                <NumberInput label="Tail degrees of freedom (df)" value={plan.fatTailDf ?? 4} onChange={e => handlePlanChange('fatTailDf', Number(e.target.value))} />
-                            </div>
+                            <NumberInput label="Tail degrees of freedom (df)" value={plan.fatTailDf ?? 4} onChange={e => handlePlanChange('fatTailDf', Number(e.target.value))} />
                         </div>
                     </div>
 
