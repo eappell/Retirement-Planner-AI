@@ -117,7 +117,7 @@ const Header: React.FC<HeaderProps> = ({
             Retirement Monthly Income Planner
           </h1>
           <span className="text-sm font-medium text-brand-text-secondary whitespace-nowrap overflow-hidden text-ellipsis" title={activeScenario.name}>
-            ({activeScenario.name})
+            ({activeScenario.name} scenario)
           </span>
         </div>
         <p className="text-xs text-brand-text-secondary mt-0.5">Estimate your retirement income, taxes, and net worth.</p>
