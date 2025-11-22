@@ -181,6 +181,13 @@ export const InputForm: React.FC<InputFormProps> = ({
                         <NumberInput label="Stocks: Volatility (std dev)" suffix="%" value={(plan.stockStd ?? 15)} onChange={e => handlePlanChange('stockStd', Number(e.target.value))} />
                         <NumberInput label="Bonds: Expected Return" suffix="%" value={(plan.bondMean ?? 3)} onChange={e => handlePlanChange('bondMean', Number(e.target.value))} />
                         <NumberInput label="Bonds: Volatility (std dev)" suffix="%" value={(plan.bondStd ?? 6)} onChange={e => handlePlanChange('bondStd', Number(e.target.value))} />
+
+                        {/* Place the tail df directly under Stocks volatility (sm:col-start-2) */}
+                        <div className="sm:col-start-2">
+                            <div className="w-36">
+                                <NumberInput label="Tail degrees of freedom (df)" value={plan.fatTailDf ?? 4} onChange={e => handlePlanChange('fatTailDf', Number(e.target.value))} />
+                            </div>
+                        </div>
                     </div>
 
                     <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
@@ -188,11 +195,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                             <input id="useFatTails" type="checkbox" checked={!!plan.useFatTails} onChange={e => handlePlanChange('useFatTails', e.target.checked as any)} className="h-4 w-4 rounded text-brand-primary focus:ring-brand-primary" />
                             <label htmlFor="useFatTails" className="text-sm font-medium">Use fat-tailed returns</label>
                         </div>
-                        <div className="flex items-center">
-                            <div className="w-36">
-                                <NumberInput label="Tail degrees of freedom (df)" value={plan.fatTailDf ?? 4} onChange={e => handlePlanChange('fatTailDf', Number(e.target.value))} />
-                            </div>
-                        </div>
+                        <div />
                     </div>
 
                     <p className="text-xs text-gray-500 mt-2">When <strong>Use fat-tailed returns</strong> is enabled, yearly returns are sampled from a Student's t‑distribution (named for "Student", William S. Gosset). The t‑distribution has heavier tails than the normal distribution — lower degrees of freedom (df) produce fatter tails and more extreme returns. For df ≈ 3–6 you'll see noticeably heavier tails; df &gt; 30 behaves like a normal distribution. The implementation scales t‑draws to match the volatility you set, so fat tails increase the chance of large gains or losses; interpret simulated success rates accordingly.</p>
