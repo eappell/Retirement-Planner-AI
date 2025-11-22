@@ -193,7 +193,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                         </div>
                     </div>
 
-                    <p className="text-xs text-gray-500 mt-2">When <strong>Use fat-tailed returns</strong> is enabled, projections sample yearly asset returns from a Student's t-distribution (lower degrees of freedom to fatter tails). This increases the probability of large shocks (both positive and negative) versus a normal distribution — use with care. Typical df values: 3–6 for noticeably fat tails; df greater than 30 approximates normal.</p>
+                    <p className="text-xs text-gray-500 mt-2">When <strong>Use fat-tailed returns</strong> is enabled, yearly returns are sampled from a Student's t‑distribution (named for "Student", William S. Gosset). The t‑distribution has heavier tails than the normal distribution — lower degrees of freedom (df) produce fatter tails and more extreme returns. For df ≈ 3–6 you'll see noticeably heavier tails; df &gt; 30 behaves like a normal distribution. The implementation scales t‑draws to match the volatility you set, so fat tails increase the chance of large gains or losses; interpret simulated success rates accordingly.</p>
 
                     {(() => {
                         const sd = Number(plan.stockStd ?? 15);
