@@ -661,7 +661,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                         <div id="panel-annuities" role="tabpanel" aria-labelledby="tab-annuities" className="relative pt-3 space-y-2">
                             <p className="text-sm text-gray-500">Enter your monthly pre-tax income (gross)</p>
                             {((plan.annuities || []) as Annuity[]).map(item => (
-                                <div key={item.id} className="grid gap-x-4 items-end p-2 rounded-md bg-indigo-50/50 grid-cols-12">
+                                <div key={item.id} className="grid gap-x-4 items-end p-2 rounded-md bg-indigo-50/50 grid-cols-11">
                                     <div className="col-span-1">
                                         <SelectInput label="Owner" value={item.owner || 'person1'} onChange={e => handleDynamicListChange('annuities', item.id, 'owner', e.target.value)}>
                                             <option value="person1">{plan.person1.name}</option>
@@ -700,20 +700,9 @@ export const InputForm: React.FC<InputFormProps> = ({
                                     <div className="col-span-1">
                                         <NumberInput label="COLA" suffix="%" value={item.cola} onChange={e => handleDynamicListChange('annuities', item.id, 'cola', e.target.value)}/>
                                     </div>
-                                    <div className="col-span-1 flex items-center justify-center">
-                                        <div>
-                                            <label htmlFor={`annuities-taxable-${item.id}`} className="mb-1 text-sm font-medium text-brand-text-secondary">Taxable</label>
-                                            <input
-                                                type="checkbox"
-                                                id={`annuities-taxable-${item.id}`}
-                                                checked={item.taxable !== false}
-                                                onChange={e => handleDynamicListChange('annuities', item.id, 'taxable', e.target.checked)}
-                                                className="h-5 w-5 rounded text-brand-primary focus:ring-brand-primary"
-                                            />
-                                        </div>
-                                    </div>
+                                    
                                     <div className="flex items-end">
-                                            <ActionIcons onAdd={() => {
+                                        <ActionIcons onAdd={() => {
                                             const id = Date.now().toString();
                                             const newAnnuity: Annuity = { id, owner: 'person1', name: 'New Annuity', type: 'Immediate (Fixed)', startAge: plan.person1.retirementAge, pmtFrequency: 'monthly', pmtAmount: 0, endAge: 0, cola: 0, taxable: true };
                                             addToList('annuities', newAnnuity);
@@ -722,11 +711,11 @@ export const InputForm: React.FC<InputFormProps> = ({
                                     </div>
                                 </div>
                             ))}
-                                    {(plan.annuities || []).length === 0 && (
+                            {(plan.annuities || []).length === 0 && (
                                 <div className="flex justify-center py-6">
-                                            <AddButton label="+ Add Annuity" icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a6 6 0 100 12 6 6 0 000-12zm1 7H9V7h2v2z"/></svg>} onClick={() => {
+                                    <AddButton label="+ Add Annuity" icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a6 6 0 100 12 6 6 0 000-12zm1 7H9V7h2v2z"/></svg>} onClick={() => {
                                         const id = Date.now().toString();
-                                        const newAnnuity: Annuity = { id, owner: 'person1', name: 'New Annuity', monthlyAmount: 0, startAge: plan.person1.retirementAge, cola: 0, taxable: true };
+                                        const newAnnuity: Annuity = { id, owner: 'person1', name: 'New Annuity', type: 'Immediate (Fixed)', startAge: plan.person1.retirementAge, pmtFrequency: 'monthly', pmtAmount: 0, endAge: 0, cola: 0, taxable: true };
                                         addToList('annuities', newAnnuity);
                                         setFocusTargetId(`annuities-name-${id}`);
                                     }} />
