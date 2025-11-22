@@ -184,12 +184,14 @@ export const InputForm: React.FC<InputFormProps> = ({
                     </div>
 
                     <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
-                        <div className="flex items-center">
-                            <NumberInput label="Tail degrees of freedom (df)" value={plan.fatTailDf ?? 4} onChange={e => handlePlanChange('fatTailDf', Number(e.target.value))} />
-                        </div>
-                        <div className="flex items-center justify-start space-x-3">
+                        <div className="flex items-center space-x-3">
                             <input id="useFatTails" type="checkbox" checked={!!plan.useFatTails} onChange={e => handlePlanChange('useFatTails', e.target.checked as any)} className="h-4 w-4 rounded text-brand-primary focus:ring-brand-primary" />
                             <label htmlFor="useFatTails" className="text-sm font-medium">Use fat-tailed returns</label>
+                        </div>
+                        <div className="flex items-center">
+                            <div className="w-36">
+                                <NumberInput label="Tail degrees of freedom (df)" value={plan.fatTailDf ?? 4} onChange={e => handlePlanChange('fatTailDf', Number(e.target.value))} />
+                            </div>
                         </div>
                     </div>
 
