@@ -13,7 +13,7 @@ const ActionIcons: React.FC<ActionIconsProps> = ({ onAdd, onRemove, canRemove = 
         type="button"
         onClick={onAdd}
         aria-label="Add"
-        className="inline-flex items-center justify-center h-7 w-7 rounded-md border border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
+        className="inline-flex items-center justify-center h-7 w-7 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-100 hover:bg-emerald-100"
       >
         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
           <path d="M12 5v14M5 12h14" />
@@ -25,7 +25,7 @@ const ActionIcons: React.FC<ActionIconsProps> = ({ onAdd, onRemove, canRemove = 
         onClick={onRemove}
         aria-label="Remove"
         disabled={!canRemove}
-        className={`inline-flex items-center justify-center h-7 w-7 rounded-md border ${!canRemove ? 'border-gray-200 text-gray-300 cursor-not-allowed bg-gray-50' : 'border-gray-200 text-gray-600 hover:bg-gray-50 bg-white'}`}
+        className={`inline-flex items-center justify-center h-7 w-7 rounded-md ${!canRemove ? 'border border-gray-200 text-gray-300 cursor-not-allowed bg-gray-50' : 'bg-red-50 text-red-700 border border-red-100 hover:bg-red-100'}`}
       >
         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
           <polyline points="3 6 5 6 21 6" />
