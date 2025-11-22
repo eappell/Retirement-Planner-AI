@@ -69,9 +69,8 @@ export interface Annuity {
   startAge: number;
   pmtFrequency?: 'monthly' | 'quarterly' | 'annual';
   pmtAmount?: number;
-  pmtTerm?: number; // in years (period-certain) or 0 for lifetime
+  endAge?: number; // age when payments end (or 0 for lifetime)
   cola: number; // cost of living adjustment %
-  survivor?: string; // e.g., 'None', 'Joint - 100%', 'Joint - 50%'
   taxable: boolean;
 }
 

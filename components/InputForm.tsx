@@ -695,17 +695,10 @@ export const InputForm: React.FC<InputFormProps> = ({
                                         <NumberInput label="Pmt Amount" prefix="$" value={item.pmtAmount || 0} onChange={e => handleDynamicListChange('annuities', item.id, 'pmtAmount', e.target.value)}/>
                                     </div>
                                     <div className="col-span-1">
-                                        <NumberInput label="Pmt Term" placeholder="yrs" value={item.pmtTerm || 0} onChange={e => handleDynamicListChange('annuities', item.id, 'pmtTerm', e.target.value)} />
+                                        <NumberInput label="End Age" placeholder="yrs" value={item.endAge || 0} onChange={e => handleDynamicListChange('annuities', item.id, 'endAge', e.target.value)} />
                                     </div>
                                     <div className="col-span-1">
                                         <NumberInput label="COLA" suffix="%" value={item.cola} onChange={e => handleDynamicListChange('annuities', item.id, 'cola', e.target.value)}/>
-                                    </div>
-                                    <div className="col-span-1">
-                                        <SelectInput label="Survivor" value={item.survivor || 'None'} onChange={e => handleDynamicListChange('annuities', item.id, 'survivor', e.target.value)}>
-                                            <option>None</option>
-                                            <option>Joint - 100%</option>
-                                            <option>Joint - 50%</option>
-                                        </SelectInput>
                                     </div>
                                     <div className="col-span-1 flex items-center justify-center">
                                         <div>
@@ -720,9 +713,9 @@ export const InputForm: React.FC<InputFormProps> = ({
                                         </div>
                                     </div>
                                     <div className="flex items-end">
-                                        <ActionIcons onAdd={() => {
+                                            <ActionIcons onAdd={() => {
                                             const id = Date.now().toString();
-                                            const newAnnuity: Annuity = { id, owner: 'person1', name: 'New Annuity', type: 'Immediate (Fixed)', startAge: plan.person1.retirementAge, pmtFrequency: 'monthly', pmtAmount: 0, pmtTerm: 0, cola: 0, survivor: 'None', taxable: true };
+                                            const newAnnuity: Annuity = { id, owner: 'person1', name: 'New Annuity', type: 'Immediate (Fixed)', startAge: plan.person1.retirementAge, pmtFrequency: 'monthly', pmtAmount: 0, endAge: 0, cola: 0, taxable: true };
                                             addToList('annuities', newAnnuity);
                                             setFocusTargetId(`annuities-name-${id}`);
                                         }} onRemove={() => removeFromList('annuities', item.id)} canRemove={(plan.annuities || []).length > 0} />
