@@ -107,6 +107,14 @@ export interface ExpensePeriod {
     endAgeRef: 'person1' | 'person2';
 }
 
+export interface OneTimeExpense {
+  id: string;
+  owner?: 'person1' | 'person2';
+  age: number; // age of owner when expense occurs
+  amount: number; // one-time amount
+  description?: string;
+}
+
 
 export interface RetirementPlan {
   planType: PlanType;
@@ -120,6 +128,7 @@ export interface RetirementPlan {
   gifts?: Gift[];
   legacyDisbursements?: LegacyDisbursement[];
   expensePeriods: ExpensePeriod[];
+  oneTimeExpenses?: OneTimeExpense[];
   socialSecurity: {
       person1EstimatedBenefit: number;
       person2EstimatedBenefit: number;

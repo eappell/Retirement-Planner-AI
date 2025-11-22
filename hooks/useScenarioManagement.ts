@@ -17,6 +17,7 @@ const initialPlanState: RetirementPlan = {
   expensePeriods: [
     { id: '1', name: 'Retirement', monthlyAmount: 5000, startAge: 67, startAgeRef: 'person1', endAge: 90, endAgeRef: 'person1' }
   ],
+    oneTimeExpenses: [],
   socialSecurity: { person1EstimatedBenefit: 0, person2EstimatedBenefit: 0 },
   state: 'CA',
   inflationRate: 2.5,
