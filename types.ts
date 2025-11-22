@@ -26,7 +26,7 @@ export interface RetirementAccount {
     balance: number;
     annualContribution: number;
     match: number;
-    type: '401k' | '457b' | 'IRA' | 'Roth IRA' | 'Other';
+  type: '401k' | '457b' | '403b' | 'IRA' | 'Roth IRA' | 'Other';
 }
 
 export interface InvestmentAccount {
@@ -43,11 +43,25 @@ export interface Pension {
     id: string;
     owner: 'person1' | 'person2';
     name: string;
-    monthlyBenefit: number;
+    // Pension can be paid as a monthly benefit or a lump-sum.
+    payoutType?: 'monthly' | 'lump';
+    monthlyBenefit?: number;
+    lumpSumAmount?: number;
     startAge: number;
     cola: number; // cost of living adjustment %
     survivorBenefit: number; // %
     taxable: boolean;
+}
+
+export interface HSA {
+  id: string;
+  owner: 'person1' | 'person2';
+  name: string;
+  balance: number;
+  annualContribution: number;
+  // Optional investment allocation for HSAs (percent stocks)
+  percentStocks?: number;
+  percentBonds?: number;
 }
 
 export interface OtherIncome {
@@ -112,6 +126,7 @@ export interface RetirementPlan {
   investmentAccounts: InvestmentAccount[];
   pensions: Pension[];
   otherIncomes: OtherIncome[];
+  hsaAccounts?: HSA[];
   annuities?: Annuity[];
   gifts?: Gift[];
   legacyDisbursements?: LegacyDisbursement[];
