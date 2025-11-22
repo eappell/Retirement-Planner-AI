@@ -114,7 +114,7 @@ const Header: React.FC<HeaderProps> = ({
       <div className="flex flex-col">
         <div className="flex items-baseline space-x-3 overflow-hidden">
           <h1 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-brand-primary to-brand-secondary flex-shrink-0">
-            Retirement Monthly Income Planner
+            Monthly Retirement Income AI
           </h1>
           <span className="text-sm font-medium text-brand-text-secondary whitespace-nowrap overflow-hidden text-ellipsis" title={activeScenario.name}>
             ({activeScenario.name} scenario)

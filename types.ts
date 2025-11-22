@@ -65,9 +65,13 @@ export interface Annuity {
   id: string;
   owner: 'person1' | 'person2';
   name: string;
-  monthlyAmount: number;
+  type?: string; // e.g., "Immediate (Fixed)", "Deferred (Indexed)", etc.
   startAge: number;
+  pmtFrequency?: 'monthly' | 'quarterly' | 'annual';
+  pmtAmount?: number;
+  pmtTerm?: number; // in years (period-certain) or 0 for lifetime
   cola: number; // cost of living adjustment %
+  survivor?: string; // e.g., 'None', 'Joint - 100%', 'Joint - 50%'
   taxable: boolean;
 }
 

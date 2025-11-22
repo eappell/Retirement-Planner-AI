@@ -661,27 +661,68 @@ export const InputForm: React.FC<InputFormProps> = ({
                         <div id="panel-annuities" role="tabpanel" aria-labelledby="tab-annuities" className="relative pt-3 space-y-2">
                             <p className="text-sm text-gray-500">Enter your monthly pre-tax income (gross)</p>
                             {((plan.annuities || []) as Annuity[]).map(item => (
-                                <div key={item.id} className="grid gap-x-4 items-end p-2 rounded-md bg-indigo-50/50 grid-cols-8">
+                                <div key={item.id} className="grid gap-x-4 items-end p-2 rounded-md bg-indigo-50/50 grid-cols-12">
+                                    <div className="col-span-1">
+                                        <SelectInput label="Owner" value={item.owner || 'person1'} onChange={e => handleDynamicListChange('annuities', item.id, 'owner', e.target.value)}>
+                                            <option value="person1">{plan.person1.name}</option>
+                                            {isCouple && <option value="person2">{plan.person2.name}</option>}
+                                        </SelectInput>
+                                    </div>
                                     <div className="col-span-2">
                                         <TextInput id={`annuities-name-${item.id}`} label="Name" value={item.name || ''} onChange={e => handleDynamicListChange('annuities', item.id, 'name', e.target.value)} />
                                     </div>
-                                    <NumberInput id={`annuities-monthlyAmount-${item.id}`} label="Monthly Amount" prefix="$" value={item.monthlyAmount} onChange={e => handleDynamicListChange('annuities', item.id, 'monthlyAmount', e.target.value)}/>
-                                    <NumberInput label="Start Age" value={item.startAge} onChange={e => handleDynamicListChange('annuities', item.id, 'startAge', e.target.value)}/>
-                                    <NumberInput label="COLA" suffix="%" value={item.cola} onChange={e => handleDynamicListChange('annuities', item.id, 'cola', e.target.value)}/>
-                                    <div className="flex flex-col items-center justify-end h-full pb-1">
-                                        <label htmlFor={`annuities-taxable-${item.id}`} className="mb-1 text-sm font-medium text-brand-text-secondary">Taxable</label>
-                                        <input
-                                            type="checkbox"
-                                            id={`annuities-taxable-${item.id}`}
-                                            checked={item.taxable !== false}
-                                            onChange={e => handleDynamicListChange('annuities', item.id, 'taxable', e.target.checked)}
-                                            className="h-5 w-5 rounded text-brand-primary focus:ring-brand-primary"
-                                        />
+                                    <div className="col-span-2">
+                                        <SelectInput label="Type" value={item.type || 'Immediate (Fixed)'} onChange={e => handleDynamicListChange('annuities', item.id, 'type', e.target.value)}>
+                                            <option>Immediate (Fixed)</option>
+                                            <option>Immediate (Indexed)</option>
+                                            <option>Immediate (Variable)</option>
+                                            <option>Deferred (Fixed)</option>
+                                            <option>Deferred (Indexed)</option>
+                                            <option>Deferred (Variable)</option>
+                                        </SelectInput>
+                                    </div>
+                                    <div className="col-span-1">
+                                        <NumberInput label="Start Age" value={item.startAge} onChange={e => handleDynamicListChange('annuities', item.id, 'startAge', e.target.value)}/>
+                                    </div>
+                                    <div className="col-span-1">
+                                        <SelectInput label="Pmt Freq" value={item.pmtFrequency || 'monthly'} onChange={e => handleDynamicListChange('annuities', item.id, 'pmtFrequency', e.target.value)}>
+                                            <option value="monthly">Monthly</option>
+                                            <option value="quarterly">Quarterly</option>
+                                            <option value="annual">Annual</option>
+                                        </SelectInput>
+                                    </div>
+                                    <div className="col-span-2">
+                                        <NumberInput label="Pmt Amount" prefix="$" value={item.pmtAmount || 0} onChange={e => handleDynamicListChange('annuities', item.id, 'pmtAmount', e.target.value)}/>
+                                    </div>
+                                    <div className="col-span-1">
+                                        <NumberInput label="Pmt Term" placeholder="yrs" value={item.pmtTerm || 0} onChange={e => handleDynamicListChange('annuities', item.id, 'pmtTerm', e.target.value)} />
+                                    </div>
+                                    <div className="col-span-1">
+                                        <NumberInput label="COLA" suffix="%" value={item.cola} onChange={e => handleDynamicListChange('annuities', item.id, 'cola', e.target.value)}/>
+                                    </div>
+                                    <div className="col-span-1">
+                                        <SelectInput label="Survivor" value={item.survivor || 'None'} onChange={e => handleDynamicListChange('annuities', item.id, 'survivor', e.target.value)}>
+                                            <option>None</option>
+                                            <option>Joint - 100%</option>
+                                            <option>Joint - 50%</option>
+                                        </SelectInput>
+                                    </div>
+                                    <div className="col-span-1 flex items-center justify-center">
+                                        <div>
+                                            <label htmlFor={`annuities-taxable-${item.id}`} className="mb-1 text-sm font-medium text-brand-text-secondary">Taxable</label>
+                                            <input
+                                                type="checkbox"
+                                                id={`annuities-taxable-${item.id}`}
+                                                checked={item.taxable !== false}
+                                                onChange={e => handleDynamicListChange('annuities', item.id, 'taxable', e.target.checked)}
+                                                className="h-5 w-5 rounded text-brand-primary focus:ring-brand-primary"
+                                            />
+                                        </div>
                                     </div>
                                     <div className="flex items-end">
                                         <ActionIcons onAdd={() => {
                                             const id = Date.now().toString();
-                                            const newAnnuity: Annuity = { id, owner: 'person1', name: 'New Annuity', monthlyAmount: 0, startAge: plan.person1.retirementAge, cola: 0, taxable: true };
+                                            const newAnnuity: Annuity = { id, owner: 'person1', name: 'New Annuity', type: 'Immediate (Fixed)', startAge: plan.person1.retirementAge, pmtFrequency: 'monthly', pmtAmount: 0, pmtTerm: 0, cola: 0, survivor: 'None', taxable: true };
                                             addToList('annuities', newAnnuity);
                                             setFocusTargetId(`annuities-name-${id}`);
                                         }} onRemove={() => removeFromList('annuities', item.id)} canRemove={(plan.annuities || []).length > 0} />
