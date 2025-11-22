@@ -685,23 +685,23 @@ export const InputForm: React.FC<InputFormProps> = ({
                                         <NumberInput label="Start Age" value={item.startAge} onChange={e => handleDynamicListChange('annuities', item.id, 'startAge', e.target.value)}/>
                                     </div>
                                     <div className="col-span-1">
+                                        <NumberInput label="End Age" placeholder="yrs" value={item.endAge || 0} onChange={e => handleDynamicListChange('annuities', item.id, 'endAge', e.target.value)} />
+                                    </div>
+                                    <div className="col-span-1">
                                         <SelectInput label="Pmt Freq" value={item.pmtFrequency || 'monthly'} onChange={e => handleDynamicListChange('annuities', item.id, 'pmtFrequency', e.target.value)}>
                                             <option value="monthly">Monthly</option>
                                             <option value="quarterly">Quarterly</option>
                                             <option value="annual">Annual</option>
                                         </SelectInput>
                                     </div>
-                                    <div className="col-span-2">
-                                        <NumberInput label="Pmt Amount" prefix="$" value={item.pmtAmount || 0} onChange={e => handleDynamicListChange('annuities', item.id, 'pmtAmount', e.target.value)}/>
-                                    </div>
                                     <div className="col-span-1">
-                                        <NumberInput label="End Age" placeholder="yrs" value={item.endAge || 0} onChange={e => handleDynamicListChange('annuities', item.id, 'endAge', e.target.value)} />
+                                        <NumberInput label="Pmt Amount" prefix="$" value={item.pmtAmount || 0} onChange={e => handleDynamicListChange('annuities', item.id, 'pmtAmount', e.target.value)}/>
                                     </div>
                                     <div className="col-span-1">
                                         <NumberInput label="COLA" suffix="%" value={item.cola} onChange={e => handleDynamicListChange('annuities', item.id, 'cola', e.target.value)}/>
                                     </div>
                                     
-                                    <div className="flex items-end">
+                                    <div className="col-span-1 flex items-end">
                                         <ActionIcons onAdd={() => {
                                             const id = Date.now().toString();
                                             const newAnnuity: Annuity = { id, owner: 'person1', name: 'New Annuity', type: 'Immediate (Fixed)', startAge: plan.person1.retirementAge, pmtFrequency: 'monthly', pmtAmount: 0, endAge: 0, cola: 0, taxable: true };
