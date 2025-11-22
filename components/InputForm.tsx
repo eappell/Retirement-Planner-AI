@@ -781,6 +781,15 @@ export const InputForm: React.FC<InputFormProps> = ({
                     {incomeTab === 'other' && (
                         <div id="panel-otherincomes" role="tabpanel" aria-labelledby="tab-otherincomes" className="relative pt-3 space-y-2">
                             <p className="text-sm text-gray-500">Enter your monthly pre-tax income (gross)</p>
+                            <div className="flex items-center space-x-2 mt-2">
+                                <button type="button" onClick={() => {
+                                    const id = Date.now().toString();
+                                    const newOther: OtherIncome = { id, owner: 'person1', name: 'Rental', monthlyAmount: 1000, startAge: plan.person1.retirementAge, endAge: plan.person1.lifeExpectancy, cola: 0, taxable: true };
+                                    addToList('otherIncomes', newOther);
+                                    setFocusTargetId(`otherIncomes-name-${id}`);
+                                }} className="px-2 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-md text-sm">Add Rental</button>
+                            </div>
+
                             {((plan.otherIncomes || []) as OtherIncome[]).map(item => (
                                 <div key={item.id} className="grid gap-x-4 items-end p-2 rounded-md bg-lime-50/50 grid-cols-8">
                                     <div className="col-span-2">
