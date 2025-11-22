@@ -1,6 +1,7 @@
 import React from 'react';
 import { RetirementPlan, CalculationResult, YearlyProjection, MonteCarloResult, PlanType } from '../types';
 import { InputSection } from './InputSection';
+import { SparklesIcon } from '@heroicons/react/24/outline';
 import { DynamicCharts } from './DynamicCharts';
 import { MonteCarloSimulator } from './MonteCarloSimulator';
 import { ProjectionTable } from './ProjectionTable';
@@ -125,7 +126,8 @@ export const AnalysisSections: React.FC<AnalysisSectionsProps> = ({
             
             <InputSection title="AI Powered Insights" subtitle="Get personalized tips based on your plan." titleColorClass="text-purple-600">
                 <div className="col-span-full">
-                <button onClick={handleGetInsights} disabled={isAiLoading || !results} className="px-4 py-2 bg-purple-600 text-white rounded-md disabled:bg-gray-400">
+                <button onClick={handleGetInsights} disabled={isAiLoading || !results} className="px-4 py-2 bg-purple-600 text-white rounded-md disabled:bg-gray-400 inline-flex items-center">
+                    <SparklesIcon className="h-4 w-4 mr-2" aria-hidden="true" />
                     {isAiLoading ? 'Analyzing...' : 'Generate AI Insights'}
                 </button>
                 {aiInsights && (
