@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import AddButton from './AddButton';
-import { RetirementPlan, Person, PlanType, RetirementAccount, InvestmentAccount, Pension, OtherIncome, Annuity, ExpensePeriod, Gift, LegacyDisbursement, HSA } from '../types';
+import { RetirementPlan, Person, PlanType, RetirementAccount, InvestmentAccount, Pension, OtherIncome, Annuity, ExpensePeriod, Gift, LegacyDisbursement } from '../types';
 import { InputSection } from './InputSection';
 import { NumberInput, SelectInput, TextInput } from './FormControls';
 import { STATES } from '../constants';
 import { validateAssetDefaults } from '../utils/assetValidation';
 
-type DynamicListKey = 'retirementAccounts' | 'investmentAccounts' | 'pensions' | 'annuities' | 'otherIncomes' | 'expensePeriods' | 'gifts' | 'legacyDisbursements' | 'hsaAccounts';
+type DynamicListKey = 'retirementAccounts' | 'investmentAccounts' | 'pensions' | 'annuities' | 'otherIncomes' | 'expensePeriods' | 'gifts' | 'legacyDisbursements';
 
 interface InputFormProps {
     plan: RetirementPlan;
@@ -20,62 +20,7 @@ interface InputFormProps {
     ) => void;
     addToList: <K extends DynamicListKey>(listName: K, newItem: RetirementPlan[K][number]) => void;
     removeFromList: (listName: DynamicListKey, id: string) => void;
-}
-
-export const InputForm: React.FC<InputFormProps> = ({
-    plan,
-    handlePlanChange,
-    handlePersonChange,
-    handleDynamicListChange,
-    addToList,
-    removeFromList
-}) => {
-    const isCouple = plan.planType === PlanType.COUPLE;
-    const [focusTargetId, setFocusTargetId] = useState<string | null>(null);
-    const [draggingId, setDraggingId] = useState<string | null>(null);
-    const [draggingValue, setDraggingValue] = useState<number | null>(null);
-    const sliderRefs = useRef<Record<string, HTMLInputElement | null>>({});
-    const [incomeTab, setIncomeTab] = useState<'pensions' | 'annuities' | 'other'>('pensions');
-    const [accountsTab, setAccountsTab] = useState<'retirement' | 'investment'>('retirement');
-    const [estateTab, setEstateTab] = useState<'gifts' | 'legacy'>('gifts');
-    useEffect(() => {
-        if (!focusTargetId) return;
-        const el = document.getElementById(focusTargetId) as HTMLInputElement | null;
-        if (el) {
-            el.focus();
-            el.select?.();
-        }
-        setFocusTargetId(null);
-    }, [focusTargetId]);
-    const formatCurrency = (value: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
-
-    const ActionIcons = ({ onAdd, onRemove, canRemove }: { onAdd: () => void; onRemove: () => void; canRemove: boolean }) => (
-        <div className="flex items-center space-x-1 pl-2">
-            <button type="button" onClick={onAdd} className="text-green-500 hover:text-green-700 p-1 rounded-full hover:bg-green-100 transition-colors" title="Add new item">
-                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
-                </svg>
-            </button>
-            {canRemove && (
-                <button type="button" onClick={onRemove} className="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-100 transition-colors" title="Remove item">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clipRule="evenodd" />
-                    </svg>
-                </button>
-            )}
-        </div>
-    );
-
-    // Keyboard navigation for Accounts tabs (Left/Right/Home/End)
-    const handleAccountsKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-        const ids = ['tab-retirement', 'tab-investment'];
-        const activeId = document.activeElement?.id || '';
-        const idx = ids.indexOf(activeId);
-        let next = idx;
-        if (e.key === 'ArrowRight') next = idx === -1 ? 0 : (idx + 1) % ids.length;
-        else if (e.key === 'ArrowLeft') next = idx === -1 ? ids.length - 1 : (idx - 1 + ids.length) % ids.length;
-        else if (e.key === 'Home') next = 0;
-        else if (e.key === 'End') next = ids.length - 1;
+            {/* HSAs moved into Retirement Accounts as type 'HSA' */}
         else return;
         e.preventDefault();
         const nextId = ids[next];
@@ -411,13 +356,16 @@ export const InputForm: React.FC<InputFormProps> = ({
                                                 <option>401k</option>
                                                 <option>457b</option>
                                                 <option>403b</option>
+                                                <option>HSA</option>
                                                 <option>IRA</option>
                                                 <option>Roth IRA</option>
                                                 <option>Other</option>
                                             </SelectInput>
                                             <NumberInput label="Balance" prefix="$" value={item.balance} onChange={e => handleDynamicListChange('retirementAccounts', item.id, 'balance', e.target.value)}/>
                                             <NumberInput label="Annual Contrib." prefix="$" value={item.annualContribution} onChange={e => handleDynamicListChange('retirementAccounts', item.id, 'annualContribution', e.target.value)}/>
-                                            <NumberInput label="Match" suffix="%" value={item.match} onChange={e => handleDynamicListChange('retirementAccounts', item.id, 'match', e.target.value)}/>
+                                            {item.type !== 'HSA' && (
+                                                <NumberInput label="Match" suffix="%" value={item.match} onChange={e => handleDynamicListChange('retirementAccounts', item.id, 'match', e.target.value)}/>
+                                            )}
                                             <div className="flex items-end">
                                                 <ActionIcons onAdd={() => {
                                                     const id = Date.now().toString();
@@ -1030,13 +978,16 @@ export const InputForm: React.FC<InputFormProps> = ({
                                             <option>401k</option>
                                             <option>457b</option>
                                             <option>403b</option>
+                                            <option>HSA</option>
                                             <option>IRA</option>
                                             <option>Roth IRA</option>
                                             <option>Other</option>
                                         </SelectInput>
                                         <NumberInput label="Balance" prefix="$" value={item.balance} onChange={e => handleDynamicListChange(listName, item.id, 'balance', e.target.value)}/>
                                         <NumberInput label="Annual Contrib." prefix="$" value={item.annualContribution} onChange={e => handleDynamicListChange(listName, item.id, 'annualContribution', e.target.value)}/>
-                                        <NumberInput label="Match" suffix="%" value={item.match} onChange={e => handleDynamicListChange(listName, item.id, 'match', e.target.value)}/>
+                                        {item.type !== 'HSA' && (
+                                            <NumberInput label="Match" suffix="%" value={item.match} onChange={e => handleDynamicListChange(listName, item.id, 'match', e.target.value)}/>
+                                        )}
                                         <div className="flex items-end">
                                             <ActionIcons onAdd={() => {
                                                 const id = Date.now().toString();
