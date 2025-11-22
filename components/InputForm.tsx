@@ -183,14 +183,14 @@ export const InputForm: React.FC<InputFormProps> = ({
                         <NumberInput label="Bonds: Volatility (std dev)" suffix="%" value={(plan.bondStd ?? 6)} onChange={e => handlePlanChange('bondStd', Number(e.target.value))} />
 
                         {/* Tail df under Stocks volatility */}
-                        <div className="sm:col-start-2">
-                            <NumberInput label="Tail degrees of freedom (df)" value={plan.fatTailDf ?? 4} onChange={e => handlePlanChange('fatTailDf', Number(e.target.value))} />
-                        </div>
-
-                        {/* Put the fat-tail checkbox adjacent to the df on the same row */}
-                        <div className="sm:col-start-3 flex items-center">
-                            <input id="useFatTails" type="checkbox" checked={!!plan.useFatTails} onChange={e => handlePlanChange('useFatTails', e.target.checked as any)} className="h-4 w-4 rounded text-brand-primary focus:ring-brand-primary" />
-                            <label htmlFor="useFatTails" className="ml-2 text-sm font-medium">Use fat-tailed returns</label>
+                        <div className="sm:col-start-2 sm:col-span-2 flex items-center space-x-4">
+                            <div className="flex items-center">
+                                <input id="useFatTails" type="checkbox" checked={!!plan.useFatTails} onChange={e => handlePlanChange('useFatTails', e.target.checked as any)} className="h-4 w-4 rounded text-brand-primary focus:ring-brand-primary" />
+                                <label htmlFor="useFatTails" className="ml-2 text-sm font-medium">Use fat-tailed returns</label>
+                            </div>
+                            <div className="flex-1">
+                                <NumberInput label="Tail degrees of freedom (df)" value={plan.fatTailDf ?? 4} onChange={e => handlePlanChange('fatTailDf', Number(e.target.value))} />
+                            </div>
                         </div>
                     </div>
 
