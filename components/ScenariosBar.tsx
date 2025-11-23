@@ -61,6 +61,8 @@ const ScenariosBar: React.FC<ScenariosBarProps> = ({ scenarios = [], activeScena
 
     const helpRef = React.useRef<HTMLDivElement | null>(null);
     const [helpOpen, setHelpOpen] = React.useState<boolean>(false);
+    const hideTimerRef = React.useRef<number | null>(null);
+    const isTouchRef = React.useRef<boolean>(false);
 
     React.useEffect(() => {
         const onDocClick = (e: MouseEvent) => {
@@ -69,6 +71,13 @@ const ScenariosBar: React.FC<ScenariosBarProps> = ({ scenarios = [], activeScena
         };
         document.addEventListener('mousedown', onDocClick);
         return () => document.removeEventListener('mousedown', onDocClick);
+    }, []);
+
+    // cleanup any pending timers on unmount
+    React.useEffect(() => {
+        return () => {
+            if (hideTimerRef.current) window.clearTimeout(hideTimerRef.current);
+        };
     }, []);
 
     return (
@@ -152,12 +161,29 @@ const ScenariosBar: React.FC<ScenariosBarProps> = ({ scenarios = [], activeScena
                     <div
                         ref={helpRef}
                         className="relative"
-                        onMouseEnter={() => setHelpOpen(true)}
-                        onMouseLeave={() => setHelpOpen(false)}
+                        onMouseEnter={() => {
+                            if (isTouchRef.current) return;
+                            if (hideTimerRef.current) { window.clearTimeout(hideTimerRef.current); hideTimerRef.current = null; }
+                            setHelpOpen(true);
+                        }}
+                        onMouseLeave={() => {
+                            if (isTouchRef.current) return;
+                            if (hideTimerRef.current) window.clearTimeout(hideTimerRef.current);
+                            hideTimerRef.current = window.setTimeout(() => setHelpOpen(false), 250);
+                        }}
+                        onTouchStart={() => { isTouchRef.current = true; }}
                     >
                         <a
                             href="#"
-                            onClick={(e) => { e.preventDefault(); }}
+                            onClick={(e) => {
+                                // toggle on touch devices; otherwise prevent default for keyboard/mouse
+                                if (isTouchRef.current) {
+                                    e.preventDefault();
+                                    setHelpOpen(prev => !prev);
+                                } else {
+                                    e.preventDefault();
+                                }
+                            }}
                             onFocus={() => setHelpOpen(true)}
                             onBlur={() => setHelpOpen(false)}
                             role="button"
