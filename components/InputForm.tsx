@@ -30,6 +30,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
     const [accountsTab, setAccountsTab] = useState<'retirement' | 'investment' | 'hsa'>('retirement');
     const [incomeTab, setIncomeTab] = useState<'pensions' | 'annuities' | 'other'>('pensions');
     const [estateTab, setEstateTab] = useState<'gifts' | 'legacy'>('gifts');
+    const [expensesTab, setExpensesTab] = useState<'periods' | 'oneTime'>('periods');
     const [focusTargetId, setFocusTargetId] = useState<string | null>(null);
     const sliderRefs = useRef<Record<string, HTMLInputElement | null>>({});
     const [draggingId, setDraggingId] = useState<string | null>(null);
