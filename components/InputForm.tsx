@@ -23,9 +23,16 @@ interface InputFormProps {
     removeFromList: (listName: DynamicListKey, id: string) => void;
     updateAllScenarios?: (partialPlan: Partial<RetirementPlan>) => void;
     scenariosCount?: number;
+    scenarios?: { id: string; name: string }[];
+    activeScenarioId?: string | null;
+    onSwitchScenario?: (id: string) => void;
+    onRenameScenario?: (id: string, name: string) => void;
+    onNewScenario?: () => void;
+    onCopyScenario?: (id: string) => void;
+    onDeleteScenario?: (id: string) => void;
 }
  
-const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePersonChange, handleDynamicListChange, addToList, removeFromList, updateAllScenarios, scenariosCount }) => {
+const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePersonChange, handleDynamicListChange, addToList, removeFromList, updateAllScenarios, scenariosCount, scenarios = [], activeScenarioId = null, onSwitchScenario, onRenameScenario, onNewScenario, onCopyScenario, onDeleteScenario }) => {
 
     const isCouple = plan.planType === PlanType.COUPLE;
 
@@ -36,6 +43,44 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
     const [incomeTab, setIncomeTab] = useState<'pensions' | 'annuities' | 'other'>('pensions');
     const [estateTab, setEstateTab] = useState<'gifts' | 'legacy'>('gifts');
     const [expensesTab, setExpensesTab] = useState<'periods' | 'oneTime'>('periods');
+
+    // Local scenario UI state
+    const [selectedScenario, setSelectedScenario] = useState<string | null>(activeScenarioId ?? (scenarios[0] && scenarios[0].id) ?? null);
+    const [scenarioName, setScenarioName] = useState<string>('');
+
+    useEffect(() => {
+        setSelectedScenario(activeScenarioId ?? (scenarios[0] && scenarios[0].id) ?? null);
+    }, [activeScenarioId, scenarios]);
+
+    useEffect(() => {
+        const s = scenarios.find(x => x.id === selectedScenario);
+        setScenarioName(s ? s.name : '');
+    }, [selectedScenario, scenarios]);
+
+    const handleSwitch = (id: string) => {
+        setSelectedScenario(id);
+        if (typeof onSwitchScenario === 'function') onSwitchScenario(id);
+        else window.dispatchEvent(new CustomEvent('scenarios:switch', { detail: { id } }));
+    };
+    const handleRename = (name: string) => {
+        if (!selectedScenario) return;
+        if (typeof onRenameScenario === 'function') onRenameScenario(selectedScenario, name);
+        else window.dispatchEvent(new CustomEvent('scenarios:rename', { detail: { id: selectedScenario, name } }));
+    };
+    const handleNew = () => {
+        if (typeof onNewScenario === 'function') onNewScenario();
+        else window.dispatchEvent(new CustomEvent('scenarios:new'));
+    };
+    const handleCopy = () => {
+        if (!selectedScenario) return;
+        if (typeof onCopyScenario === 'function') onCopyScenario(selectedScenario);
+        else window.dispatchEvent(new CustomEvent('scenarios:copy', { detail: { id: selectedScenario } }));
+    };
+    const handleDelete = () => {
+        if (!selectedScenario) return;
+        if (typeof onDeleteScenario === 'function') onDeleteScenario(selectedScenario);
+        else window.dispatchEvent(new CustomEvent('scenarios:delete', { detail: { id: selectedScenario } }));
+    };
 
     const [focusTargetId, setFocusTargetId] = useState<string | null>(null);
     useEffect(() => {
@@ -131,6 +176,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
     
     return (
         <>
+            {/* Scenarios bar removed — now rendered in App to sit with Key Indicators */}
             {/* local focus target for newly-added dynamic list items */}
             {/* when set, effect will focus the element with that id after render */}
             

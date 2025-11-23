@@ -8,6 +8,7 @@ import { PrintableReport } from './components/PrintableReport';
 import Header from './components/Header';
 import Toast from './components/Toast';
 import { ResultsPanel } from './components/ResultsPanel';
+import ScenariosBar from './components/ScenariosBar';
 import { InputForm } from './components/InputForm';
 import { AnalysisSections } from './components/AnalysisSections';
 import { 
@@ -68,7 +69,21 @@ const App: React.FC = () => {
         resetAllScenarios,
         uploadScenarios,
         updateAllScenarios,
-    } = useScenarioManagement(loadFromStorage() || undefined);
+    } = useScenarioManagement();
+
+    // Load persisted scenarios from localStorage on client mount only
+    useEffect(() => {
+        try {
+            const stored = loadFromStorage();
+            if (stored) {
+                // uploadScenarios accepts either legacy ScenariosState or wrapped format
+                uploadScenarios(stored as any);
+            }
+        } catch (e) {
+            // ignore storage errors
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     // New helper to update all scenarios from the hook
     // (exposed directly for child components to call)
@@ -461,8 +476,25 @@ const App: React.FC = () => {
                 />
 
                 <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
-                    <ResultsPanel results={results} isLoading={isLoading} />
-                    
+                    <div className="sticky top-16 z-10">
+                        <ScenariosBar
+                            scenarios={scenarios}
+                            activeScenarioId={activeScenarioId}
+                            onSwitchScenario={handleSelectScenario}
+                            onRenameScenario={handleUpdateScenarioName}
+                            onNewScenario={handleNewScenario}
+                            onCopyScenario={handleCopyScenario}
+                            onDeleteScenario={handleDeleteScenario}
+                            onDownload={() => { handleDownloadScenarios(); }}
+                            onUpload={(file: File) => {
+                                const fakeEvent = { target: { files: [file] } } as unknown as React.ChangeEvent<HTMLInputElement>;
+                                // call the existing handler
+                                handleUploadScenarios(fakeEvent);
+                            }}
+                        />
+                        <ResultsPanel results={results} isLoading={isLoading} />
+                    </div>
+
                     <div className="mt-4 space-y-6">
                         <InputForm
                             plan={plan}
@@ -476,6 +508,13 @@ const App: React.FC = () => {
                                 window.dispatchEvent(new CustomEvent('app:toast', { detail: { message: 'Applied section to all scenarios' } }));
                             }}
                             scenariosCount={Object.keys(scenarios).length}
+                            scenarios={Object.values(scenarios)}
+                            activeScenarioId={activeScenarioId}
+                            onSwitchScenario={handleSelectScenario}
+                            onRenameScenario={handleUpdateScenarioName}
+                            onNewScenario={handleNewScenario}
+                            onCopyScenario={handleCopyScenario}
+                            onDeleteScenario={handleDeleteScenario}
                         />
                         <AnalysisSections
                             plan={plan}
