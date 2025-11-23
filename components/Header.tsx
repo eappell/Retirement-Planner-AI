@@ -112,9 +112,6 @@ const Header: React.FC<HeaderProps> = ({
           <h1 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-brand-primary to-brand-secondary flex-shrink-0">
             Monthly Retirement Income AI
           </h1>
-          <span className="text-sm font-medium text-brand-text-secondary whitespace-nowrap overflow-hidden text-ellipsis" title={activeScenario.name}>
-            ({activeScenario.name} scenario)
-          </span>
         </div>
         <p className="text-xs text-brand-text-secondary mt-0.5">Estimate your retirement income, taxes, and net worth.</p>
       </div>
