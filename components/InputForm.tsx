@@ -1,11 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import AddButton from './AddButton';
-<<<<<<< HEAD
 import ActionIcons from './ActionIcons';
-import { RetirementPlan, Person, PlanType, RetirementAccount, InvestmentAccount, Pension, OtherIncome, Annuity, ExpensePeriod, Gift, LegacyDisbursement } from '../types';
-=======
 import { RetirementPlan, Person, PlanType, RetirementAccount, InvestmentAccount, Pension, OtherIncome, Annuity, ExpensePeriod, Gift, LegacyDisbursement, OneTimeExpense } from '../types';
->>>>>>> feat/expenses
 import { InputSection } from './InputSection';
 import { NumberInput, SelectInput, TextInput } from './FormControls';
 import { STATES } from '../constants';
@@ -38,15 +34,6 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
     const sliderRefs = useRef<Record<string, HTMLInputElement | null>>({});
     const [draggingId, setDraggingId] = useState<string | null>(null);
     const [draggingValue, setDraggingValue] = useState<number | null>(null);
-<<<<<<< HEAD
-
-=======
-    const sliderRefs = useRef<Record<string, HTMLInputElement | null>>({});
-    const [incomeTab, setIncomeTab] = useState<'pensions' | 'annuities' | 'other'>('pensions');
-    const [accountsTab, setAccountsTab] = useState<'retirement' | 'investment'>('retirement');
-    const [estateTab, setEstateTab] = useState<'gifts' | 'legacy'>('gifts');
-    const [expensesTab, setExpensesTab] = useState<'periods' | 'oneTime'>('periods');
->>>>>>> feat/expenses
     useEffect(() => {
         if (!focusTargetId) return;
         const el = document.getElementById(focusTargetId) as HTMLElement | null;
@@ -1004,7 +991,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                 </div>
             </InputSection>
 
-<<<<<<< HEAD
+
             {['Expense Periods'].map(section => {
                 const listName = section.replace(' ', '').charAt(0).toLowerCase() + section.replace(' ', '').slice(1) as DynamicListKey;
                 const items = (plan[listName] as any[]) || [];
@@ -1097,7 +1084,22 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                                 addToList('investmentAccounts', { ...item, id, balance: 0, annualContribution: 0, percentStocks: 60, percentBonds: 40 });
                                                 setFocusTargetId(`investmentAccounts-name-${id}`);
                                             }} onRemove={() => removeFromList('investmentAccounts', item.id)} canRemove={items.length > 1} />
-=======
+                                        </div>
+                                    </>}
+                                </div>
+                            ))}
+
+                            {(items || []).length === 0 && (
+                                <div className="flex justify-center py-6">
+                                    <AddButton label={`+ Add ${section}`} onClick={() => { const id = Date.now().toString(); addToList(listName as any, { id } as any); setFocusTargetId(`${listName}-name-${id}`); }} />
+                                </div>
+                            )}
+
+                        </div>
+                    </InputSection>
+                    );
+                })}
+
             <InputSection title="Expenses" subtitle="Model recurring expense phases and one-time expenses." titleColorClass="text-red-600" gridCols={1}>
                 <div className="col-span-full">
                     <div className="flex items-center space-x-6 mb-3" role="tablist" aria-label="Expenses Tabs">
@@ -1112,7 +1114,6 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                         <div id="expense-periods-tooltip" role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2.5 rounded shadow border border-gray-200 hidden group-hover:block z-10">
                                             <div className="font-medium">Expense Periods</div>
                                             <div className="mt-1 text-sm">Model different recurring monthly spending phases in retirement. Use start/end ages to define each phase. Periods should not overlap — ensure the start age of a later phase is after the end age of an earlier phase.</div>
->>>>>>> feat/expenses
                                         </div>
                                     </span>
                                 </span>
