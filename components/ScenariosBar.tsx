@@ -195,8 +195,9 @@ const ScenariosBar: React.FC<ScenariosBarProps> = ({ scenarios = [], activeScena
                         </a>
 
                         <div
-                            className={`absolute top-full mt-2 left-1/2 transform -translate-x-1/2 w-80 bg-white shadow-lg rounded-md p-4 z-50 transition-opacity transition-transform duration-200 ease-out ${helpOpen ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-1 pointer-events-none'}`}
+                            className={`absolute top-full mt-2 left-1/2 transform -translate-x-1/2 w-80 bg-white shadow-xl rounded-md p-4 z-50 transition-all duration-300 ease-in-out ${helpOpen ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto' : 'opacity-0 -translate-y-2 scale-95 pointer-events-none'}`}
                             aria-hidden={!helpOpen}
+                            style={{ willChange: 'opacity, transform' }}
                         >
                             <h4 className="text-sm font-semibold text-[#0b6b04]">What Are Scenarios?</h4>
                             <div className="text-sm text-gray-700 mt-2 space-y-2">
