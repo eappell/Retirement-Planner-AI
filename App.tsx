@@ -477,7 +477,6 @@ const App: React.FC = () => {
 
                 <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
                     <div className="sticky top-16 z-10">
-                        <div className="text-xs text-red-600 mb-2">All changes to data are saved automatically</div>
                         <ScenariosBar
                             scenarios={scenarios}
                             activeScenarioId={activeScenarioId}
