@@ -38,7 +38,7 @@ export const InputForm: React.FC<InputFormProps> = ({
     const [incomeTab, setIncomeTab] = useState<'pensions' | 'annuities' | 'other'>('pensions');
     const [accountsTab, setAccountsTab] = useState<'retirement' | 'investment'>('retirement');
     const [estateTab, setEstateTab] = useState<'gifts' | 'legacy'>('gifts');
-    const [expensesTab, setExpensesTab] = useState<'periods' | 'oneTime'>('periods');
+    const [expensesTab, setExpensesTab] = useState<'periods' | 'oneTime'>('oneTime');
     useEffect(() => {
         if (!focusTargetId) return;
         const el = document.getElementById(focusTargetId) as HTMLInputElement | null;
@@ -917,102 +917,22 @@ export const InputForm: React.FC<InputFormProps> = ({
 
             <InputSection title="Expenses" subtitle="Model recurring expense phases and one-time expenses." titleColorClass="text-red-600" gridCols={1}>
                 <div className="col-span-full">
-                    <div className="flex items-center space-x-6 mb-3" role="tablist" aria-label="Expenses Tabs">
-                        {expensesTab === 'periods' ? (
-                            <button type="button" role="tab" id="tab-expense-periods" aria-selected="true" aria-controls="panel-expense-periods" onClick={() => setExpensesTab('periods')} className={`text-sm pb-2 ${'border-b-2 border-red-600 text-red-700 font-medium'} group`}>
-                                <span className="inline-flex items-center space-x-2">
-                                    <span>Expense Periods</span>
-                                    <span className="relative inline-flex">
-                                        <span className="text-gray-400 hover:text-gray-600 focus:outline-none" aria-hidden="true" tabIndex={-1}>
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M18 10A8 8 0 112 10a8 8 0 0116 0zm-8-3a1 1 0 100 2 1 1 0 000-2zm1 4a1 1 0 10-2 0v3a1 1 0 102 0v-3z" clipRule="evenodd"/></svg>
-                                        </span>
-                                        <div id="expense-periods-tooltip" role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2.5 rounded shadow border border-gray-200 hidden group-hover:block z-10">
-                                            <div className="font-medium">Expense Periods</div>
-                                            <div className="mt-1 text-sm">Model different recurring monthly spending phases in retirement. Use start/end ages to define each phase. Periods should not overlap — ensure the start age of a later phase is after the end age of an earlier phase.</div>
-                                        </div>
-                                    </span>
+                    <div className="flex items-center space-x-6 mb-3">
+                        <div className="text-sm pb-2 border-b-2 border-red-600 text-red-700 font-medium inline-flex items-center space-x-2">
+                            <span>One-Time Expenses</span>
+                            <span className="relative inline-flex">
+                                <span className="text-gray-400 hover:text-gray-600 focus:outline-none" aria-hidden="true" tabIndex={-1}>
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M18 10A8 8 0 112 10a8 8 0 0116 0zm-8-3a1 1 0 100 2 1 1 0 000-2zm1 4a1 1 0 10-2 0v3a1 1 0 102 0v-3z" clipRule="evenodd"/></svg>
                                 </span>
-                            </button>
-                        ) : (
-                            <button type="button" role="tab" id="tab-expense-periods" aria-controls="panel-expense-periods" onClick={() => setExpensesTab('periods')} className={`text-sm pb-2 ${'border-b-2 border-transparent text-gray-600 hover:text-gray-800'} group`}>
-                                <span className="inline-flex items-center space-x-2">
-                                    <span>Expense Periods</span>
-                                    <span className="relative inline-flex">
-                                        <span className="text-gray-400 hover:text-gray-600 focus:outline-none" aria-hidden="true" tabIndex={-1}>
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M18 10A8 8 0 112 10a8 8 0 0116 0zm-8-3a1 1 0 100 2 1 1 0 000-2zm1 4a1 1 0 10-2 0v3a1 1 0 102 0v-3z" clipRule="evenodd"/></svg>
-                                        </span>
-                                        <div id="expense-periods-tooltip" role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2.5 rounded shadow border border-gray-200 hidden group-hover:block z-10">
-                                            <div className="font-medium">Expense Periods</div>
-                                            <div className="mt-1 text-sm">Model different recurring monthly spending phases in retirement. Use start/end ages to define each phase. Periods should not overlap — ensure the start age of a later phase is after the end age of an earlier phase.</div>
-                                        </div>
-                                    </span>
-                                </span>
-                            </button>
-                        )}
-                        {expensesTab === 'oneTime' ? (
-                            <button type="button" role="tab" id="tab-one-time-expenses" aria-selected="true" aria-controls="panel-one-time-expenses" onClick={() => setExpensesTab('oneTime')} className={`text-sm pb-2 ${'border-b-2 border-red-600 text-red-700 font-medium'} group`}>
-                                <span className="inline-flex items-center space-x-2">
-                                    <span>One-Time Expenses</span>
-                                    <span className="relative inline-flex">
-                                        <span className="text-gray-400 hover:text-gray-600 focus:outline-none" aria-hidden="true" tabIndex={-1}>
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M18 10A8 8 0 112 10a8 8 0 0116 0zm-8-3a1 1 0 100 2 1 1 0 000-2zm1 4a1 1 0 10-2 0v3a1 1 0 102 0v-3z" clipRule="evenodd"/></svg>
-                                        </span>
-                                        <div id="one-time-expenses-tooltip" role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2.5 rounded shadow border border-gray-200 hidden group-hover:block z-10">
-                                            <div className="font-medium">One-Time Expenses</div>
-                                            <div className="mt-1 text-sm">One-time expenses are single, non-recurring costs that occur at a specific age. Enter the amount, the age when it happens, and an optional description. The expense is applied once to the projection at the selected owner's age.</div>
-                                        </div>
-                                    </span>
-                                </span>
-                            </button>
-                        ) : (
-                            <button type="button" role="tab" id="tab-one-time-expenses" aria-controls="panel-one-time-expenses" onClick={() => setExpensesTab('oneTime')} className={`text-sm pb-2 ${'border-b-2 border-transparent text-gray-600 hover:text-gray-800'} group`}>
-                                <span className="inline-flex items-center space-x-2">
-                                    <span>One-Time Expenses</span>
-                                    <span className="relative inline-flex">
-                                        <span className="text-gray-400 hover:text-gray-600 focus:outline-none" aria-hidden="true" tabIndex={-1}>
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M18 10A8 8 0 112 10a8 8 0 0116 0zm-8-3a1 1 0 100 2 1 1 0 000-2zm1 4a1 1 0 10-2 0v3a1 1 0 102 0v-3z" clipRule="evenodd"/></svg>
-                                        </span>
-                                        <div id="one-time-expenses-tooltip" role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2.5 rounded shadow border border-gray-200 hidden group-hover:block z-10">
-                                            <div className="font-medium">One-Time Expenses</div>
-                                            <div className="mt-1 text-sm">One-time expenses are single, non-recurring costs that occur at a specific age. Enter the amount, the age when it happens, and an optional description. The expense is applied once to the projection at the selected owner's age.</div>
-                                        </div>
-                                    </span>
-                                </span>
-                            </button>
-                        )}
+                                <div id="one-time-expenses-tooltip" role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2.5 rounded shadow border border-gray-200 hidden group-hover:block z-10">
+                                    <div className="font-medium">One-Time Expenses</div>
+                                    <div className="mt-1 text-sm">One-time expenses are single, non-recurring costs that occur at a specific age. Enter the amount, the age when it happens, and an optional description. The expense is applied once to the projection at the selected owner's age.</div>
+                                </div>
+                            </span>
+                        </div>
                     </div>
 
-                    {/* Expense Periods panel */}
-                    {expensesTab === 'periods' && (
-                        <div id="panel-expense-periods" role="tabpanel" aria-labelledby="tab-expense-periods" className="relative pt-3 space-y-2">
-                            {((plan.expensePeriods || []) as ExpensePeriod[]).map((item, idx, arr) => (
-                                <div key={item.id} className="grid gap-x-4 items-end p-2 rounded-md bg-red-50/50 grid-cols-5">
-                                    <TextInput id={`expensePeriods-name-${item.id}`} label="Name" value={item.name} onChange={e => handleDynamicListChange('expensePeriods', item.id, 'name', e.target.value)} data-list={'expensePeriods'} data-id={item.id} />
-                                    <NumberInput label="Total Monthly Expenses" prefix="$" value={item.monthlyAmount} onChange={e => handleDynamicListChange('expensePeriods', item.id, 'monthlyAmount', e.target.value)}/>
-                                    <div className="flex items-end space-x-2">
-                                        {isCouple && <SelectInput label=" " value={item.startAgeRef} onChange={e => handleDynamicListChange('expensePeriods', item.id, 'startAgeRef', e.target.value)}><option value="person1">{plan.person1.name}</option><option value="person2">{plan.person2.name}</option></SelectInput>}
-                                        <NumberInput label="Start Age" value={item.startAge} onChange={e => handleDynamicListChange('expensePeriods', item.id, 'startAge', e.target.value)} />
-                                    </div>
-                                    <div className="flex items-end space-x-2">
-                                        {isCouple && <SelectInput label=" " value={item.endAgeRef} onChange={e => handleDynamicListChange('expensePeriods', item.id, 'endAgeRef', e.target.value)}><option value="person1">{plan.person1.name}</option><option value="person2">{plan.person2.name}</option></SelectInput>}
-                                        <NumberInput label="End Age" value={item.endAge} onChange={e => handleDynamicListChange('expensePeriods', item.id, 'endAge', e.target.value)}/>
-                                    </div>
-                                    <div className="flex items-end">
-                                        <ActionIcons onAdd={() => {
-                                            const id = Date.now().toString();
-                                            addToList('expensePeriods', { id, monthlyAmount: 0, name: `Phase ${arr.length + 1}`, startAge: arr.length > 0 ? arr[arr.length - 1].endAge + 1 : plan.person1.retirementAge, startAgeRef: arr[arr.length - 1]?.startAgeRef || 'person1', endAge: plan.person1.lifeExpectancy, endAgeRef: arr[arr.length - 1]?.endAgeRef || 'person1' } as ExpensePeriod);
-                                            setFocusTargetId(`expensePeriods-name-${id}`);
-                                        }} onRemove={() => removeFromList('expensePeriods', item.id)} canRemove={(plan.expensePeriods || []).length > 1} />
-                                    </div>
-                                </div>
-                            ))}
-                            {(plan.expensePeriods || []).length === 0 && (
-                                <div className="flex justify-center py-6">
-                                    <AddButton label="+ Add Expense Period" icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M6 2v2M14 2v2M3 8h14M4 6h12v12H4z" /></svg>} onClick={() => { const id = Date.now().toString(); const newExp: ExpensePeriod = { id, monthlyAmount: 0, name: `Phase ${((plan.expensePeriods || []).length) + 1}`, startAge: plan.person1.retirementAge, startAgeRef: 'person1', endAge: plan.person1.lifeExpectancy, endAgeRef: 'person1' }; addToList('expensePeriods', newExp); setFocusTargetId(`expensePeriods-name-${id}`); }} />
-                                </div>
-                            )}
-                        </div>
-                    )}
+                    {/* Expense Periods removed: using One-Time Expenses only */}
 
                     {/* One-Time Expenses panel */}
                     {expensesTab === 'oneTime' && (
