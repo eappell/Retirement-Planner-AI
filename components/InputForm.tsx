@@ -21,20 +21,22 @@ interface InputFormProps {
     ) => void;
     addToList: <K extends DynamicListKey>(listName: K, newItem: RetirementPlan[K][number]) => void;
     removeFromList: (listName: DynamicListKey, id: string) => void;
+    updateAllScenarios?: (partialPlan: Partial<RetirementPlan>) => void;
 }
  
-const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePersonChange, handleDynamicListChange, addToList, removeFromList }) => {
+const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePersonChange, handleDynamicListChange, addToList, removeFromList, updateAllScenarios }) => {
 
     const isCouple = plan.planType === PlanType.COUPLE;
+
+    const currencyFormatter = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    const formatCurrency = (value: number) => currencyFormatter.format(value ?? 0);
 
     const [accountsTab, setAccountsTab] = useState<'retirement' | 'investment' | 'hsa'>('retirement');
     const [incomeTab, setIncomeTab] = useState<'pensions' | 'annuities' | 'other'>('pensions');
     const [estateTab, setEstateTab] = useState<'gifts' | 'legacy'>('gifts');
     const [expensesTab, setExpensesTab] = useState<'periods' | 'oneTime'>('periods');
+
     const [focusTargetId, setFocusTargetId] = useState<string | null>(null);
-    const sliderRefs = useRef<Record<string, HTMLInputElement | null>>({});
-    const [draggingId, setDraggingId] = useState<string | null>(null);
-    const [draggingValue, setDraggingValue] = useState<number | null>(null);
     useEffect(() => {
         if (!focusTargetId) return;
         const el = document.getElementById(focusTargetId) as HTMLElement | null;
@@ -42,47 +44,9 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
         setFocusTargetId(null);
     }, [focusTargetId]);
 
-    const formatCurrency = (value: number) => {
-        return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
-    };
-
-    // Keyboard navigation for Accounts tabs (Left/Right/Home/End)
-    const handleAccountsKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-        const ids = ['tab-retirement', 'tab-investment', 'tab-hsa'];
-        const activeId = document.activeElement?.id || '';
-        const idx = ids.indexOf(activeId);
-        let next = idx;
-        if (e.key === 'ArrowRight') next = idx === -1 ? 0 : (idx + 1) % ids.length;
-        else if (e.key === 'ArrowLeft') next = idx === -1 ? ids.length - 1 : (idx - 1 + ids.length) % ids.length;
-        else if (e.key === 'Home') next = 0;
-        else if (e.key === 'End') next = ids.length - 1;
-        else return;
-        e.preventDefault();
-        const nextId = ids[next];
-        setAccountsTab(nextId === 'tab-retirement' ? 'retirement' : (nextId === 'tab-investment' ? 'investment' : 'hsa'));
-        const el = document.getElementById(nextId);
-        el?.focus();
-    };
-
-    // Keyboard navigation for Income tabs (Left/Right/Home/End)
-    const handleIncomeKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-        const ids = ['tab-pensions', 'tab-annuities', 'tab-otherincomes'];
-        const activeId = document.activeElement?.id || '';
-        const idx = ids.indexOf(activeId);
-        let next = idx;
-        if (e.key === 'ArrowRight') next = idx === -1 ? 0 : (idx + 1) % ids.length;
-        else if (e.key === 'ArrowLeft') next = idx === -1 ? ids.length - 1 : (idx - 1 + ids.length) % ids.length;
-        else if (e.key === 'Home') next = 0;
-        else if (e.key === 'End') next = ids.length - 1;
-        else return;
-        e.preventDefault();
-        const nextId = ids[next];
-        if (nextId === 'tab-pensions') setIncomeTab('pensions');
-        else if (nextId === 'tab-annuities') setIncomeTab('annuities');
-        else setIncomeTab('other');
-        const el = document.getElementById(nextId);
-        el?.focus();
-    };
+    const sliderRefs = useRef<Record<string, HTMLInputElement | null>>({});
+    const [draggingId, setDraggingId] = useState<string | null>(null);
+    const [draggingValue, setDraggingValue] = useState<number | null>(null);
 
     // Keyboard navigation for Estate Planning tabs
     const handleEstateKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -103,6 +67,46 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
         el?.focus();
     };
 
+    // Keyboard navigation for Accounts tabs
+    const handleAccountsKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+        const ids = ['tab-retirement', 'tab-investment', 'tab-hsa'];
+        const activeId = document.activeElement?.id || '';
+        const idx = ids.indexOf(activeId);
+        let next = idx;
+        if (e.key === 'ArrowRight') next = idx === -1 ? 0 : (idx + 1) % ids.length;
+        else if (e.key === 'ArrowLeft') next = idx === -1 ? ids.length - 1 : (idx - 1 + ids.length) % ids.length;
+        else if (e.key === 'Home') next = 0;
+        else if (e.key === 'End') next = ids.length - 1;
+        else return;
+        e.preventDefault();
+        const nextId = ids[next];
+        if (nextId === 'tab-retirement') setAccountsTab('retirement');
+        else if (nextId === 'tab-investment') setAccountsTab('investment');
+        else setAccountsTab('hsa');
+        const el = document.getElementById(nextId);
+        el?.focus();
+    };
+
+    // Keyboard navigation for Income tabs
+    const handleIncomeKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+        const ids = ['tab-pensions', 'tab-annuities', 'tab-otherincomes'];
+        const activeId = document.activeElement?.id || '';
+        const idx = ids.indexOf(activeId);
+        let next = idx;
+        if (e.key === 'ArrowRight') next = idx === -1 ? 0 : (idx + 1) % ids.length;
+        else if (e.key === 'ArrowLeft') next = idx === -1 ? ids.length - 1 : (idx - 1 + ids.length) % ids.length;
+        else if (e.key === 'Home') next = 0;
+        else if (e.key === 'End') next = ids.length - 1;
+        else return;
+        e.preventDefault();
+        const nextId = ids[next];
+        if (nextId === 'tab-pensions') setIncomeTab('pensions');
+        else if (nextId === 'tab-annuities') setIncomeTab('annuities');
+        else setIncomeTab('other');
+        const el = document.getElementById(nextId);
+        el?.focus();
+    };
+
     // helpers for gifts & legacy so they can be used in the new Estate section
     const addGiftGlobal = () => {
         const id = Date.now().toString();
@@ -116,6 +120,12 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
         const newLegacy: LegacyDisbursement = { id, beneficiary: '', beneficiaryType: 'person', percentage: 0 };
         addToList('legacyDisbursements', newLegacy);
         setFocusTargetId(`legacy-beneficiary-${id}`);
+    };
+    
+    const doUpdateAll = (partial: Partial<RetirementPlan>, label?: string) => {
+        if (!partial) return;
+        if (!confirm(`Apply ${label ?? 'these changes'} to ALL scenarios? This will overwrite the same section in every scenario.`)) return;
+        if (typeof updateAllScenarios === 'function') updateAllScenarios(partial);
     };
     
     return (
@@ -162,7 +172,6 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                         <NumberInput label="Bonds: Expected Return" suffix="%" value={(plan.bondMean ?? 3)} onChange={e => handlePlanChange('bondMean', Number(e.target.value))} />
                         <NumberInput label="Bonds: Volatility (std dev)" suffix="%" value={(plan.bondStd ?? 6)} onChange={e => handlePlanChange('bondStd', Number(e.target.value))} />
 
-                        {/* Tail df: checkbox under Stocks Expected Return, df under Stocks Volatility */}
                         <div className="sm:col-start-1 flex items-center">
                             <input id="useFatTails" type="checkbox" checked={!!plan.useFatTails} onChange={e => handlePlanChange('useFatTails', e.target.checked as any)} className="h-4 w-4 rounded text-brand-primary focus:ring-brand-primary" />
                             <label htmlFor="useFatTails" className="ml-2 text-sm font-medium">Use fat-tailed returns</label>
@@ -172,7 +181,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                         </div>
                     </div>
 
-                    <p className="text-xs text-gray-500 mt-2">When <strong>Use fat-tailed returns</strong> is enabled, yearly returns are sampled from a Student's t‑distribution (named for "Student", William S. Gosset). The t‑distribution has heavier tails than the normal distribution — lower degrees of freedom (df) produce fatter tails and more extreme returns. For df ≈ 3–6 you'll see noticeably heavier tails; df &gt; 30 behaves like a normal distribution. The implementation scales t‑draws to match the volatility you set, so fat tails increase the chance of large gains or losses; interpret simulated success rates accordingly.</p>
+                    <p className="text-xs text-gray-500 mt-2">When <strong>Use fat-tailed returns</strong> is enabled, yearly returns are sampled from a Student's t‑distribution. Lower degrees of freedom produce fatter tails and more extreme returns. Use these settings to tweak expected returns and volatilities for allocation-weighted returns.</p>
 
                     {(() => {
                         const sd = Number(plan.stockStd ?? 15);
@@ -180,35 +189,42 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                         const sm = Number(plan.stockMean ?? 8);
                         const bm = Number(plan.bondMean ?? 3);
                         const issues = validateAssetDefaults({ stockMean: sm, bondMean: bm, stockStd: sd, bondStd: bd });
-
+                        if (issues.length === 0) return null;
                         return (
-                            <>
-                                <p className="text-xs text-gray-500 mt-2">These settings let you tweak the expected returns and volatilities used when calculating allocation-weighted returns for investment accounts. The plan-level Average Return still acts as a baseline and will bias these values so the overall portfolio still matches your `Avg. Return`.</p>
-                                {issues.length > 0 && (
-                                    <div className="mt-2">
-                                        <p className="text-sm text-red-600 font-medium">Market assumptions warnings:</p>
-                                        <ul className="text-sm text-red-600 list-disc list-inside">
-                                            {issues.map((x, i) => <li key={i}>{x}</li>)}
-                                        </ul>
-                                    </div>
-                                )}
-                                <div className="mt-3">
-                                    <button type="button" onClick={() => {
-                                        try {
-                                            const assetDefaults = { stockMean: sm, stockStd: sd, bondMean: bm, bondStd: bd, useFatTails: !!plan.useFatTails, fatTailDf: plan.fatTailDf ?? 4 };
-                                            localStorage.setItem('assetAssumptionDefaults', JSON.stringify(assetDefaults));
-                                            window.dispatchEvent(new CustomEvent('app:toast', { detail: { message: 'Saved asset-assumption defaults' } }));
-                                        } catch (e) {
-                                            console.error(e);
-                                            window.dispatchEvent(new CustomEvent('app:toast', { detail: { message: 'Failed to save app defaults' } }));
-                                        }
-                                    }} className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-md text-sm">Save as App Defaults</button>
-                                </div>
-                            </>
+                            <div className="mt-2">
+                                <p className="text-sm text-red-600 font-medium">Market assumptions warnings:</p>
+                                <ul className="text-sm text-red-600 list-disc list-inside">
+                                    {issues.map((x, i) => <li key={i}>{x}</li>)}
+                                </ul>
+                            </div>
                         );
                     })()}
+
+                    <div className="flex justify-end mt-3">
+                        <button type="button" className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-md text-sm" onClick={() => {
+                            try {
+                                const payload = {
+                                    stockMean: plan.stockMean,
+                                    stockStd: plan.stockStd,
+                                    bondMean: plan.bondMean,
+                                    bondStd: plan.bondStd,
+                                    useFatTails: plan.useFatTails,
+                                    fatTailDf: plan.fatTailDf
+                                };
+                                window.dispatchEvent(new CustomEvent('app:saveMarketDefaults', { detail: payload }));
+                                window.dispatchEvent(new CustomEvent('app:toast', { detail: { message: 'Saved market assumptions' } }));
+                            } catch (e) {
+                                console.error(e);
+                                window.dispatchEvent(new CustomEvent('app:toast', { detail: { message: 'Failed to save app defaults' } }));
+                            }
+                        }}>Save as App Defaults</button>
+                    </div>
                 </details>
                 {/* Fat-tail demo removed per user request */}
+
+                <div className="flex justify-end mt-3">
+                    <button type="button" className="text-sm px-2 py-1 bg-gray-100 rounded" onClick={() => doUpdateAll({ planType: plan.planType, state: plan.state, inflationRate: plan.inflationRate, avgReturn: plan.avgReturn, annualWithdrawalRate: plan.annualWithdrawalRate, useFatTails: plan.useFatTails, fatTailDf: plan.fatTailDf, stockMean: (plan as any).stockMean, stockStd: (plan as any).stockStd, bondMean: (plan as any).bondMean, bondStd: (plan as any).bondStd, dieWithZero: plan.dieWithZero, legacyAmount: plan.legacyAmount }, 'Plan Information')}>Update All Scenarios</button>
+                </div>
 
             </InputSection>
 
@@ -317,6 +333,11 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                         )}
                     </div>
                     {isCouple && <p className="col-span-full text-xs text-gray-500 mt-2">Note: Survivor benefits are simplified. Typically, a surviving spouse receives the higher of their own benefit or their deceased spouse's benefit.</p>}
+
+                <div className="flex justify-end mt-3">
+                    <button type="button" className="text-sm px-2 py-1 bg-gray-100 rounded" onClick={() => doUpdateAll({ person1: { ...plan.person1 }, person2: { ...plan.person2 }, socialSecurity: plan.socialSecurity }, 'Social Security')}>Update All Scenarios</button>
+                </div>
+
             </InputSection>
 
                     {/* Accounts - combined tabs for Retirement / Investment accounts */}
@@ -496,64 +517,57 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                         const invs = (plan.investmentAccounts || []) as InvestmentAccount[];
                                         return (
                                             <>
-                                                {invs.map(item => {
-                                                    return (
-                                                        <React.Fragment key={item.id}>
-                                                                <div className="grid gap-x-4 items-end p-2 rounded-md bg-teal-50/50 grid-cols-9">
-                                                                    <SelectInput label="Owner" value={item.owner || 'person1'} onChange={e => handleDynamicListChange('investmentAccounts', item.id, 'owner', e.target.value)}>
-                                                                        <option value="person1">{plan.person1.name}</option>
-                                                                        {isCouple && <option value="person2">{plan.person2.name}</option>}
-                                                                    </SelectInput>
-                                                                    <TextInput id={`investmentAccounts-name-${item.id}`} label="Name" value={item.name} onChange={e => handleDynamicListChange('investmentAccounts', item.id, 'name', e.target.value)} />
-                                                                    <NumberInput label="Balance" prefix="$" value={item.balance} onChange={e => handleDynamicListChange('investmentAccounts', item.id, 'balance', e.target.value)}/>
-                                                                    <NumberInput label="Annual Contrib." prefix="$" value={item.annualContribution} onChange={e => handleDynamicListChange('investmentAccounts', item.id, 'annualContribution', e.target.value)}/>
-                                                                    <div className="col-span-2">
-                                                                        <label className="block text-sm font-medium text-brand-text-secondary">% Stocks</label>
-                                                                        <div className="flex items-center space-x-3">
-                                                                                <div className="relative w-full" onMouseUp={() => setDraggingId(null)} onTouchEnd={() => setDraggingId(null)}>
-                                                                                    <input
-                                                                                        ref={el => { sliderRefs.current[item.id] = el; }}
-                                                                                        type="range"
-                                                                                        min={0}
-                                                                                        max={100}
-                                                                                        aria-label={`% Stocks for ${item.name || 'account'}`}
-                                                                                        value={Number(item.percentStocks ?? 0)}
-                                                                                        onMouseDown={() => setDraggingId(item.id)}
-                                                                                        onTouchStart={() => setDraggingId(item.id)}
-                                                                                        onChange={e => {
-                                                                                            const v = Number(e.target.value);
-                                                                                            handleDynamicListChange('investmentAccounts', item.id, 'percentStocks', String(v));
-                                                                                            handleDynamicListChange('investmentAccounts', item.id, 'percentBonds', String(100 - v));
-                                                                                            setDraggingValue(v);
-                                                                                        }}
-                                                                                        className="w-full"
-                                                                                    />
-                                                                                    {draggingId === item.id && (
-                                                                                        <div className="absolute -top-8 left-0 pointer-events-none w-full flex justify-center">
-                                                                                            <div className="bg-gray-800 text-white text-xs px-2 py-1 rounded">{draggingValue ?? Number(item.percentStocks ?? 0)}%</div>
-                                                                                        </div>
-                                                                                    )}
-                                                                                </div>
-                                                                            <div className="w-20 text-right">
-                                                                                <div aria-live="polite" className="text-sm font-medium">{Number(item.percentStocks ?? 0)}%</div>
-                                                                            </div>
+                                                {invs.map(item => (
+                                                    <div key={item.id} className="grid gap-x-4 items-end p-2 rounded-md bg-teal-50/50 grid-cols-9">
+                                                        <SelectInput label="Owner" value={item.owner || 'person1'} onChange={e => handleDynamicListChange('investmentAccounts', item.id, 'owner', e.target.value)}>
+                                                            <option value="person1">{plan.person1.name}</option>
+                                                            {isCouple && <option value="person2">{plan.person2.name}</option>}
+                                                        </SelectInput>
+                                                        <TextInput id={`investmentAccounts-name-${item.id}`} label="Name" value={item.name} onChange={e => handleDynamicListChange('investmentAccounts', item.id, 'name', e.target.value)} />
+                                                        <NumberInput label="Balance" prefix="$" value={item.balance} onChange={e => handleDynamicListChange('investmentAccounts', item.id, 'balance', e.target.value)}/>
+                                                        <NumberInput label="Annual Contrib." prefix="$" value={item.annualContribution} onChange={e => handleDynamicListChange('investmentAccounts', item.id, 'annualContribution', e.target.value)}/>
+                                                        <div className="col-span-2">
+                                                            <label className="block text-sm font-medium text-brand-text-secondary">% Stocks</label>
+                                                            <div className="flex items-center space-x-3">
+                                                                <div className="relative w-full" onMouseUp={() => setDraggingId(null)} onTouchEnd={() => setDraggingId(null)}>
+                                                                    <input
+                                                                        ref={el => { sliderRefs.current[item.id] = el; }}
+                                                                        type="range"
+                                                                        min={0}
+                                                                        max={100}
+                                                                        aria-label={`% Stocks for ${item.name || 'account'}`}
+                                                                        value={Number(item.percentStocks ?? 0)}
+                                                                        onMouseDown={() => setDraggingId(item.id)}
+                                                                        onTouchStart={() => setDraggingId(item.id)}
+                                                                        onChange={e => {
+                                                                            const v = Number(e.target.value);
+                                                                            handleDynamicListChange('investmentAccounts', item.id, 'percentStocks', String(v));
+                                                                            handleDynamicListChange('investmentAccounts', item.id, 'percentBonds', String(100 - v));
+                                                                            setDraggingValue(v);
+                                                                        }}
+                                                                        className="w-full"
+                                                                    />
+                                                                    {draggingId === item.id && (
+                                                                        <div className="absolute -top-8 left-0 pointer-events-none w-full flex justify-center">
+                                                                            <div className="bg-gray-800 text-white text-xs px-2 py-1 rounded">{draggingValue ?? Number(item.percentStocks ?? 0)}%</div>
                                                                         </div>
-                                                                    </div>
-                                                                    <div>
-                                                                        <NumberInput label="% Bonds" suffix="%" value={100 - (Number(item.percentStocks ?? 0))} disabled />
-                                                                    </div>
-                                                                <div className="flex items-end">
-                                                                    <ActionIcons onAdd={() => {
-                                                                        const id = Date.now().toString();
-                                                                        const newInv: InvestmentAccount = { ...item, id, balance: 0, annualContribution: 0, percentStocks: 60, percentBonds: 40 } as InvestmentAccount;
-                                                                        addToList('investmentAccounts', newInv);
-                                                                        setFocusTargetId(`investmentAccounts-name-${id}`);
-                                                                    }} onRemove={() => removeFromList('investmentAccounts', item.id)} canRemove={(plan.investmentAccounts || []).length > 1} />
+                                                                    )}
+                                                                </div>
+                                                                <div className="w-20 text-right">
+                                                                    <div aria-live="polite" className="text-sm font-medium">{Number(item.percentStocks ?? 0)}%</div>
                                                                 </div>
                                                             </div>
-                                                        </React.Fragment>
-                                                    );
-                                                })}
+                                                        </div>
+                                                        <div className="flex items-end">
+                                                            <ActionIcons onAdd={() => {
+                                                                const id = Date.now().toString();
+                                                                const newInv: InvestmentAccount = { ...item, id, balance: 0, annualContribution: 0, percentStocks: 60, percentBonds: 40 } as InvestmentAccount;
+                                                                addToList('investmentAccounts', newInv);
+                                                                setFocusTargetId(`investmentAccounts-name-${id}`);
+                                                            }} onRemove={() => removeFromList('investmentAccounts', item.id)} canRemove={(plan.investmentAccounts || []).length > 1} />
+                                                        </div>
+                                                    </div>
+                                                ))}
                                             </>
                                         );
                                     })()}
@@ -567,6 +581,9 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                             }} />
                                         </div>
                                     )}
+                                    <div className="flex justify-end mt-3">
+                                        <button type="button" className="text-sm px-2 py-1 bg-gray-100 rounded" onClick={() => doUpdateAll({ retirementAccounts: plan.retirementAccounts, investmentAccounts: plan.investmentAccounts }, 'Accounts')}>Update All Scenarios</button>
+                                    </div>
                                 </div>
                             )}
                         </div>
@@ -827,6 +844,11 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                         </div>
                     )}
                 </div>
+
+                <div className="flex justify-end mt-3">
+                    <button type="button" className="text-sm px-2 py-1 bg-gray-100 rounded" onClick={() => doUpdateAll({ expensePeriods: plan.expensePeriods, oneTimeExpenses: plan.oneTimeExpenses }, 'Expenses')}>Update All Scenarios</button>
+                </div>
+
             </InputSection>
 
             {/* Estate Planning - Gifts + Legacy (tabs) */}
@@ -955,8 +977,8 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                     <div className="col-span-2">
                                         <TextInput id={`legacy-beneficiary-${ld.id}`} label="Beneficiary" value={ld.beneficiary} disabled={plan.dieWithZero} onChange={e => handleDynamicListChange('legacyDisbursements', ld.id, 'beneficiary', e.target.value)} />
                                     </div>
-                                    <div>
-                                        <SelectInput label="Type" value={ld.beneficiaryType} disabled={plan.dieWithZero} onChange={e => handleDynamicListChange('legacyDisbursements', ld.id, 'beneficiaryType', e.target.value)}>
+                                    <div className="w-28">
+                                        <SelectInput label="Beneficiary Type" value={ld.beneficiaryType || 'person'} onChange={e => handleDynamicListChange('legacyDisbursements', ld.id, 'beneficiaryType', e.target.value)}>
                                             <option value="person">Person</option>
                                             <option value="organization">Organization</option>
                                         </SelectInput>
@@ -988,6 +1010,9 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                 return null;
                             })()}
                             {plan.dieWithZero && <p className="text-sm text-gray-500 italic">Legacy disbursements are disabled while Die With Zero is enabled.</p>}
+                            <div className="flex justify-end mt-3">
+                                <button type="button" className="text-sm px-2 py-1 bg-gray-100 rounded" onClick={() => doUpdateAll({ gifts: plan.gifts, legacyDisbursements: plan.legacyDisbursements }, 'Estate Planning')}>Update All Scenarios</button>
+                            </div>
                         </div>
                     )}
                 </div>
