@@ -83,6 +83,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
     };
 
     const [focusTargetId, setFocusTargetId] = useState<string | null>(null);
+    const [dieTooltipOpen, setDieTooltipOpen] = useState(false);
     useEffect(() => {
         if (!focusTargetId) return;
         const el = document.getElementById(focusTargetId) as HTMLElement | null;
@@ -294,11 +295,19 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                     <label htmlFor="dieWithZeroCheck" className="font-bold text-lg text-brand-primary cursor-pointer whitespace-nowrap">
                         Die With Zero
                     </label>
-                    <span className="relative inline-flex ml-2">
-                        <span className="text-gray-400 hover:text-gray-600 focus:text-gray-700" aria-hidden="true" tabIndex={0}> 
+                    <span
+                        className="relative inline-flex ml-2"
+                        onMouseEnter={() => setDieTooltipOpen(true)}
+                        onMouseLeave={() => setDieTooltipOpen(false)}
+                        onFocus={() => setDieTooltipOpen(true)}
+                        onBlur={() => setDieTooltipOpen(false)}
+                        onKeyDown={(e) => { if (e.key === 'Escape') setDieTooltipOpen(false); }}
+                        tabIndex={-1}
+                    >
+                        <span className="text-gray-400 hover:text-gray-600 focus:text-gray-700" aria-hidden="true" tabIndex={0}>
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
                         </span>
-                        <div id="die-with-zero-tooltip" role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-72 bg-gray-100 text-gray-900 text-[0.95rem] p-2.5 rounded shadow border border-gray-200 hidden group-hover:block group-focus-within:block z-10">
+                        <div id="die-with-zero-tooltip" role="tooltip" aria-hidden={!dieTooltipOpen} className={`absolute left-full top-1/2 -translate-y-1/2 ml-2 w-72 bg-gray-100 text-gray-900 text-[0.95rem] p-2.5 rounded shadow border border-gray-200 ${dieTooltipOpen ? 'block' : 'hidden'} z-10`}>
                             <div className="font-medium">Die With Zero</div>
                             <div className="mt-1 text-sm">Calculates the maximum withdrawal that leaves your target legacy (for example, $0). When enabled, the fixed withdrawal rate is ignored and legacy disbursements are disabled — this can significantly change spending and final legacy.</div>
                         </div>
