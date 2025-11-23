@@ -194,16 +194,17 @@ const ScenariosBar: React.FC<ScenariosBarProps> = ({ scenarios = [], activeScena
                             <span>What are scenarios?</span>
                         </a>
 
-                        {helpOpen && (
-                            <div className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 w-80 bg-white shadow-lg rounded-md p-4 z-50">
-                                <h4 className="text-sm font-semibold text-[#0b6b04]">What Are Scenarios?</h4>
-                                <div className="text-sm text-gray-700 mt-2 space-y-2">
-                                    <p>Scenarios let you save a copy of your current plan so you can switch between different versions of your assumptions and inputs.</p>
-                                    <p>Use scenarios to preserve your work, experiment safely, and compare outcomes across alternatives.</p>
-                                    <p>You can also download your scenarios to a file and load them in another browser or device so your work travels with you.</p>
-                                </div>
+                        <div
+                            className={`absolute top-full mt-2 left-1/2 transform -translate-x-1/2 w-80 bg-white shadow-lg rounded-md p-4 z-50 transition-opacity transition-transform duration-200 ease-out ${helpOpen ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-1 pointer-events-none'}`}
+                            aria-hidden={!helpOpen}
+                        >
+                            <h4 className="text-sm font-semibold text-[#0b6b04]">What Are Scenarios?</h4>
+                            <div className="text-sm text-gray-700 mt-2 space-y-2">
+                                <p>Scenarios let you save a copy of your current plan so you can switch between different versions of your assumptions and inputs.</p>
+                                <p>Use scenarios to preserve your work, experiment safely, and compare outcomes across alternatives.</p>
+                                <p>You can also download your scenarios to a file and load them in another browser or device so your work travels with you.</p>
                             </div>
-                        )}
+                        </div>
                     </div>
                 </div>
             </div>
