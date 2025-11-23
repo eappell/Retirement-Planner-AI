@@ -29,7 +29,6 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
 
     const [accountsTab, setAccountsTab] = useState<'retirement' | 'investment' | 'hsa'>('retirement');
     const [incomeTab, setIncomeTab] = useState<'pensions' | 'annuities' | 'other'>('pensions');
-    const [estateTab, setEstateTab] = useState<'gifts' | 'legacy'>('gifts');
     const [expensesTab, setExpensesTab] = useState<'periods' | 'oneTime'>('periods');
     const [focusTargetId, setFocusTargetId] = useState<string | null>(null);
     const sliderRefs = useRef<Record<string, HTMLInputElement | null>>({});
@@ -132,6 +131,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 col-span-full">
                     <div className="flex flex-col space-y-2 h-full">
                         {(Object.values(PlanType) as PlanType[]).map(type => (
+                            
                             <button
                                 key={type}
                                 onClick={() => {
@@ -1171,32 +1171,45 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                     {/* Expense Periods panel */}
                     {expensesTab === 'periods' && (
                         <div id="panel-expense-periods" role="tabpanel" aria-labelledby="tab-expense-periods" className="relative pt-3 space-y-2">
-                            {((plan.expensePeriods || []) as ExpensePeriod[]).map((item, idx, arr) => (
-                                <div key={item.id} className="grid gap-x-4 items-end p-2 rounded-md bg-red-50/50 grid-cols-5">
-                                    <TextInput id={`expensePeriods-name-${item.id}`} label="Name" value={item.name} onChange={e => handleDynamicListChange('expensePeriods', item.id, 'name', e.target.value)} data-list={'expensePeriods'} data-id={item.id} />
-                                    <NumberInput label="Total Monthly Expenses" prefix="$" value={item.monthlyAmount} onChange={e => handleDynamicListChange('expensePeriods', item.id, 'monthlyAmount', e.target.value)}/>
-                                    <div className="flex items-end space-x-2">
-                                        {isCouple && <SelectInput label=" " value={item.startAgeRef} onChange={e => handleDynamicListChange('expensePeriods', item.id, 'startAgeRef', e.target.value)}><option value="person1">{plan.person1.name}</option><option value="person2">{plan.person2.name}</option></SelectInput>}
-                                        <NumberInput label="Start Age" value={item.startAge} onChange={e => handleDynamicListChange('expensePeriods', item.id, 'startAge', e.target.value)} />
+                            {((plan.expensePeriods || []) as ExpensePeriod[]).map(ep => (
+                                <div key={ep.id} className="grid gap-x-4 items-end p-2 rounded-md bg-red-50/50 grid-cols-7">
+                                    <div className="col-span-1">
+                                        <TextInput id={`expensePeriods-name-${ep.id}`} className="max-w-[10rem]" label="Name" value={ep.name || ''} onChange={e => handleDynamicListChange('expensePeriods', ep.id, 'name', e.target.value)} />
                                     </div>
-                                    <div className="flex items-end space-x-2">
-                                        {isCouple && <SelectInput label=" " value={item.endAgeRef} onChange={e => handleDynamicListChange('expensePeriods', item.id, 'endAgeRef', e.target.value)}><option value="person1">{plan.person1.name}</option><option value="person2">{plan.person2.name}</option></SelectInput>}
-                                        <NumberInput label="End Age" value={item.endAge} onChange={e => handleDynamicListChange('expensePeriods', item.id, 'endAge', e.target.value)}/>
+                                    <NumberInput label="Monthly Amount" prefix="$" value={ep.monthlyAmount} onChange={e => handleDynamicListChange('expensePeriods', ep.id, 'monthlyAmount', e.target.value)} />
+                                    <div className="w-28">
+                                        <SelectInput aria-label="Start owner" value={ep.startAgeRef || 'person1'} onChange={e => handleDynamicListChange('expensePeriods', ep.id, 'startAgeRef', e.target.value)}>
+                                            <option value="person1">{plan.person1.name}</option>
+                                            {isCouple && <option value="person2">{plan.person2.name}</option>}
+                                        </SelectInput>
+                                    </div>
+                                    <div className="w-28">
+                                        <NumberInput label="Start Age" value={ep.startAge} onChange={e => handleDynamicListChange('expensePeriods', ep.id, 'startAge', e.target.value)} />
+                                    </div>
+                                    <div className="w-28">
+                                        <SelectInput aria-label="End owner" value={ep.endAgeRef || 'person1'} onChange={e => handleDynamicListChange('expensePeriods', ep.id, 'endAgeRef', e.target.value)}>
+                                            <option value="person1">{plan.person1.name}</option>
+                                            {isCouple && <option value="person2">{plan.person2.name}</option>}
+                                        </SelectInput>
+                                    </div>
+                                    <div className="w-28">
+                                        <NumberInput label="End Age" value={ep.endAge} onChange={e => handleDynamicListChange('expensePeriods', ep.id, 'endAge', e.target.value)} />
                                     </div>
                                     <div className="flex items-end">
-                                        <ActionIcons onAdd={() => {
-                                            const id = Date.now().toString();
-                                            addToList('expensePeriods', { id, monthlyAmount: 0, name: `Phase ${arr.length + 1}`, startAge: arr.length > 0 ? arr[arr.length - 1].endAge + 1 : plan.person1.retirementAge, startAgeRef: arr[arr.length - 1]?.startAgeRef || 'person1', endAge: plan.person1.lifeExpectancy, endAgeRef: arr[arr.length - 1]?.endAgeRef || 'person1' } as ExpensePeriod);
-                                            setFocusTargetId(`expensePeriods-name-${id}`);
-                                        }} onRemove={() => removeFromList('expensePeriods', item.id)} canRemove={(plan.expensePeriods || []).length > 1} />
+                                        <ActionIcons onAdd={() => { const id = Date.now().toString(); const newEp: ExpensePeriod = { id, name: ep.name || `Phase ${(plan.expensePeriods || []).length + 1}`, monthlyAmount: ep.monthlyAmount || 0, startAge: ep.startAge || plan.person1.retirementAge, startAgeRef: ep.startAgeRef || 'person1', endAge: ep.endAge || plan.person1.lifeExpectancy, endAgeRef: ep.endAgeRef || 'person1' }; addToList('expensePeriods', newEp); setFocusTargetId(`expensePeriods-name-${id}`); }} onRemove={() => removeFromList('expensePeriods', ep.id)} canRemove={(plan.expensePeriods || []).length > 0} />
                                     </div>
                                 </div>
                             ))}
-                            {(plan.expensePeriods || []).length === 0 && (
-                                <div className="flex justify-center py-6">
-                                    <AddButton label="+ Add Expense Period" icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M6 2v2M14 2v2M3 8h14M4 6h12v12H4z" /></svg>} onClick={() => { const id = Date.now().toString(); const newExp: ExpensePeriod = { id, monthlyAmount: 0, name: `Phase ${((plan.expensePeriods || []).length) + 1}`, startAge: plan.person1.retirementAge, startAgeRef: 'person1', endAge: plan.person1.lifeExpectancy, endAgeRef: 'person1' }; addToList('expensePeriods', newExp); setFocusTargetId(`expensePeriods-name-${id}`); }} />
-                                </div>
-                            )}
+
+                            {/* Always show Add button for Expense Periods */}
+                            <div className="flex justify-end py-2">
+                                <AddButton label="+ Add Expense Period" icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zM10 6a2 2 0 100 4 2 2 0 000-4zM8 12v2h4v-2H8z" /></svg>} onClick={() => {
+                                    const id = Date.now().toString();
+                                    const newExp: ExpensePeriod = { id, name: `Phase ${(plan.expensePeriods || []).length + 1}`, monthlyAmount: 0, startAge: plan.person1.retirementAge, startAgeRef: 'person1', endAge: plan.person1.lifeExpectancy, endAgeRef: 'person1' };
+                                    addToList('expensePeriods', newExp);
+                                    setFocusTargetId(`expensePeriods-name-${id}`);
+                                }} />
+                            </div>
                         </div>
                     )}
 
