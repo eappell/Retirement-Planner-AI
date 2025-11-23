@@ -437,10 +437,21 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                         aria-selected="true"
                                         aria-controls="panel-retirement"
                                         onClick={() => setAccountsTab('retirement')}
-                                        className={`text-sm pb-2 ${'border-b-2 border-cyan-600 text-cyan-700 font-medium'}`}
-                                    >
-                                        Retirement Accounts
-                                    </button>
+                                        className={`text-sm pb-2 group ${'border-b-2 border-cyan-600 text-cyan-700 font-medium'}`}
+                                            >
+                                                <span className="inline-flex items-center space-x-2">
+                                                    <span>Retirement Accounts</span>
+                                                    <span className="relative inline-flex">
+                                                        <span className="text-gray-400 hover:text-gray-600 focus:text-gray-700" aria-hidden="true" tabIndex={-1}>
+                                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
+                                                        </span>
+                                                        <div role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
+                                                            <div className="font-medium">Retirement Accounts</div>
+                                                            <div className="mt-1 text-sm">Manage employer retirement plans and IRAs. Specify balance, annual contributions and employer match to include in projections.</div>
+                                                        </div>
+                                                    </span>
+                                                </span>
+                                            </button>
                                 ) : (
                                     <button
                                         type="button"
@@ -448,9 +459,20 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                         id="tab-retirement"
                                         aria-controls="panel-retirement"
                                         onClick={() => setAccountsTab('retirement')}
-                                        className={`text-sm pb-2 ${'border-b-2 border-transparent text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200'}`}
+                                        className={`text-sm pb-2 group ${'border-b-2 border-transparent text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200'}`}
                                     >
-                                        Retirement Accounts
+                                        <span className="inline-flex items-center space-x-2">
+                                            <span>Retirement Accounts</span>
+                                            <span className="relative inline-flex">
+                                                <span className="text-gray-400 hover:text-gray-600 focus:text-gray-700" aria-hidden="true" tabIndex={-1}>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
+                                                </span>
+                                                <div role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
+                                                    <div className="font-medium">Retirement Accounts</div>
+                                                    <div className="mt-1 text-sm">Manage employer retirement plans and IRAs. Specify balance, annual contributions and employer match to include in projections.</div>
+                                                </div>
+                                            </span>
+                                        </span>
                                     </button>
                                 )}
                                 {accountsTab === 'investment' ? (
@@ -461,9 +483,20 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                         aria-selected="true"
                                         aria-controls="panel-investment"
                                         onClick={() => setAccountsTab('investment')}
-                                        className={`text-sm pb-2 ${'border-b-2 border-teal-600 text-teal-700 font-medium'}`}
+                                        className={`text-sm pb-2 group ${'border-b-2 border-teal-600 text-teal-700 font-medium'}`}
                                     >
-                                        Investment Accounts
+                                        <span className="inline-flex items-center space-x-2">
+                                            <span>Investment Accounts</span>
+                                            <span className="relative inline-flex">
+                                                <span className="text-gray-400 hover:text-gray-600 focus:text-gray-700" aria-hidden="true" tabIndex={-1}>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
+                                                </span>
+                                                <div role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
+                                                    <div className="font-medium">Investment Accounts</div>
+                                                    <div className="mt-1 text-sm">Brokerage and taxable accounts for investments outside of retirement vehicles. Include balances and expected contributions.</div>
+                                                </div>
+                                            </span>
+                                        </span>
                                     </button>
                                 ) : (
                                     <button
@@ -472,9 +505,20 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                         id="tab-investment"
                                         aria-controls="panel-investment"
                                         onClick={() => setAccountsTab('investment')}
-                                        className={`text-sm pb-2 ${'border-b-2 border-transparent text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200'}`}
+                                        className={`text-sm pb-2 group ${'border-b-2 border-transparent text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200'}`}
                                     >
-                                        Investment Accounts
+                                        <span className="inline-flex items-center space-x-2">
+                                            <span>Investment Accounts</span>
+                                            <span className="relative inline-flex">
+                                                <span className="text-gray-400 hover:text-gray-600 focus:text-gray-700" aria-hidden="true" tabIndex={-1}>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
+                                                </span>
+                                                <div role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
+                                                    <div className="font-medium">Investment Accounts</div>
+                                                    <div className="mt-1 text-sm">Brokerage and taxable accounts for investments outside of retirement vehicles. Include balances and expected contributions.</div>
+                                                </div>
+                                            </span>
+                                        </span>
                                     </button>
                                 )}
                                 {accountsTab === 'hsa' ? (
@@ -485,9 +529,20 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                         aria-selected="true"
                                         aria-controls="panel-hsa"
                                         onClick={() => setAccountsTab('hsa')}
-                                        className={`text-sm pb-2 ${'border-b-2 border-emerald-600 text-emerald-700 font-medium'}`}
+                                        className={`text-sm pb-2 group ${'border-b-2 border-emerald-600 text-emerald-700 font-medium'}`}
                                     >
-                                        HSAs
+                                        <span className="inline-flex items-center space-x-2">
+                                            <span>HSAs</span>
+                                            <span className="relative inline-flex">
+                                                <span className="text-gray-400 hover:text-gray-600 focus:text-gray-700" aria-hidden="true" tabIndex={-1}>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
+                                                </span>
+                                                <div role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
+                                                    <div className="font-medium">HSAs</div>
+                                                    <div className="mt-1 text-sm">Health Savings Accounts: tax-advantaged savings for medical expenses. Include balance and annual contributions.</div>
+                                                </div>
+                                            </span>
+                                        </span>
                                     </button>
                                 ) : (
                                     <button
@@ -496,9 +551,20 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                         id="tab-hsa"
                                         aria-controls="panel-hsa"
                                         onClick={() => setAccountsTab('hsa')}
-                                        className={`text-sm pb-2 ${'border-b-2 border-transparent text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200'}`}
+                                        className={`text-sm pb-2 group ${'border-b-2 border-transparent text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200'}`}
                                     >
-                                        HSAs
+                                        <span className="inline-flex items-center space-x-2">
+                                            <span>HSAs</span>
+                                            <span className="relative inline-flex">
+                                                <span className="text-gray-400 hover:text-gray-600 focus:text-gray-700" aria-hidden="true" tabIndex={-1}>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
+                                                </span>
+                                                <div role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
+                                                    <div className="font-medium">HSAs</div>
+                                                    <div className="mt-1 text-sm">Health Savings Accounts: tax-advantaged savings for medical expenses. Include balance and annual contributions.</div>
+                                                </div>
+                                            </span>
+                                        </span>
                                     </button>
                                 )}
                             </div>
@@ -691,9 +757,20 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                 aria-selected="true"
                                 aria-controls="panel-pensions"
                                 onClick={() => setIncomeTab('pensions')}
-                                className={`text-sm pb-2 ${'border-b-2 border-sky-600 text-sky-700 font-medium'}`}
+                                className={`text-sm pb-2 group ${'border-b-2 border-sky-600 text-sky-700 font-medium'}`}
                             >
-                                Pensions
+                                <span className="inline-flex items-center space-x-2">
+                                    <span>Pensions</span>
+                                    <span className="relative inline-flex">
+                                        <span className="text-gray-400 hover:text-gray-600 focus:text-gray-700" aria-hidden="true" tabIndex={-1}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
+                                        </span>
+                                        <div role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
+                                            <div className="font-medium">Pensions</div>
+                                            <div className="mt-1 text-sm">Add employer pensions or defined-benefit plans. Specify payout type, start age, and COLA to include them in projections.</div>
+                                        </div>
+                                    </span>
+                                </span>
                             </button>
                         ) : (
                             <button
@@ -702,9 +779,20 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                 id="tab-pensions"
                                 aria-controls="panel-pensions"
                                 onClick={() => setIncomeTab('pensions')}
-                                className={`text-sm pb-2 ${'border-b-2 border-transparent text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200'}`}
+                                className={`text-sm pb-2 group ${'border-b-2 border-transparent text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200'}`}
                             >
-                                Pensions
+                                <span className="inline-flex items-center space-x-2">
+                                    <span>Pensions</span>
+                                    <span className="relative inline-flex">
+                                        <span className="text-gray-400 hover:text-gray-600 focus:text-gray-700" aria-hidden="true" tabIndex={-1}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
+                                        </span>
+                                        <div role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
+                                            <div className="font-medium">Pensions</div>
+                                            <div className="mt-1 text-sm">Add employer pensions or defined-benefit plans. Specify payout type, start age, and COLA to include them in projections.</div>
+                                        </div>
+                                    </span>
+                                </span>
                             </button>
                         )}
                         {incomeTab === 'annuities' ? (
@@ -715,9 +803,20 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                 aria-selected="true"
                                 aria-controls="panel-annuities"
                                 onClick={() => setIncomeTab('annuities')}
-                                className={`text-sm pb-2 ${'border-b-2 border-indigo-600 text-indigo-700 font-medium'}`}
+                                className={`text-sm pb-2 group ${'border-b-2 border-indigo-600 text-indigo-700 font-medium'}`}
                             >
-                                Annuities
+                                <span className="inline-flex items-center space-x-2">
+                                    <span>Annuities</span>
+                                    <span className="relative inline-flex">
+                                        <span className="text-gray-400 hover:text-gray-600 focus:text-gray-700" aria-hidden="true" tabIndex={-1}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
+                                        </span>
+                                        <div role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
+                                            <div className="font-medium">Annuities</div>
+                                            <div className="mt-1 text-sm">Model purchased annuities and guaranteed income products. Include purchase amount, start age, and payout options.</div>
+                                        </div>
+                                    </span>
+                                </span>
                             </button>
                         ) : (
                             <button
@@ -726,9 +825,20 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                 id="tab-annuities"
                                 aria-controls="panel-annuities"
                                 onClick={() => setIncomeTab('annuities')}
-                                className={`text-sm pb-2 ${'border-b-2 border-transparent text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200'}`}
+                                className={`text-sm pb-2 group ${'border-b-2 border-transparent text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200'}`}
                             >
-                                Annuities
+                                <span className="inline-flex items-center space-x-2">
+                                    <span>Annuities</span>
+                                    <span className="relative inline-flex">
+                                        <span className="text-gray-400 hover:text-gray-600 focus:text-gray-700" aria-hidden="true" tabIndex={-1}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
+                                        </span>
+                                        <div role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
+                                            <div className="font-medium">Annuities</div>
+                                            <div className="mt-1 text-sm">Model purchased annuities and guaranteed income products. Include purchase amount, start age, and payout options.</div>
+                                        </div>
+                                    </span>
+                                </span>
                             </button>
                         )}
                         {incomeTab === 'other' ? (
@@ -739,9 +849,20 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                 aria-selected="true"
                                 aria-controls="panel-otherincomes"
                                 onClick={() => setIncomeTab('other')}
-                                className={`text-sm pb-2 ${'border-b-2 border-lime-600 text-lime-700 font-medium'}`}
+                                className={`text-sm pb-2 group ${'border-b-2 border-lime-600 text-lime-700 font-medium'}`}
                             >
-                                Other Incomes
+                                <span className="inline-flex items-center space-x-2">
+                                    <span>Other Incomes</span>
+                                    <span className="relative inline-flex">
+                                        <span className="text-gray-400 hover:text-gray-600 focus:text-gray-700" aria-hidden="true" tabIndex={-1}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
+                                        </span>
+                                        <div role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
+                                            <div className="font-medium">Other Incomes</div>
+                                            <div className="mt-1 text-sm">Include side incomes, rental properties, or irregular income sources. Mark whether amounts are monthly or lump-sum.</div>
+                                        </div>
+                                    </span>
+                                </span>
                             </button>
                         ) : (
                             <button
@@ -750,9 +871,20 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                 id="tab-otherincomes"
                                 aria-controls="panel-otherincomes"
                                 onClick={() => setIncomeTab('other')}
-                                className={`text-sm pb-2 ${'border-b-2 border-transparent text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200'}`}
+                                className={`text-sm pb-2 group ${'border-b-2 border-transparent text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200'}`}
                             >
-                                Other Incomes
+                                <span className="inline-flex items-center space-x-2">
+                                    <span>Other Incomes</span>
+                                    <span className="relative inline-flex">
+                                        <span className="text-gray-400 hover:text-gray-600 focus:text-gray-700" aria-hidden="true" tabIndex={-1}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
+                                        </span>
+                                        <div role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2 rounded shadow border border-gray-200 hidden group-hover:block z-10">
+                                            <div className="font-medium">Other Incomes</div>
+                                            <div className="mt-1 text-sm">Include side incomes, rental properties, or irregular income sources. Mark whether amounts are monthly or lump-sum.</div>
+                                        </div>
+                                    </span>
+                                </span>
                             </button>
                         )}
                     </div>
@@ -1125,7 +1257,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                         <span className="text-gray-400 hover:text-gray-600 focus:outline-none" aria-hidden="true" tabIndex={-1}>
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M18 10A8 8 0 112 10a8 8 0 0116 0zm-8-3a1 1 0 100 2 1 1 0 000-2zm1 4a1 1 0 10-2 0v3a1 1 0 102 0v-3z" clipRule="evenodd"/></svg>
                                         </span>
-                                        <div id="expense-periods-tooltip" role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2.5 rounded shadow border border-gray-200 hidden group-hover:block z-10">
+                                        <div id="expense-periods-tooltip" role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2.5 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
                                             <div className="font-medium">Expense Periods</div>
                                             <div className="mt-1 text-sm">Model different recurring monthly spending phases in retirement. Use start/end ages to define each phase. Periods should not overlap — ensure the start age of a later phase is after the end age of an earlier phase.</div>
                                         </div>
@@ -1140,7 +1272,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                         <span className="text-gray-400 hover:text-gray-600 focus:outline-none" aria-hidden="true" tabIndex={-1}>
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M18 10A8 8 0 112 10a8 8 0 0116 0zm-8-3a1 1 0 100 2 1 1 0 000-2zm1 4a1 1 0 10-2 0v3a1 1 0 102 0v-3z" clipRule="evenodd"/></svg>
                                         </span>
-                                        <div id="expense-periods-tooltip" role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2.5 rounded shadow border border-gray-200 hidden group-hover:block z-10">
+                                        <div id="expense-periods-tooltip" role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2.5 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
                                             <div className="font-medium">Expense Periods</div>
                                             <div className="mt-1 text-sm">Model different recurring monthly spending phases in retirement. Use start/end ages to define each phase. Periods should not overlap — ensure the start age of a later phase is after the end age of an earlier phase.</div>
                                         </div>
@@ -1156,7 +1288,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                         <span className="text-gray-400 hover:text-gray-600 focus:outline-none" aria-hidden="true" tabIndex={-1}>
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M18 10A8 8 0 112 10a8 8 0 0116 0zm-8-3a1 1 0 100 2 1 1 0 000-2zm1 4a1 1 0 10-2 0v3a1 1 0 102 0v-3z" clipRule="evenodd"/></svg>
                                         </span>
-                                        <div id="one-time-expenses-tooltip" role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2.5 rounded shadow border border-gray-200 hidden group-hover:block z-10">
+                                        <div id="one-time-expenses-tooltip" role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2.5 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
                                             <div className="font-medium">One-Time Expenses</div>
                                             <div className="mt-1 text-sm">One-time expenses are single, non-recurring costs that occur at a specific age. Enter the amount, the age when it happens, and an optional description. The expense is applied once to the projection at the selected owner's age.</div>
                                         </div>
@@ -1171,7 +1303,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                         <span className="text-gray-400 hover:text-gray-600 focus:outline-none" aria-hidden="true" tabIndex={-1}>
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M18 10A8 8 0 112 10a8 8 0 0116 0zm-8-3a1 1 0 100 2 1 1 0 000-2zm1 4a1 1 0 10-2 0v3a1 1 0 102 0v-3z" clipRule="evenodd"/></svg>
                                         </span>
-                                        <div id="one-time-expenses-tooltip" role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2.5 rounded shadow border border-gray-200 hidden group-hover:block z-10">
+                                        <div id="one-time-expenses-tooltip" role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2.5 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
                                             <div className="font-medium">One-Time Expenses</div>
                                             <div className="mt-1 text-sm">One-time expenses are single, non-recurring costs that occur at a specific age. Enter the amount, the age when it happens, and an optional description. The expense is applied once to the projection at the selected owner's age.</div>
                                         </div>
