@@ -509,7 +509,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                                         const newAcct: RetirementAccount = { id, owner: 'person1', name: 'New HSA', type: 'HSA', balance: 0, annualContribution: 0, match: 0 } as RetirementAccount;
                                                         addToList('retirementAccounts', newAcct);
                                                         setFocusTargetId(`retirementAccounts-name-${id}`);
-                                                    }} onRemove={() => removeFromList('retirementAccounts', item.id)} canRemove={((plan.retirementAccounts || []) as RetirementAccount[]).filter(a => a.type === 'HSA').length > 1} />
+                                                    }} onRemove={() => removeFromList('retirementAccounts', item.id)} canRemove={true} />
                                                 </div>
                                             </div>
                                         ))}
@@ -1149,15 +1149,17 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                 </div>
                             ))}
 
-                            {/* Always show Add button for Expense Periods */}
-                            <div className="flex justify-end py-2">
-                                <AddButton label="+ Add Expense Period" icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zM10 6a2 2 0 100 4 2 2 0 000-4zM8 12v2h4v-2H8z" /></svg>} onClick={() => {
-                                    const id = Date.now().toString();
-                                    const newExp: ExpensePeriod = { id, name: `Phase ${(plan.expensePeriods || []).length + 1}`, monthlyAmount: 0, startAge: plan.person1.retirementAge, startAgeRef: 'person1', endAge: plan.person1.lifeExpectancy, endAgeRef: 'person1' };
-                                    addToList('expensePeriods', newExp);
-                                    setFocusTargetId(`expensePeriods-name-${id}`);
-                                }} />
-                            </div>
+                            {/* Show Add button only when there are no expense periods (each item has its own add control) */}
+                            {(plan.expensePeriods || []).length === 0 && (
+                                <div className="flex justify-end py-2">
+                                    <AddButton label="+ Add Expense Period" icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zM10 6a2 2 0 100 4 2 2 0 000-4zM8 12v2h4v-2H8z" /></svg>} onClick={() => {
+                                        const id = Date.now().toString();
+                                        const newExp: ExpensePeriod = { id, name: `Phase ${(plan.expensePeriods || []).length + 1}`, monthlyAmount: 0, startAge: plan.person1.retirementAge, startAgeRef: 'person1', endAge: plan.person1.lifeExpectancy, endAgeRef: 'person1' };
+                                        addToList('expensePeriods', newExp);
+                                        setFocusTargetId(`expensePeriods-name-${id}`);
+                                    }} />
+                                </div>
+                            )}
                         </div>
                     )}
 
