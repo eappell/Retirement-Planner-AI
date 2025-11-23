@@ -134,9 +134,12 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
             {/* when set, effect will focus the element with that id after render */}
             
             
-            <InputSection 
+            <InputSection
                 title="Plan Information"
                 subtitle="Set the high-level assumptions for your retirement plan."
+                actions={
+                    <button type="button" className="text-sm px-2 py-1 bg-gray-100 rounded" onClick={() => doUpdateAll({ planType: plan.planType, state: plan.state, inflationRate: plan.inflationRate, avgReturn: plan.avgReturn, annualWithdrawalRate: plan.annualWithdrawalRate, useFatTails: plan.useFatTails, fatTailDf: plan.fatTailDf, stockMean: (plan as any).stockMean, stockStd: (plan as any).stockStd, bondMean: (plan as any).bondMean, bondStd: (plan as any).bondStd, dieWithZero: plan.dieWithZero, legacyAmount: plan.legacyAmount }, 'Plan Information')}>Update All Scenarios</button>
+                }
             >
                     {/* Advanced Market Assumptions moved below person fields for better flow */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 col-span-full">
@@ -222,9 +225,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                 </details>
                 {/* Fat-tail demo removed per user request */}
 
-                <div className="flex justify-end mt-3">
-                    <button type="button" className="text-sm px-2 py-1 bg-gray-100 rounded" onClick={() => doUpdateAll({ planType: plan.planType, state: plan.state, inflationRate: plan.inflationRate, avgReturn: plan.avgReturn, annualWithdrawalRate: plan.annualWithdrawalRate, useFatTails: plan.useFatTails, fatTailDf: plan.fatTailDf, stockMean: (plan as any).stockMean, stockStd: (plan as any).stockStd, bondMean: (plan as any).bondMean, bondStd: (plan as any).bondStd, dieWithZero: plan.dieWithZero, legacyAmount: plan.legacyAmount }, 'Plan Information')}>Update All Scenarios</button>
-                </div>
+                {/* header action moved into InputSection.actions */}
 
             </InputSection>
 
@@ -301,7 +302,14 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                 )}
             </div>
 
-            <InputSection title="Social Security" subtitle="Estimate benefits based on current salary and your planned claiming age." titleColorClass="text-[#D4AF37]">
+            <InputSection
+                title="Social Security"
+                subtitle="Estimate benefits based on current salary and your planned claiming age."
+                titleColorClass="text-[#D4AF37]"
+                actions={
+                    <button type="button" className="text-sm px-2 py-1 bg-gray-100 rounded" onClick={() => doUpdateAll({ person1: { ...plan.person1 }, person2: { ...plan.person2 }, socialSecurity: plan.socialSecurity }, 'Social Security')}>Update All Scenarios</button>
+                }
+            >
                     <div className={`col-span-full grid grid-cols-1 ${isCouple ? 'md:grid-cols-2' : ''} gap-6`}>
                         <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
                             <h3 className="font-semibold text-blue-800 mb-3 flex items-center">
@@ -334,9 +342,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                     </div>
                     {isCouple && <p className="col-span-full text-xs text-gray-500 mt-2">Note: Survivor benefits are simplified. Typically, a surviving spouse receives the higher of their own benefit or their deceased spouse's benefit.</p>}
 
-                <div className="flex justify-end mt-3">
-                    <button type="button" className="text-sm px-2 py-1 bg-gray-100 rounded" onClick={() => doUpdateAll({ person1: { ...plan.person1 }, person2: { ...plan.person2 }, socialSecurity: plan.socialSecurity }, 'Social Security')}>Update All Scenarios</button>
-                </div>
+                {/* header action moved into InputSection.actions */}
 
             </InputSection>
 
@@ -345,6 +351,9 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                         title="Accounts"
                         subtitle="Manage retirement and investment accounts in separate tabs."
                         titleColorClass="text-cyan-600"
+                        actions={
+                            <button type="button" className="text-sm px-2 py-1 bg-gray-100 rounded" onClick={() => doUpdateAll({ retirementAccounts: plan.retirementAccounts, investmentAccounts: plan.investmentAccounts }, 'Accounts')}>Update All Scenarios</button>
+                        }
                     >
                         <div className="col-span-full">
                             <div className="flex items-center space-x-6 mb-3" role="tablist" aria-label="Accounts Tabs" onKeyDown={handleAccountsKeyDown}>
@@ -581,9 +590,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                             }} />
                                         </div>
                                     )}
-                                    <div className="flex justify-end mt-3">
-                                        <button type="button" className="text-sm px-2 py-1 bg-gray-100 rounded" onClick={() => doUpdateAll({ retirementAccounts: plan.retirementAccounts, investmentAccounts: plan.investmentAccounts }, 'Accounts')}>Update All Scenarios</button>
-                                    </div>
+                                    {/* header action moved into InputSection.actions */}
                                 </div>
                             )}
                         </div>
@@ -596,6 +603,9 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                 title="Income"
                 subtitle="Manage pensions and other income sources in tabs."
                 titleColorClass="text-sky-600"
+                actions={
+                    <button type="button" className="text-sm px-2 py-1 bg-gray-100 rounded" onClick={() => doUpdateAll({ pensions: plan.pensions, annuities: plan.annuities, otherIncomes: plan.otherIncomes }, 'Income')}>Update All Scenarios</button>
+                }
             >
                 <div className="col-span-full">
                     <div className="flex items-center space-x-6 mb-3" role="tablist" aria-label="Income Tabs" onKeyDown={handleIncomeKeyDown}>
@@ -845,9 +855,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                     )}
                 </div>
 
-                <div className="flex justify-end mt-3">
-                    <button type="button" className="text-sm px-2 py-1 bg-gray-100 rounded" onClick={() => doUpdateAll({ expensePeriods: plan.expensePeriods, oneTimeExpenses: plan.oneTimeExpenses }, 'Expenses')}>Update All Scenarios</button>
-                </div>
+                {/* header action moved into Expenses InputSection.actions */}
 
             </InputSection>
 
@@ -856,6 +864,9 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                 title="Estate Planning"
                 subtitle="Manage gifts and legacy allocations."
                 titleColorClass="text-purple-600"
+                actions={
+                    <button type="button" className="text-sm px-2 py-1 bg-gray-100 rounded" onClick={() => doUpdateAll({ gifts: plan.gifts, legacyDisbursements: plan.legacyDisbursements }, 'Estate Planning')}>Update All Scenarios</button>
+                }
             >
                 <div className="col-span-full">
                     <div className="flex items-center space-x-6 mb-3" role="tablist" aria-label="Estate Tabs" onKeyDown={handleEstateKeyDown}>
@@ -1021,7 +1032,11 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
 
             
 
-            <InputSection title="Expenses" subtitle="Model recurring expense phases and one-time expenses." titleColorClass="text-red-600" gridCols={1}>
+            <InputSection title="Expenses" subtitle="Model recurring expense phases and one-time expenses." titleColorClass="text-red-600" gridCols={1}
+                actions={
+                    <button type="button" className="text-sm px-2 py-1 bg-gray-100 rounded" onClick={() => doUpdateAll({ expensePeriods: plan.expensePeriods, oneTimeExpenses: plan.oneTimeExpenses }, 'Expenses')}>Update All Scenarios</button>
+                }
+            >
                 <div className="col-span-full">
                     <div className="flex items-center space-x-6 mb-3" role="tablist" aria-label="Expenses Tabs">
                         {expensesTab === 'periods' ? (
