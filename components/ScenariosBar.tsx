@@ -149,10 +149,17 @@ const ScenariosBar: React.FC<ScenariosBarProps> = ({ scenarios = [], activeScena
                         <span className="text-sm font-semibold text-white whitespace-nowrap">Restore Scenarios</span>
                         <span className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-40 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-none">Restore Scenarios</span>
                     </label>
-                    <div ref={helpRef} className="relative">
+                    <div
+                        ref={helpRef}
+                        className="relative"
+                        onMouseEnter={() => setHelpOpen(true)}
+                        onMouseLeave={() => setHelpOpen(false)}
+                    >
                         <a
                             href="#"
-                            onClick={(e) => { e.preventDefault(); setHelpOpen(prev => !prev); }}
+                            onClick={(e) => { e.preventDefault(); }}
+                            onFocus={() => setHelpOpen(true)}
+                            onBlur={() => setHelpOpen(false)}
                             role="button"
                             aria-expanded={helpOpen}
                             className="ml-2 flex items-center space-x-2 text-[#0b6b04] hover:underline font-bold text-base"
