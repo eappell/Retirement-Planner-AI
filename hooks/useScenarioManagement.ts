@@ -174,6 +174,21 @@ export const useScenarioManagement = (initialState?: ScenariosState) => {
         activeScenarioId,
         scenarios,
         updateActivePlan,
+        updateAllScenarios: (partialPlan: Partial<RetirementPlan>) => {
+            setScenariosState(prev => {
+                const newScenarios: typeof prev.scenarios = {} as any;
+                Object.entries(prev.scenarios).forEach(([id, sc]) => {
+                    newScenarios[id] = {
+                        ...sc,
+                        plan: {
+                            ...sc.plan,
+                            ...structuredClone(partialPlan),
+                        },
+                    };
+                });
+                return { ...prev, scenarios: newScenarios };
+            });
+        },
         selectScenario,
         createNewScenario,
         deleteScenario,

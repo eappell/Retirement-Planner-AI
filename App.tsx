@@ -67,7 +67,11 @@ const App: React.FC = () => {
         updateScenarioName,
         resetAllScenarios,
         uploadScenarios,
+        updateAllScenarios,
     } = useScenarioManagement(loadFromStorage() || undefined);
+
+    // New helper to update all scenarios from the hook
+    // (exposed directly for child components to call)
     
     // Auto-save scenarios to localStorage
     useAutoSave(scenariosState);
@@ -467,6 +471,11 @@ const App: React.FC = () => {
                             handleDynamicListChange={handleDynamicListChange}
                             addToList={addToList}
                             removeFromList={removeFromList}
+                            updateAllScenarios={(partialPlan: Partial<RetirementPlan>) => {
+                                updateAllScenarios(partialPlan);
+                                window.dispatchEvent(new CustomEvent('app:toast', { detail: { message: 'Applied section to all scenarios' } }));
+                            }}
+                            scenariosCount={Object.keys(scenarios).length}
                         />
                         <AnalysisSections
                             plan={plan}

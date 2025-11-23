@@ -22,9 +22,10 @@ interface InputFormProps {
     addToList: <K extends DynamicListKey>(listName: K, newItem: RetirementPlan[K][number]) => void;
     removeFromList: (listName: DynamicListKey, id: string) => void;
     updateAllScenarios?: (partialPlan: Partial<RetirementPlan>) => void;
+    scenariosCount?: number;
 }
  
-const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePersonChange, handleDynamicListChange, addToList, removeFromList, updateAllScenarios }) => {
+const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePersonChange, handleDynamicListChange, addToList, removeFromList, updateAllScenarios, scenariosCount }) => {
 
     const isCouple = plan.planType === PlanType.COUPLE;
 
@@ -138,7 +139,9 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                 title="Plan Information"
                 subtitle="Set the high-level assumptions for your retirement plan."
                 actions={
-                    <button type="button" className="text-sm px-2 py-1 bg-gray-100 rounded transition-colors hover:bg-[#5b8dde] hover:text-white" onClick={() => doUpdateAll({ planType: plan.planType, state: plan.state, inflationRate: plan.inflationRate, avgReturn: plan.avgReturn, annualWithdrawalRate: plan.annualWithdrawalRate, useFatTails: plan.useFatTails, fatTailDf: plan.fatTailDf, stockMean: (plan as any).stockMean, stockStd: (plan as any).stockStd, bondMean: (plan as any).bondMean, bondStd: (plan as any).bondStd, dieWithZero: plan.dieWithZero, legacyAmount: plan.legacyAmount }, 'Plan Information')}>Update All Scenarios</button>
+                    scenariosCount && scenariosCount > 1 ? (
+                        <button type="button" className="text-sm px-2 py-1 bg-gray-100 rounded transition-colors hover:bg-[#5b8dde] hover:text-white" onClick={() => doUpdateAll({ planType: plan.planType, state: plan.state, inflationRate: plan.inflationRate, avgReturn: plan.avgReturn, annualWithdrawalRate: plan.annualWithdrawalRate, useFatTails: plan.useFatTails, fatTailDf: plan.fatTailDf, stockMean: (plan as any).stockMean, stockStd: (plan as any).stockStd, bondMean: (plan as any).bondMean, bondStd: (plan as any).bondStd, dieWithZero: plan.dieWithZero, legacyAmount: plan.legacyAmount }, 'Plan Information')}>Update All Scenarios</button>
+                    ) : undefined
                 }
             >
                     {/* Advanced Market Assumptions moved below person fields for better flow */}
@@ -307,7 +310,9 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                 subtitle="Estimate benefits based on current salary and your planned claiming age."
                 titleColorClass="text-[#D4AF37]"
                 actions={
-                    <button type="button" className="text-sm px-2 py-1 bg-gray-100 rounded transition-colors hover:bg-[#5b8dde] hover:text-white" onClick={() => doUpdateAll({ person1: { ...plan.person1 }, person2: { ...plan.person2 }, socialSecurity: plan.socialSecurity }, 'Social Security')}>Update All Scenarios</button>
+                    scenariosCount && scenariosCount > 1 ? (
+                        <button type="button" className="text-sm px-2 py-1 bg-gray-100 rounded transition-colors hover:bg-[#5b8dde] hover:text-white" onClick={() => doUpdateAll({ person1: { ...plan.person1 }, person2: { ...plan.person2 }, socialSecurity: plan.socialSecurity }, 'Social Security')}>Update All Scenarios</button>
+                    ) : undefined
                 }
             >
                     <div className={`col-span-full grid grid-cols-1 ${isCouple ? 'md:grid-cols-2' : ''} gap-6`}>
@@ -352,7 +357,9 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                         subtitle="Manage retirement and investment accounts in separate tabs."
                         titleColorClass="text-cyan-600"
                         actions={
-                            <button type="button" className="text-sm px-2 py-1 bg-gray-100 rounded transition-colors hover:bg-[#5b8dde] hover:text-white" onClick={() => doUpdateAll({ retirementAccounts: plan.retirementAccounts, investmentAccounts: plan.investmentAccounts }, 'Accounts')}>Update All Scenarios</button>
+                            scenariosCount && scenariosCount > 1 ? (
+                                <button type="button" className="text-sm px-2 py-1 bg-gray-100 rounded transition-colors hover:bg-[#5b8dde] hover:text-white" onClick={() => doUpdateAll({ retirementAccounts: plan.retirementAccounts, investmentAccounts: plan.investmentAccounts }, 'Accounts')}>Update All Scenarios</button>
+                            ) : undefined
                         }
                     >
                         <div className="col-span-full">
@@ -604,7 +611,9 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                 subtitle="Manage pensions and other income sources in tabs."
                 titleColorClass="text-sky-600"
                 actions={
-                    <button type="button" className="text-sm px-2 py-1 bg-gray-100 rounded transition-colors hover:bg-[#5b8dde] hover:text-white" onClick={() => doUpdateAll({ pensions: plan.pensions, annuities: plan.annuities, otherIncomes: plan.otherIncomes }, 'Income')}>Update All Scenarios</button>
+                    scenariosCount && scenariosCount > 1 ? (
+                        <button type="button" className="text-sm px-2 py-1 bg-gray-100 rounded transition-colors hover:bg-[#5b8dde] hover:text-white" onClick={() => doUpdateAll({ pensions: plan.pensions, annuities: plan.annuities, otherIncomes: plan.otherIncomes }, 'Income')}>Update All Scenarios</button>
+                    ) : undefined
                 }
             >
                 <div className="col-span-full">
@@ -865,7 +874,9 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                 subtitle="Manage gifts and legacy allocations."
                 titleColorClass="text-purple-600"
                 actions={
-                    <button type="button" className="text-sm px-2 py-1 bg-gray-100 rounded transition-colors hover:bg-[#5b8dde] hover:text-white" onClick={() => doUpdateAll({ gifts: plan.gifts, legacyDisbursements: plan.legacyDisbursements }, 'Estate Planning')}>Update All Scenarios</button>
+                    scenariosCount && scenariosCount > 1 ? (
+                        <button type="button" className="text-sm px-2 py-1 bg-gray-100 rounded transition-colors hover:bg-[#5b8dde] hover:text-white" onClick={() => doUpdateAll({ gifts: plan.gifts, legacyDisbursements: plan.legacyDisbursements }, 'Estate Planning')}>Update All Scenarios</button>
+                    ) : undefined
                 }
             >
                 <div className="col-span-full">
@@ -1034,7 +1045,9 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
 
             <InputSection title="Expenses" subtitle="Model recurring expense phases and one-time expenses." titleColorClass="text-red-600" gridCols={1}
                 actions={
-                    <button type="button" className="text-sm px-2 py-1 bg-gray-100 rounded transition-colors hover:bg-[#5b8dde] hover:text-white" onClick={() => doUpdateAll({ expensePeriods: plan.expensePeriods, oneTimeExpenses: plan.oneTimeExpenses }, 'Expenses')}>Update All Scenarios</button>
+                    scenariosCount && scenariosCount > 1 ? (
+                        <button type="button" className="text-sm px-2 py-1 bg-gray-100 rounded transition-colors hover:bg-[#5b8dde] hover:text-white" onClick={() => doUpdateAll({ expensePeriods: plan.expensePeriods, oneTimeExpenses: plan.oneTimeExpenses }, 'Expenses')}>Update All Scenarios</button>
+                    ) : undefined
                 }
             >
                 <div className="col-span-full">
