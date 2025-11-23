@@ -983,6 +983,51 @@ export const InputForm: React.FC<InputFormProps> = ({
                         )}
                     </div>
 
+                    {/* Expense Periods panel */}
+                    {expensesTab === 'periods' && (
+                        <div id="panel-expense-periods" role="tabpanel" aria-labelledby="tab-expense-periods" className="relative pt-3 space-y-2">
+                            {((plan.expensePeriods || []) as ExpensePeriod[]).map(ep => (
+                                <div key={ep.id} className="grid gap-x-4 items-end p-2 rounded-md bg-red-50/50 grid-cols-7">
+                                    <div className="col-span-1">
+                                        <TextInput id={`expensePeriods-name-${ep.id}`} className="max-w-[10rem]" label="Name" value={ep.name || ''} onChange={e => handleDynamicListChange('expensePeriods', ep.id, 'name', e.target.value)} />
+                                    </div>
+                                    <NumberInput label="Monthly Amount" prefix="$" value={ep.monthlyAmount} onChange={e => handleDynamicListChange('expensePeriods', ep.id, 'monthlyAmount', e.target.value)} />
+                                    <div className="w-28">
+                                        <SelectInput aria-label="Start owner" value={ep.startAgeRef || 'person1'} onChange={e => handleDynamicListChange('expensePeriods', ep.id, 'startAgeRef', e.target.value)}>
+                                            <option value="person1">{plan.person1.name}</option>
+                                            {isCouple && <option value="person2">{plan.person2.name}</option>}
+                                        </SelectInput>
+                                    </div>
+                                    <div className="w-28">
+                                        <NumberInput label="Start Age" value={ep.startAge} onChange={e => handleDynamicListChange('expensePeriods', ep.id, 'startAge', e.target.value)} />
+                                    </div>
+                                    <div className="w-28">
+                                        <SelectInput aria-label="End owner" value={ep.endAgeRef || 'person1'} onChange={e => handleDynamicListChange('expensePeriods', ep.id, 'endAgeRef', e.target.value)}>
+                                            <option value="person1">{plan.person1.name}</option>
+                                            {isCouple && <option value="person2">{plan.person2.name}</option>}
+                                        </SelectInput>
+                                    </div>
+                                    <div className="w-28">
+                                        <NumberInput label="End Age" value={ep.endAge} onChange={e => handleDynamicListChange('expensePeriods', ep.id, 'endAge', e.target.value)} />
+                                    </div>
+                                    <div className="flex items-end">
+                                        <ActionIcons onAdd={() => { const id = Date.now().toString(); const newEp: ExpensePeriod = { id, name: ep.name || `Phase ${(plan.expensePeriods || []).length + 1}`, monthlyAmount: ep.monthlyAmount || 0, startAge: ep.startAge || plan.person1.retirementAge, startAgeRef: ep.startAgeRef || 'person1', endAge: ep.endAge || plan.person1.lifeExpectancy, endAgeRef: ep.endAgeRef || 'person1' }; addToList('expensePeriods', newEp); setFocusTargetId(`expensePeriods-name-${id}`); }} onRemove={() => removeFromList('expensePeriods', ep.id)} canRemove={(plan.expensePeriods || []).length > 0} />
+                                    </div>
+                                </div>
+                            ))}
+
+                            {/* Always show Add button for Expense Periods */}
+                            <div className="flex justify-end py-2">
+                                <AddButton label="+ Add Expense Period" icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zM10 6a2 2 0 100 4 2 2 0 000-4zM8 12v2h4v-2H8z" /></svg>} onClick={() => {
+                                    const id = Date.now().toString();
+                                    const newExp: ExpensePeriod = { id, name: `Phase ${(plan.expensePeriods || []).length + 1}`, monthlyAmount: 0, startAge: plan.person1.retirementAge, startAgeRef: 'person1', endAge: plan.person1.lifeExpectancy, endAgeRef: 'person1' };
+                                    addToList('expensePeriods', newExp);
+                                    setFocusTargetId(`expensePeriods-name-${id}`);
+                                }} />
+                            </div>
+                        </div>
+                    )}
+
                     {/* One-Time Expenses panel */}
                     {expensesTab === 'oneTime' && (
                         <div id="panel-one-time-expenses" role="tabpanel" aria-labelledby="tab-one-time-expenses" className="relative pt-3 space-y-2">
