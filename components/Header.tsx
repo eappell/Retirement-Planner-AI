@@ -77,14 +77,10 @@ const Header: React.FC<HeaderProps> = ({
     try {
       const success = await handleUploadScenarios(e);
       setIsScenarioMenuOpen(false);
-      setToastType(success ? 'success' : 'error');
-      setToastMessage(success ? 'Scenarios uploaded' : 'Upload failed');
-      setShowToast(true);
+      // Global app toast will show the upload result; avoid duplicating toasts here.
     } catch (err) {
       setIsScenarioMenuOpen(false);
-      setToastType('error');
-      setToastMessage('Upload failed');
-      setShowToast(true);
+      // Global app toast will display the failure; suppress header toast.
     }
   };
 
