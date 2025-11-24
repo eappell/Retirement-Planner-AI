@@ -25,6 +25,19 @@ export const ThemeProvider: React.FC<React.PropsWithChildren<{}>> = ({ children 
     }
   }, []);
 
+  // If no explicit preference is stored, respect the OS/browser preference
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('theme');
+      if (!stored && window.matchMedia) {
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        setTheme(prefersDark ? 'dark' : 'light');
+      }
+    } catch (e) {
+      // ignore
+    }
+  }, []);
+
   useEffect(() => {
     try {
       document.documentElement.classList.toggle('theme-dark', theme === 'dark');
