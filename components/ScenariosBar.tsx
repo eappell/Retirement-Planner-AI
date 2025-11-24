@@ -81,11 +81,11 @@ const ScenariosBar: React.FC<ScenariosBarProps> = ({ scenarios = [], activeScena
     }, []);
 
     return (
-        <div className="w-full bg-[#f1f5fb] py-2 px-3">
+        <div className="w-full bg-[#f1f5fb] dark:bg-slate-900 py-2 px-3">
             <div className="max-w-full mx-auto flex items-center space-x-3">
                 <div className="flex items-center space-x-2 w-64">
-                    <label htmlFor="scenarios-select" className="text-lg font-semibold text-[#0b6b04] flex items-center space-x-2">
-                        <Square3Stack3DIcon className="h-5 w-5 text-[#0b6b04]" />
+                    <label htmlFor="scenarios-select" className="text-lg font-semibold text-[#0b6b04] dark:text-green-300 flex items-center space-x-2">
+                        <Square3Stack3DIcon className="h-5 w-5 text-[#0b6b04] dark:text-green-300" />
                         <span>Scenarios</span>
                     </label>
                     <SelectInput id="scenarios-select" value={selected ?? ''} onChange={e => handleSwitch(e.target.value)}>
@@ -188,19 +188,19 @@ const ScenariosBar: React.FC<ScenariosBarProps> = ({ scenarios = [], activeScena
                             onBlur={() => setHelpOpen(false)}
                             role="button"
                             aria-expanded={helpOpen}
-                            className="ml-2 flex items-center space-x-2 text-[#0b6b04] hover:underline font-bold text-base"
+                            className="ml-2 flex items-center space-x-2 text-[#0b6b04] dark:text-green-300 hover:underline font-bold text-base"
                         >
-                            <InformationCircleIcon className="h-4 w-4 text-[#0b6b04]" strokeWidth={2} />
+                            <InformationCircleIcon className="h-4 w-4 text-[#0b6b04] dark:text-green-300" strokeWidth={2} />
                             <span>What are scenarios?</span>
                         </a>
 
                         <div
-                            className={`absolute top-full mt-2 left-1/2 transform -translate-x-1/2 w-80 bg-white shadow-xl rounded-md p-4 z-50 transition-all duration-300 ease-in-out ${helpOpen ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto' : 'opacity-0 -translate-y-2 scale-95 pointer-events-none'}`}
+                            className={`absolute top-full mt-2 left-1/2 transform -translate-x-1/2 w-80 bg-white dark:bg-slate-800 shadow-xl rounded-md p-4 z-50 transition-all duration-300 ease-in-out ${helpOpen ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto' : 'opacity-0 -translate-y-2 scale-95 pointer-events-none'}`}
                             aria-hidden={!helpOpen}
                             style={{ willChange: 'opacity, transform' }}
                         >
-                            <h4 className="text-sm font-semibold text-[#0b6b04]">What Are Scenarios?</h4>
-                            <div className="text-sm text-gray-700 mt-2 space-y-2">
+                            <h4 className="text-sm font-semibold text-[#0b6b04] dark:text-green-300">What Are Scenarios?</h4>
+                            <div className="text-sm text-gray-700 dark:text-gray-300 mt-2 space-y-2">
                                 <p>Scenarios let you save a copy of your current plan so you can switch between different versions of your assumptions and inputs.</p>
                                 <p>Use scenarios to preserve your work, experiment safely, and compare outcomes across alternatives.</p>
                                 <p>You can also download your scenarios to a file and load them in another browser or device so your work travels with you.</p>
