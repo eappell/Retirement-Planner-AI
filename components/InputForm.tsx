@@ -308,7 +308,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                         <span className="text-gray-400 hover:text-gray-600 focus:text-gray-700" aria-hidden="true" tabIndex={0}>
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
                         </span>
-                        <div id="die-with-zero-tooltip" role="tooltip" aria-hidden={!dieTooltipOpen} className={`absolute left-full top-1/2 -translate-y-1/2 ml-2 w-72 bg-gray-100 text-gray-900 text-[0.95rem] p-2.5 rounded shadow border border-gray-200 ${dieTooltipOpen ? 'block' : 'hidden'} z-10`}>
+                        <div id="die-with-zero-tooltip" role="tooltip" aria-hidden={!dieTooltipOpen} className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-72 bg-gray-100 text-gray-900 text-[0.95rem] p-2.5 rounded shadow border border-gray-200 ${dieTooltipOpen ? 'block' : 'hidden'} z-10`}>
                             <div className="font-medium">Die With Zero</div>
                             <div className="mt-1 text-sm">Calculates the maximum withdrawal that leaves your target legacy (for example, $0). When enabled, the fixed withdrawal rate is ignored and legacy disbursements are disabled — this can significantly change spending and final legacy.</div>
                         </div>
@@ -446,7 +446,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                                         <span className="text-gray-400 hover:text-gray-600 focus:text-gray-700" aria-hidden="true" tabIndex={-1}>
                                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
                                                         </span>
-                                                        <div role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
+                                                        <div role="tooltip" className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
                                                             <div className="font-medium">Retirement Accounts</div>
                                                             <div className="mt-1 text-sm">Manage employer retirement plans and IRAs. Specify balance, annual contributions and employer match to include in projections.</div>
                                                         </div>
@@ -468,7 +468,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                                 <span className="text-gray-400 hover:text-gray-600 focus:text-gray-700" aria-hidden="true" tabIndex={-1}>
                                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
                                                 </span>
-                                                <div role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
+                                                <div role="tooltip" className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
                                                     <div className="font-medium">Retirement Accounts</div>
                                                     <div className="mt-1 text-sm">Manage employer retirement plans and IRAs. Specify balance, annual contributions and employer match to include in projections.</div>
                                                 </div>
@@ -492,7 +492,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                                 <span className="text-gray-400 hover:text-gray-600 focus:text-gray-700" aria-hidden="true" tabIndex={-1}>
                                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
                                                 </span>
-                                                <div role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
+                                                <div role="tooltip" className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
                                                     <div className="font-medium">Investment Accounts</div>
                                                     <div className="mt-1 text-sm">Brokerage and taxable accounts for investments outside of retirement vehicles. Include balances and expected contributions.</div>
                                                 </div>
@@ -514,7 +514,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                                 <span className="text-gray-400 hover:text-gray-600 focus:text-gray-700" aria-hidden="true" tabIndex={-1}>
                                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
                                                 </span>
-                                                <div role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
+                                                <div role="tooltip" className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
                                                     <div className="font-medium">Investment Accounts</div>
                                                     <div className="mt-1 text-sm">Brokerage and taxable accounts for investments outside of retirement vehicles. Include balances and expected contributions.</div>
                                                 </div>
@@ -538,7 +538,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                                 <span className="text-gray-400 hover:text-gray-600 focus:text-gray-700" aria-hidden="true" tabIndex={-1}>
                                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
                                                 </span>
-                                                <div role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
+                                                <div role="tooltip" className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
                                                     <div className="font-medium">HSAs</div>
                                                     <div className="mt-1 text-sm">Health Savings Accounts: tax-advantaged savings for medical expenses. Include balance and annual contributions.</div>
                                                 </div>
@@ -560,7 +560,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                                 <span className="text-gray-400 hover:text-gray-600 focus:text-gray-700" aria-hidden="true" tabIndex={-1}>
                                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
                                                 </span>
-                                                <div role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
+                                                <div role="tooltip" className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
                                                     <div className="font-medium">HSAs</div>
                                                     <div className="mt-1 text-sm">Health Savings Accounts: tax-advantaged savings for medical expenses. Include balance and annual contributions.</div>
                                                 </div>
@@ -766,7 +766,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                         <span className="text-gray-400 hover:text-gray-600 focus:text-gray-700" aria-hidden="true" tabIndex={-1}>
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
                                         </span>
-                                        <div role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
+                                        <div role="tooltip" className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
                                             <div className="font-medium">Pensions</div>
                                             <div className="mt-1 text-sm">Add employer pensions or defined-benefit plans. Specify payout type, start age, and COLA to include them in projections.</div>
                                         </div>
@@ -788,7 +788,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                         <span className="text-gray-400 hover:text-gray-600 focus:text-gray-700" aria-hidden="true" tabIndex={-1}>
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
                                         </span>
-                                        <div role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
+                                                <div role="tooltip" className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
                                             <div className="font-medium">Pensions</div>
                                             <div className="mt-1 text-sm">Add employer pensions or defined-benefit plans. Specify payout type, start age, and COLA to include them in projections.</div>
                                         </div>
@@ -812,7 +812,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                         <span className="text-gray-400 hover:text-gray-600 focus:text-gray-700" aria-hidden="true" tabIndex={-1}>
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
                                         </span>
-                                        <div role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
+                                                <div role="tooltip" className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
                                             <div className="font-medium">Annuities</div>
                                             <div className="mt-1 text-sm">Model purchased annuities and guaranteed income products. Include purchase amount, start age, and payout options.</div>
                                         </div>
@@ -834,7 +834,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                         <span className="text-gray-400 hover:text-gray-600 focus:text-gray-700" aria-hidden="true" tabIndex={-1}>
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
                                         </span>
-                                        <div role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
+                                                <div role="tooltip" className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
                                             <div className="font-medium">Annuities</div>
                                             <div className="mt-1 text-sm">Model purchased annuities and guaranteed income products. Include purchase amount, start age, and payout options.</div>
                                         </div>
@@ -858,7 +858,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                         <span className="text-gray-400 hover:text-gray-600 focus:text-gray-700" aria-hidden="true" tabIndex={-1}>
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
                                         </span>
-                                        <div role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
+                                        <div role="tooltip" className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
                                             <div className="font-medium">Other Incomes</div>
                                             <div className="mt-1 text-sm">Include side incomes, rental properties, or irregular income sources. Mark whether amounts are monthly or lump-sum.</div>
                                         </div>
@@ -880,7 +880,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                         <span className="text-gray-400 hover:text-gray-600 focus:text-gray-700" aria-hidden="true" tabIndex={-1}>
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
                                         </span>
-                                        <div role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2 rounded shadow border border-gray-200 hidden group-hover:block z-10">
+                                        <div role="tooltip" className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2 rounded shadow border border-gray-200 hidden group-hover:block z-10">
                                             <div className="font-medium">Other Incomes</div>
                                             <div className="mt-1 text-sm">Include side incomes, rental properties, or irregular income sources. Mark whether amounts are monthly or lump-sum.</div>
                                         </div>
@@ -1095,7 +1095,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                         <span className="text-gray-400 hover:text-gray-600 focus:text-gray-700" aria-hidden="true" tabIndex={-1}>
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
                                         </span>
-                                        <div id="gifts-tooltip" role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2.5 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
+                                        <div id="gifts-tooltip" role="tooltip" className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2.5 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
                                             <div className="font-medium">Gifts</div>
                                             <div className="mt-1 text-sm">Record planned gifts to beneficiaries. Use one-time gifts for single transfers, or annual gifts to model recurring donations. Specify owner, amounts, and start/end ages for annual gifts.</div>
                                         </div>
@@ -1117,7 +1117,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                         <span className="text-gray-400 hover:text-gray-600 focus:text-gray-700" aria-hidden="true" tabIndex={-1}>
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
                                         </span>
-                                        <div id="gifts-tooltip" role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2.5 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
+                                        <div id="gifts-tooltip" role="tooltip" className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2.5 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
                                             <div className="font-medium">Gifts</div>
                                             <div className="mt-1 text-sm">Record planned gifts to beneficiaries. Use one-time gifts for single transfers, or annual gifts to model recurring donations. Specify owner, amounts, and start/end ages for annual gifts.</div>
                                         </div>
@@ -1141,7 +1141,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                         <span className="text-gray-400 hover:text-gray-600 focus:text-gray-700" aria-hidden="true" tabIndex={-1}>
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
                                         </span>
-                                        <div id="legacy-tooltip" role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2.5 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
+                                        <div id="legacy-tooltip" role="tooltip" className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2.5 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
                                             <div className="font-medium">Legacy Disbursements</div>
                                             <div className="mt-1 text-sm">Allocate percentages of your estate to beneficiaries. Percentages should total 100% if you want the whole estate distributed. Legacy disbursements are disabled when Die With Zero is enabled.</div>
                                         </div>
@@ -1163,7 +1163,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                         <span className="text-gray-400 hover:text-gray-600 focus:text-gray-700" aria-hidden="true" tabIndex={-1}>
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
                                         </span>
-                                        <div id="legacy-tooltip" role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2.5 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
+                                        <div id="legacy-tooltip" role="tooltip" className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2.5 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
                                             <div className="font-medium">Legacy Disbursements</div>
                                             <div className="mt-1 text-sm">Allocate percentages of your estate to beneficiaries. Percentages should total 100% if you want the whole estate distributed. Legacy disbursements are disabled when Die With Zero is enabled.</div>
                                         </div>
@@ -1302,7 +1302,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                         <span className="text-gray-400 hover:text-gray-600 focus:text-gray-700" aria-hidden="true" tabIndex={-1}>
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
                                         </span>
-                                        <div id="expense-periods-tooltip" role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2.5 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
+                                        <div id="expense-periods-tooltip" role="tooltip" className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2.5 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
                                             <div className="font-medium">Expense Periods</div>
                                             <div className="mt-1 text-sm">Model different recurring monthly spending phases in retirement. Use start/end ages to define each phase. Periods should not overlap — ensure the start age of a later phase is after the end age of an earlier phase.</div>
                                         </div>
@@ -1317,7 +1317,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                         <span className="text-gray-400 hover:text-gray-600 focus:text-gray-700" aria-hidden="true" tabIndex={-1}>
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
                                         </span>
-                                        <div id="expense-periods-tooltip" role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2.5 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
+                                        <div id="expense-periods-tooltip" role="tooltip" className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2.5 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
                                             <div className="font-medium">Expense Periods</div>
                                             <div className="mt-1 text-sm">Model different recurring monthly spending phases in retirement. Use start/end ages to define each phase. Periods should not overlap — ensure the start age of a later phase is after the end age of an earlier phase.</div>
                                         </div>
@@ -1333,7 +1333,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                         <span className="text-gray-400 hover:text-gray-600 focus:text-gray-700" aria-hidden="true" tabIndex={-1}>
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
                                         </span>
-                                        <div id="one-time-expenses-tooltip" role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2.5 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
+                                        <div id="one-time-expenses-tooltip" role="tooltip" className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2.5 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
                                             <div className="font-medium">One-Time Expenses</div>
                                             <div className="mt-1 text-sm">One-time expenses are single, non-recurring costs that occur at a specific age. Enter the amount, the age when it happens, and an optional description. The expense is applied once to the projection at the selected owner's age.</div>
                                         </div>
@@ -1348,7 +1348,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                         <span className="text-gray-400 hover:text-gray-600 focus:text-gray-700" aria-hidden="true" tabIndex={-1}>
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
                                         </span>
-                                        <div id="one-time-expenses-tooltip" role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2.5 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
+                                        <div id="one-time-expenses-tooltip" role="tooltip" className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2.5 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
                                             <div className="font-medium">One-Time Expenses</div>
                                             <div className="mt-1 text-sm">One-time expenses are single, non-recurring costs that occur at a specific age. Enter the amount, the age when it happens, and an optional description. The expense is applied once to the projection at the selected owner's age.</div>
                                         </div>

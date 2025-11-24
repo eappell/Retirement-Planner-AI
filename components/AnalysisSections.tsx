@@ -149,7 +149,7 @@ export const AnalysisSections: React.FC<AnalysisSectionsProps> = ({
                     <span className="text-gray-400 hover:text-gray-600 focus:text-gray-700" aria-hidden="true" tabIndex={-1}>
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
                     </span>
-                    <div role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-72 bg-gray-100 text-gray-900 text-[0.95rem] p-2.5 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10 font-normal">
+                    <div role="tooltip" className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-72 bg-gray-100 text-gray-900 text-[0.95rem] p-2.5 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10 font-normal">
                         <div>Monte Carlo Simulation</div>
                         <div className="mt-1 text-sm">Run many randomized market-return simulations to estimate a distribution of possible outcomes for your plan. Increase the number of simulations or volatility to stress-test resilience against market swings.</div>
                     </div>
