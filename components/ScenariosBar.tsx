@@ -67,6 +67,7 @@ const ScenariosBar: React.FC<ScenariosBarProps> = ({ scenarios = [], activeScena
     const [isDark, setIsDark] = React.useState<boolean>(false);
     const [isLight, setIsLight] = React.useState<boolean>(false);
     const rootRef = React.useRef<HTMLDivElement | null>(null);
+    const prevThemeRef = React.useRef<string | null>(null);
 
     React.useEffect(() => {
         try {
@@ -82,13 +83,26 @@ const ScenariosBar: React.FC<ScenariosBarProps> = ({ scenarios = [], activeScena
             };
 
             // initialize
-            setIsDark(getIsDark());
-            setIsLight(getIsLight());
+            const initialDark = getIsDark();
+            const initialLight = getIsLight();
+            setIsDark(initialDark);
+            setIsLight(initialLight);
+            prevThemeRef.current = initialLight ? 'light' : (initialDark ? 'dark' : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
 
             const mq = window.matchMedia('(prefers-color-scheme: dark)');
             const handler = () => {
-                setIsDark(getIsDark());
-                setIsLight(getIsLight());
+                const dark = getIsDark();
+                const light = getIsLight();
+                setIsDark(dark);
+                setIsLight(light);
+
+                const themeStr = light ? 'light' : (dark ? 'dark' : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+                if (prevThemeRef.current === null) {
+                    prevThemeRef.current = themeStr;
+                } else if (prevThemeRef.current !== themeStr) {
+                    prevThemeRef.current = themeStr;
+                    try { window.alert(`Theme changed: ${themeStr}`); } catch (e) { /* ignore */ }
+                }
             };
             if (mq.addEventListener) mq.addEventListener('change', handler);
             else mq.addListener(handler as any);
@@ -139,7 +153,7 @@ const ScenariosBar: React.FC<ScenariosBarProps> = ({ scenarios = [], activeScena
     }, []);
 
     return (
-        <div ref={rootRef} className="w-full bg-[#f1f5fb] dark:bg-slate-900 py-2 px-3" style={{ backgroundColor: isLight ? '#f1f5fb' : (isDark ? undefined : '#f1f5fb') }}>
+        <div className="w-full bg-[#f1f5fb] dark:bg-slate-900 py-2 px-3" style={{ backgroundColor: isLight ? '#f1f5fb' : (isDark ? undefined : '#f1f5fb') }}>
             <div className="max-w-full mx-auto flex items-center space-x-3">
                 <div className="flex items-center space-x-2 w-64">
                     <label htmlFor="scenarios-select" className="text-lg font-semibold text-[#0b6b04] dark:text-green-300 flex items-center space-x-2">
