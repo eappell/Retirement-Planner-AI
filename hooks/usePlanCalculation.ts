@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { RetirementPlan, CalculationResult, YearlyProjection } from '../types';
 import { runSimulation } from '../services/simulationService';
-import { getRetirementInsights } from '../services/geminiService';
+// AI requests are proxied through the server-side API at /api/insights
 import { estimateSocialSecurityBenefit } from '../services/socialSecurityService';
 
 /**
@@ -55,15 +55,23 @@ export const useAIInsights = () => {
         try {
             setIsAiLoading(true);
             setAiInsights('');
-            
-            // Check if API key is available
-            if (!process.env.API_KEY) {
-                setAiInsights('**AI Insights not available in local development.**\n\nThis feature requires a Gemini API key which is only configured in the Vercel deployment environment.\n\nTo use AI Insights locally, add your API key to the environment variables.');
-                return;
+            // Send plan+results to the server-side AI proxy
+            try {
+                const resp = await fetch('/api/insights', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ plan, result: results }),
+                });
+                if (!resp.ok) {
+                    const text = await resp.text();
+                    throw new Error(text || `AI proxy error: ${resp.status}`);
+                }
+                const data = await resp.json();
+                setAiInsights(data.text || 'No insights returned.');
+            } catch (err: any) {
+                console.error('AI proxy call failed:', err);
+                setAiInsights('AI Insights are currently unavailable. Please try again later.');
             }
-            
-            const insights = await getRetirementInsights(plan, results);
-            setAiInsights(insights);
         } catch (error) {
             console.error('Error getting AI insights:', error);
             setAiInsights('Failed to generate insights. Please try again.');
