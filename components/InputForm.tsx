@@ -1086,9 +1086,20 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                 aria-selected="true"
                                 aria-controls="panel-gifts"
                                 onClick={() => setEstateTab('gifts')}
-                                className={`text-sm pb-2 ${'border-b-2 border-purple-600 text-purple-700 font-medium'}`}
+                                className={`text-sm pb-2 ${'border-b-2 border-purple-600 text-purple-700 font-medium'} group`}
                             >
-                                Gifts
+                                <span className="inline-flex items-center space-x-2">
+                                    <span>Gifts</span>
+                                    <span className="relative inline-flex">
+                                        <span className="text-gray-400 hover:text-gray-600 focus:text-gray-700" aria-hidden="true" tabIndex={-1}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
+                                        </span>
+                                        <div id="gifts-tooltip" role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2.5 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
+                                            <div className="font-medium">Gifts</div>
+                                            <div className="mt-1 text-sm">Record planned gifts to beneficiaries. Use one-time gifts for single transfers, or annual gifts to model recurring donations. Specify owner, amounts, and start/end ages for annual gifts.</div>
+                                        </div>
+                                    </span>
+                                </span>
                             </button>
                         ) : (
                             <button
@@ -1097,9 +1108,20 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                 id="tab-gifts"
                                 aria-controls="panel-gifts"
                                 onClick={() => setEstateTab('gifts')}
-                                className={`text-sm pb-2 ${'border-b-2 border-transparent text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200'}`}
+                                className={`text-sm pb-2 ${'border-b-2 border-transparent text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200'} group`}
                             >
-                                Gifts
+                                <span className="inline-flex items-center space-x-2">
+                                    <span>Gifts</span>
+                                    <span className="relative inline-flex">
+                                        <span className="text-gray-400 hover:text-gray-600 focus:text-gray-700" aria-hidden="true" tabIndex={-1}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
+                                        </span>
+                                        <div id="gifts-tooltip" role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2.5 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
+                                            <div className="font-medium">Gifts</div>
+                                            <div className="mt-1 text-sm">Record planned gifts to beneficiaries. Use one-time gifts for single transfers, or annual gifts to model recurring donations. Specify owner, amounts, and start/end ages for annual gifts.</div>
+                                        </div>
+                                    </span>
+                                </span>
                             </button>
                         )}
                         {estateTab === 'legacy' ? (
@@ -1110,9 +1132,20 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                 aria-selected="true"
                                 aria-controls="panel-legacy"
                                 onClick={() => setEstateTab('legacy')}
-                                className={`text-sm pb-2 ${'border-b-2 border-orange-600 text-orange-700 font-medium'}`}
+                                className={`text-sm pb-2 ${'border-b-2 border-orange-600 text-orange-700 font-medium'} group`}
                             >
-                                Legacy
+                                <span className="inline-flex items-center space-x-2">
+                                    <span>Legacy</span>
+                                    <span className="relative inline-flex">
+                                        <span className="text-gray-400 hover:text-gray-600 focus:text-gray-700" aria-hidden="true" tabIndex={-1}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
+                                        </span>
+                                        <div id="legacy-tooltip" role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2.5 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
+                                            <div className="font-medium">Legacy Disbursements</div>
+                                            <div className="mt-1 text-sm">Allocate percentages of your estate to beneficiaries. Percentages should total 100% if you want the whole estate distributed. Legacy disbursements are disabled when Die With Zero is enabled.</div>
+                                        </div>
+                                    </span>
+                                </span>
                             </button>
                         ) : (
                             <button
@@ -1121,9 +1154,20 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                 id="tab-legacy"
                                 aria-controls="panel-legacy"
                                 onClick={() => setEstateTab('legacy')}
-                                className={`text-sm pb-2 ${'border-b-2 border-transparent text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200'}`}
+                                className={`text-sm pb-2 ${'border-b-2 border-transparent text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200'} group`}
                             >
-                                Legacy
+                                <span className="inline-flex items-center space-x-2">
+                                    <span>Legacy</span>
+                                    <span className="relative inline-flex">
+                                        <span className="text-gray-400 hover:text-gray-600 focus:text-gray-700" aria-hidden="true" tabIndex={-1}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
+                                        </span>
+                                        <div id="legacy-tooltip" role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2.5 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
+                                            <div className="font-medium">Legacy Disbursements</div>
+                                            <div className="mt-1 text-sm">Allocate percentages of your estate to beneficiaries. Percentages should total 100% if you want the whole estate distributed. Legacy disbursements are disabled when Die With Zero is enabled.</div>
+                                        </div>
+                                    </span>
+                                </span>
                             </button>
                         )}
                     </div>
@@ -1254,8 +1298,8 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                 <span className="inline-flex items-center space-x-2">
                                     <span>Expense Periods</span>
                                     <span className="relative inline-flex">
-                                        <span className="text-gray-400 hover:text-gray-600 focus:outline-none" aria-hidden="true" tabIndex={-1}>
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M18 10A8 8 0 112 10a8 8 0 0116 0zm-8-3a1 1 0 100 2 1 1 0 000-2zm1 4a1 1 0 10-2 0v3a1 1 0 102 0v-3z" clipRule="evenodd"/></svg>
+                                        <span className="text-gray-400 hover:text-gray-600 focus:text-gray-700" aria-hidden="true" tabIndex={-1}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
                                         </span>
                                         <div id="expense-periods-tooltip" role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2.5 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
                                             <div className="font-medium">Expense Periods</div>
@@ -1269,8 +1313,8 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                 <span className="inline-flex items-center space-x-2">
                                     <span>Expense Periods</span>
                                     <span className="relative inline-flex">
-                                        <span className="text-gray-400 hover:text-gray-600 focus:outline-none" aria-hidden="true" tabIndex={-1}>
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M18 10A8 8 0 112 10a8 8 0 0116 0zm-8-3a1 1 0 100 2 1 1 0 000-2zm1 4a1 1 0 10-2 0v3a1 1 0 102 0v-3z" clipRule="evenodd"/></svg>
+                                        <span className="text-gray-400 hover:text-gray-600 focus:text-gray-700" aria-hidden="true" tabIndex={-1}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
                                         </span>
                                         <div id="expense-periods-tooltip" role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2.5 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
                                             <div className="font-medium">Expense Periods</div>
@@ -1285,8 +1329,8 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                 <span className="inline-flex items-center space-x-2">
                                     <span>One-Time Expenses</span>
                                     <span className="relative inline-flex">
-                                        <span className="text-gray-400 hover:text-gray-600 focus:outline-none" aria-hidden="true" tabIndex={-1}>
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M18 10A8 8 0 112 10a8 8 0 0116 0zm-8-3a1 1 0 100 2 1 1 0 000-2zm1 4a1 1 0 10-2 0v3a1 1 0 102 0v-3z" clipRule="evenodd"/></svg>
+                                        <span className="text-gray-400 hover:text-gray-600 focus:text-gray-700" aria-hidden="true" tabIndex={-1}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
                                         </span>
                                         <div id="one-time-expenses-tooltip" role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2.5 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
                                             <div className="font-medium">One-Time Expenses</div>
@@ -1300,8 +1344,8 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                 <span className="inline-flex items-center space-x-2">
                                     <span>One-Time Expenses</span>
                                     <span className="relative inline-flex">
-                                        <span className="text-gray-400 hover:text-gray-600 focus:outline-none" aria-hidden="true" tabIndex={-1}>
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M18 10A8 8 0 112 10a8 8 0 0116 0zm-8-3a1 1 0 100 2 1 1 0 000-2zm1 4a1 1 0 10-2 0v3a1 1 0 102 0v-3z" clipRule="evenodd"/></svg>
+                                        <span className="text-gray-400 hover:text-gray-600 focus:text-gray-700" aria-hidden="true" tabIndex={-1}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
                                         </span>
                                         <div id="one-time-expenses-tooltip" role="tooltip" className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-100 text-gray-900 text-[0.95rem] p-2.5 text-left rounded shadow border border-gray-200 hidden group-hover:block z-10">
                                             <div className="font-medium">One-Time Expenses</div>
