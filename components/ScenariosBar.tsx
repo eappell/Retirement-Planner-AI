@@ -1,4 +1,5 @@
 import React from 'react';
+import { ThemeContext } from '../contexts/ThemeContext';
 import { SelectInput, TextInput } from './FormControls';
 import { Square3Stack3DIcon, ArrowDownTrayIcon, ArrowUpTrayIcon, PlusIcon, DocumentDuplicateIcon, TrashIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
 
@@ -69,6 +70,8 @@ const ScenariosBar: React.FC<ScenariosBarProps> = ({ scenarios = [], activeScena
     const rootRef = React.useRef<HTMLDivElement | null>(null);
     const prevThemeRef = React.useRef<string | null>(null);
 
+    const themeCtx = React.useContext(ThemeContext);
+
     React.useEffect(() => {
         try {
             const getIsDark = () => {
@@ -88,12 +91,39 @@ const ScenariosBar: React.FC<ScenariosBarProps> = ({ scenarios = [], activeScena
                 return htmlLight || bodyLight;
             };
 
-            // initialize
-            const initialDark = getIsDark();
-            const initialLight = getIsLight();
-            setIsDark(initialDark);
-            setIsLight(initialLight);
-            prevThemeRef.current = initialLight ? 'light' : (initialDark ? 'dark' : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+            // initialize from context first, then fall back to DOM/media/localStorage
+            const initFromContext = () => {
+                if (themeCtx && themeCtx.theme) {
+                    setIsDark(themeCtx.theme === 'dark');
+                    setIsLight(themeCtx.theme === 'light');
+                    prevThemeRef.current = themeCtx.theme;
+                    return true;
+                }
+                return false;
+            };
+
+            const initialFromCtx = initFromContext();
+            if (!initialFromCtx) {
+                const initialDark = getIsDark();
+                const initialLight = getIsLight();
+                // also try localStorage if present
+                try {
+                    const stored = localStorage.getItem('theme');
+                    if (stored === 'dark' || stored === 'light') {
+                        setIsDark(stored === 'dark');
+                        setIsLight(stored === 'light');
+                        prevThemeRef.current = stored;
+                    } else {
+                        setIsDark(initialDark);
+                        setIsLight(initialLight);
+                        prevThemeRef.current = initialLight ? 'light' : (initialDark ? 'dark' : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+                    }
+                } catch (e) {
+                    setIsDark(initialDark);
+                    setIsLight(initialLight);
+                    prevThemeRef.current = initialLight ? 'light' : (initialDark ? 'dark' : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+                }
+            }
 
             const mq = window.matchMedia('(prefers-color-scheme: dark)');
             const handler = () => {
@@ -107,7 +137,7 @@ const ScenariosBar: React.FC<ScenariosBarProps> = ({ scenarios = [], activeScena
                     prevThemeRef.current = themeStr;
                 } else if (prevThemeRef.current !== themeStr) {
                     prevThemeRef.current = themeStr;
-                    try { window.alert(`Theme changed: ${themeStr}`); } catch (e) { /* ignore */ }
+                    try { console.log(`Theme changed: ${themeStr}`); } catch (e) { /* ignore */ }
                 }
             };
             if (mq.addEventListener) mq.addEventListener('change', handler);
@@ -118,6 +148,19 @@ const ScenariosBar: React.FC<ScenariosBarProps> = ({ scenarios = [], activeScena
             if (document.documentElement) obs.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
             if (document.body) obs.observe(document.body, { attributes: true, attributeFilter: ['class'] });
 
+            // listen for storage events (other tabs) to catch theme changes
+            const storageListener = (e: StorageEvent) => {
+                try {
+                    if (e.key === 'theme') {
+                        const t = e.newValue;
+                        setIsDark(t === 'dark');
+                        setIsLight(t === 'light');
+                        console.log('Theme changed (storage):', t);
+                    }
+                } catch (err) { /* ignore */ }
+            };
+            window.addEventListener('storage', storageListener);
+
             // listen for a possible custom event some theme toggles may emit
             const themeEventListener = () => handler();
             window.addEventListener('theme:change', themeEventListener as EventListener);
@@ -127,26 +170,42 @@ const ScenariosBar: React.FC<ScenariosBarProps> = ({ scenarios = [], activeScena
                 else mq.removeListener(handler as any);
                 obs.disconnect();
                 window.removeEventListener('theme:change', themeEventListener as EventListener);
+                window.removeEventListener('storage', storageListener);
             };
         } catch (e) {
             // ignore
         }
-    }, []);
+    }, [themeCtx]);
 
-    // Enforce explicit light background using CSS priority in case global theme CSS overrides it
+    // respond to ThemeContext changes (re-rendered automatically when context value changes)
     React.useEffect(() => {
         try {
-            if (!rootRef.current) return;
-            if (isLight) {
-                rootRef.current.style.setProperty('background-color', '#f1f5fb', 'important');
-            } else {
-                // remove the forced style when not in explicit light mode
-                rootRef.current.style.removeProperty('background-color');
+            if (!themeCtx) return;
+            const t = themeCtx.theme;
+            setIsDark(t === 'dark');
+            setIsLight(t === 'light');
+            const themeStr = t === 'light' ? 'light' : 'dark';
+            if (prevThemeRef.current !== themeStr) {
+                prevThemeRef.current = themeStr;
+                console.log(`Theme changed (context): ${themeStr}`);
             }
         } catch (e) {
             // ignore
         }
-    }, [isLight]);
+    }, [themeCtx?.theme]);
+
+    // compute theme from context, localStorage or prefers-color-scheme to drive immediate styling
+    const computedTheme = React.useMemo(() => {
+        try {
+            if (themeCtx && themeCtx.theme) return themeCtx.theme;
+            const stored = localStorage.getItem('theme');
+            if (stored === 'light' || stored === 'dark') return stored;
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) return 'dark';
+            return 'light';
+        } catch (e) {
+            return undefined as any;
+        }
+    }, [themeCtx?.theme]);
 
     React.useEffect(() => {
         const onDocClick = (e: MouseEvent) => {
@@ -165,11 +224,11 @@ const ScenariosBar: React.FC<ScenariosBarProps> = ({ scenarios = [], activeScena
     }, []);
 
     return (
-        <div className="w-full bg-[#f1f5fb] dark:bg-slate-900 py-2 px-3" style={{ backgroundColor: isLight ? '#f1f5fb' : (isDark ? undefined : '#f1f5fb') }}>
+        <div ref={rootRef} className="w-full bg-[#f1f5fb] dark:bg-slate-900 py-2 px-3" style={{ backgroundColor: computedTheme === 'light' ? '#f1f5fb' : (computedTheme === 'dark' ? '#081025' : undefined) }}>
             <div className="max-w-full mx-auto flex items-center space-x-3">
                 <div className="flex items-center space-x-2 w-64">
-                    <label htmlFor="scenarios-select" className="text-lg font-semibold text-[#0b6b04] dark:text-green-300 flex items-center space-x-2">
-                        <Square3Stack3DIcon className="h-5 w-5 text-[#0b6b04] dark:text-green-300" />
+                    <label htmlFor="scenarios-select" className="text-lg font-semibold dark:text-green-300 flex items-center space-x-2" style={{ color: computedTheme === 'light' ? '#2e6f2b' : undefined }}>
+                        <Square3Stack3DIcon className="h-5 w-5 dark:text-green-300" style={{ color: computedTheme === 'light' ? '#2e6f2b' : undefined }} />
                         <span>Scenarios</span>
                     </label>
                     <SelectInput id="scenarios-select" value={selected ?? ''} onChange={e => handleSwitch(e.target.value)}>
@@ -272,19 +331,24 @@ const ScenariosBar: React.FC<ScenariosBarProps> = ({ scenarios = [], activeScena
                             onBlur={() => setHelpOpen(false)}
                             role="button"
                             aria-expanded={helpOpen}
-                            className="ml-2 flex items-center space-x-2 text-[#0b6b04] dark:text-green-300 hover:underline font-bold text-base"
+                            className="ml-2 flex items-center space-x-2 dark:text-green-300 hover:underline font-bold text-base"
+                            style={{ color: computedTheme === 'light' ? '#2e6f2b' : undefined }}
                         >
-                            <InformationCircleIcon className="h-4 w-4 text-[#0b6b04] dark:text-green-300" strokeWidth={2} />
+                            <InformationCircleIcon className="h-4 w-4 dark:text-green-300" strokeWidth={2} style={{ color: computedTheme === 'light' ? '#2e6f2b' : undefined }} />
                             <span>What are scenarios?</span>
                         </a>
 
                         <div
                             className={`absolute top-full mt-2 left-1/2 transform -translate-x-1/2 w-80 bg-white dark:bg-slate-800 shadow-xl rounded-md p-4 z-50 transition-all duration-300 ease-in-out ${helpOpen ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto' : 'opacity-0 -translate-y-2 scale-95 pointer-events-none'}`}
                             aria-hidden={!helpOpen}
-                            style={{ willChange: 'opacity, transform' }}
+                            style={{
+                                willChange: 'opacity, transform',
+                                backgroundColor: computedTheme === 'light' ? '#ffffff' : undefined,
+                                color: computedTheme === 'light' ? '#1f2937' : undefined,
+                            }}
                         >
-                            <h4 className="text-sm font-semibold text-[#0b6b04] dark:text-green-300">What Are Scenarios?</h4>
-                            <div className="text-sm text-gray-700 dark:text-gray-300 mt-2 space-y-2">
+                            <h4 className="text-sm font-semibold dark:text-green-300" style={{ color: computedTheme === 'light' ? '#2e6f2b' : undefined }}>What Are Scenarios?</h4>
+                            <div className="text-sm text-gray-700 dark:text-gray-300 mt-2 space-y-2" style={{ color: computedTheme === 'light' ? '#1f2937' : undefined }}>
                                 <p>Scenarios let you save a copy of your current plan so you can switch between different versions of your assumptions and inputs.</p>
                                 <p>Use scenarios to preserve your work, experiment safely, and compare outcomes across alternatives.</p>
                                 <p>You can also download your scenarios to a file and load them in another browser or device so your work travels with you.</p>
