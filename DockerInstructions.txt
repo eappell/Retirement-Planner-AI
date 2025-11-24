@@ -1,0 +1,28 @@
+Quick reference for managing the deployment:
+
+Start/stop containers:
+
+# Stop both
+sudo docker stop retirement-planner api
+
+# Start both
+sudo docker start api retirement-planner
+
+# View logs
+sudo docker logs -f api
+sudo docker logs -f retirement-planner
+
+Update the API (after code changes):
+
+# Rebuild image
+cd /volume2/docker/retirement-income
+DOCKER_BUILDKIT=0 docker build --no-cache -t retirement-planner-api:latest ./server
+
+# Recreate container
+sudo docker stop api && sudo docker rm api
+sudo docker run -d --name api --network retire-net --env-file /volume2/docker/retirement-income/.env --restart unless-stopped retirement-planner-api:latest
+
+Update the frontend (after rebuilding dist locally):
+
+# Copy new dist to NAS, then:
+sudo docker restart retirement-planner
