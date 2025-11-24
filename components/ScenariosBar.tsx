@@ -66,6 +66,7 @@ const ScenariosBar: React.FC<ScenariosBarProps> = ({ scenarios = [], activeScena
 
     const [isDark, setIsDark] = React.useState<boolean>(false);
     const [isLight, setIsLight] = React.useState<boolean>(false);
+    const rootRef = React.useRef<HTMLDivElement | null>(null);
 
     React.useEffect(() => {
         try {
@@ -106,6 +107,21 @@ const ScenariosBar: React.FC<ScenariosBarProps> = ({ scenarios = [], activeScena
         }
     }, []);
 
+    // Enforce explicit light background using CSS priority in case global theme CSS overrides it
+    React.useEffect(() => {
+        try {
+            if (!rootRef.current) return;
+            if (isLight) {
+                rootRef.current.style.setProperty('background-color', '#f1f5fb', 'important');
+            } else {
+                // remove the forced style when not in explicit light mode
+                rootRef.current.style.removeProperty('background-color');
+            }
+        } catch (e) {
+            // ignore
+        }
+    }, [isLight]);
+
     React.useEffect(() => {
         const onDocClick = (e: MouseEvent) => {
             if (!helpRef.current) return;
@@ -123,7 +139,7 @@ const ScenariosBar: React.FC<ScenariosBarProps> = ({ scenarios = [], activeScena
     }, []);
 
     return (
-        <div className="w-full bg-[#f1f5fb] dark:bg-slate-900 py-2 px-3" style={{ backgroundColor: isLight ? '#f1f5fb' : (isDark ? undefined : '#f1f5fb') }}>
+        <div ref={rootRef} className="w-full bg-[#f1f5fb] dark:bg-slate-900 py-2 px-3" style={{ backgroundColor: isLight ? '#f1f5fb' : (isDark ? undefined : '#f1f5fb') }}>
             <div className="max-w-full mx-auto flex items-center space-x-3">
                 <div className="flex items-center space-x-2 w-64">
                     <label htmlFor="scenarios-select" className="text-lg font-semibold text-[#0b6b04] dark:text-green-300 flex items-center space-x-2">
