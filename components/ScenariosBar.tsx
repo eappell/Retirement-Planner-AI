@@ -64,26 +64,32 @@ const ScenariosBar: React.FC<ScenariosBarProps> = ({ scenarios = [], activeScena
     const hideTimerRef = React.useRef<number | null>(null);
     const isTouchRef = React.useRef<boolean>(false);
 
-    const [isDark, setIsDark] = React.useState<boolean>(() => {
-        try {
-            if (typeof document !== 'undefined' && document.documentElement) {
-                return document.documentElement.classList.contains('theme-dark') || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
-            }
-        } catch (e) {
-            // ignore
-        }
-        return false;
-    });
+    const [isDark, setIsDark] = React.useState<boolean>(false);
 
     React.useEffect(() => {
         try {
+            const getIsDark = () => {
+                if (!document || !document.documentElement) return false;
+                const el = document.documentElement;
+                return el.classList.contains('theme-dark') || el.classList.contains('dark') || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            };
+
+            // initialize
+            setIsDark(getIsDark());
+
             const mq = window.matchMedia('(prefers-color-scheme: dark)');
-            const handler = () => setIsDark(document.documentElement.classList.contains('theme-dark') || mq.matches);
+            const handler = () => setIsDark(getIsDark());
             if (mq.addEventListener) mq.addEventListener('change', handler);
             else mq.addListener(handler as any);
+
+            // observe class changes on <html> so toggling theme class is detected
+            const obs = new MutationObserver(() => setIsDark(getIsDark()));
+            obs.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+
             return () => {
                 if (mq.removeEventListener) mq.removeEventListener('change', handler);
                 else mq.removeListener(handler as any);
+                obs.disconnect();
             };
         } catch (e) {
             // ignore
