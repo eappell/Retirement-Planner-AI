@@ -125,7 +125,8 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
     
     const doUpdateAll = (partial: Partial<RetirementPlan>, label?: string) => {
         if (!partial) return;
-        if (!confirm(`Apply ${label ?? 'these changes'} to ALL scenarios? This will overwrite the same section in every scenario.`)) return;
+        const section = label ?? 'these changes';
+        if (!confirm(`Apply ${section} data to ALL scenarios? This will overwrite the same section in every scenario.`)) return;
         if (typeof updateAllScenarios === 'function') updateAllScenarios(partial);
     };
     
