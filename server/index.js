@@ -1,27 +1,61 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const { GoogleGenAI } = require('@google/genai');
+let GoogleGenAI;
+try {
+  // optional dependency: @google/genai may not be published/available in some registries
+  GoogleGenAI = require('@google/genai').GoogleGenAI;
+} catch (err) {
+  console.warn('Optional dependency @google/genai is not installed; AI proxy will return a fallback message.');
+}
 require('dotenv').config();
 
 const app = express();
 app.use(bodyParser.json({ limit: '1mb' }));
 
 if (!process.env.API_KEY) {
-  console.warn('Warning: API_KEY not set in server environment. AI proxy will fail without it.');
+  console.warn('Warning: API_KEY not set in server environment. AI proxy will return a fallback message.');
 }
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Create an `ai` wrapper. If GoogleGenAI is available, use it; otherwise provide a safe fallback.
+let ai;
+if (GoogleGenAI) {
+  try {
+    ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  } catch (err) {
+    console.error('Failed to initialize GoogleGenAI client:', err);
+  }
+}
+if (!ai) {
+  // fallback implementation so server builds and runs even when the real client isn't installed
+  ai = {
+    models: {
+      async generateContent(opts) {
+        return { text: 'AI proxy not available: server dependency @google/genai is not installed or could not be initialized.' };
+      }
+    }
+  };
+}
 
 const formatCurrency = (value) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
 
 app.post('/api/insights', async (req, res) => {
   try {
     const { plan, result } = req.body || {};
-    if (!plan || !result) return res.status(400).json({ error: 'Missing plan or result in request body' });
+    if (!plan || !result || !plan.person1) {
+      return res.status(400).json({ error: 'Missing required plan or result data (need plan.person1 and result)' });
+    }
 
     const totalInvestments = ([...(plan.retirementAccounts || []), ...(plan.investmentAccounts || [])]).reduce((s, a) => s + (a.balance || 0), 0);
 
-    const planSummary = `A user is planning for retirement with the following details:\n- Planning for: ${plan.planType}\n- State: ${plan.state}\n- Inflation: ${plan.inflationRate}%\n- Avg return: ${plan.avgReturn}%\n\nPeople:\n- ${plan.person1.name}: age ${plan.person1.currentAge}, retires ${plan.person1.retirementAge}\n${plan.planType==='Couple' ? `- ${plan.person2.name}: age ${plan.person2.currentAge}, retires ${plan.person2.retirementAge}\n` : ''}\nFinancials:\n- Total investments: ${formatCurrency(totalInvestments)}\n- Avg monthly net income (today): ${formatCurrency(result.avgMonthlyNetIncomeToday)}\n- Net worth at end: ${formatCurrency(result.netWorthAtEnd)}\n`;
+    // Safely access nested fields with defaults to avoid runtime errors when callers send partial data
+    const planType = plan.planType || 'Unknown';
+    const state = plan.state || 'Unknown';
+    const inflationRate = plan.inflationRate ?? 'Unknown';
+    const avgReturn = plan.avgReturn ?? 'Unknown';
+    const p1 = plan.person1 || {};
+    const p2 = plan.person2 || {};
+
+    const planSummary = `A user is planning for retirement with the following details:\n- Planning for: ${planType}\n- State: ${state}\n- Inflation: ${inflationRate}%\n- Avg return: ${avgReturn}%\n\nPeople:\n- ${p1.name || 'Person 1'}: age ${p1.currentAge ?? 'Unknown'}, retires ${p1.retirementAge ?? 'Unknown'}\n${planType === 'Couple' ? `- ${p2.name || 'Person 2'}: age ${p2.currentAge ?? 'Unknown'}, retires ${p2.retirementAge ?? 'Unknown'}\n` : ''}\nFinancials:\n- Total investments: ${formatCurrency(totalInvestments)}\n- Avg monthly net income (today): ${formatCurrency(result.avgMonthlyNetIncomeToday || 0)}\n- Net worth at end: ${formatCurrency(result.netWorthAtEnd || 0)}\n`;
 
     const prompt = `You are a friendly financial advisor. Read the plan summary and give a short Overview and three Actionable Tips in Markdown.\n\n${planSummary}`;
 
