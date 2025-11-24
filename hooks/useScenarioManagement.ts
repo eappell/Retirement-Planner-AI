@@ -56,81 +56,94 @@ export const useScenarioManagement = (initialState?: ScenariosState) => {
 
     // Helper to update the plan within the active scenario
     const updateActivePlan = useCallback((updater: (prevPlan: RetirementPlan) => RetirementPlan) => {
-        if (!activeScenarioId) return;
         setScenariosState(prev => {
-            const currentPlan = prev.scenarios[activeScenarioId].plan;
+            const id = prev.activeScenarioId;
+            if (!id) return prev;
+            const current = prev.scenarios[id];
+            if (!current) return prev;
+            const currentPlan = current.plan;
             const updatedPlan = updater(currentPlan);
             if (updatedPlan === currentPlan) return prev; // No change
             return {
                 ...prev,
                 scenarios: {
                     ...prev.scenarios,
-                    [activeScenarioId]: {
-                        ...prev.scenarios[activeScenarioId],
+                    [id]: {
+                        ...prev.scenarios[id],
                         plan: updatedPlan,
                     },
                 },
             };
         });
-    }, [activeScenarioId]);
+    }, []);
 
     const selectScenario = useCallback((id: string) => {
         setScenariosState(prev => ({ ...prev, activeScenarioId: id }));
     }, []);
 
     const createNewScenario = useCallback(() => {
-        const newId = `scenario-${Date.now()}`;
-        const newScenario: Scenario = {
-            id: newId,
-            name: `New Scenario ${Object.keys(scenarios).length + 1}`,
-            plan: initialPlanState,
-        };
-        setScenariosState(prev => ({
-            activeScenarioId: newId,
-            scenarios: { ...prev.scenarios, [newId]: newScenario },
-        }));
-    }, [scenarios]);
+        setScenariosState(prev => {
+            const newId = `scenario-${Date.now()}`;
+            const count = Object.keys(prev.scenarios).length;
+            const newScenario: Scenario = {
+                id: newId,
+                name: `New Scenario ${count + 1}`,
+                plan: initialPlanState,
+            };
+            return {
+                activeScenarioId: newId,
+                scenarios: { ...prev.scenarios, [newId]: newScenario },
+            };
+        });
+    }, []);
 
     const deleteScenario = useCallback(() => {
-        if (!activeScenarioId || !activeScenario || Object.keys(scenarios).length <= 1) {
-            return false; // Cannot delete
-        }
-
+        let deleted = false;
         setScenariosState(prev => {
+            const id = prev.activeScenarioId;
+            if (!id || !prev.scenarios[id] || Object.keys(prev.scenarios).length <= 1) {
+                return prev; // Cannot delete
+            }
             const newScenarios = { ...prev.scenarios };
-            delete newScenarios[activeScenarioId];
+            delete newScenarios[id];
             const newActiveId = Object.keys(newScenarios)[0] || null;
-            return { scenarios: newScenarios, activeScenarioId: newActiveId };
+            deleted = true;
+            return { scenarios: newScenarios, activeScenarioId: newActiveId } as ScenariosState;
         });
-        return true;
-    }, [activeScenarioId, activeScenario, scenarios]);
+        return deleted;
+    }, []);
 
     const copyScenario = useCallback(() => {
-        if (!activeScenarioId || !activeScenario) return;
-
-        const newId = `scenario-${Date.now()}`;
-        const newScenario: Scenario = {
-            id: newId,
-            name: `${activeScenario.name} Copy`,
-            plan: structuredClone(activeScenario.plan),
-        };
-
-        setScenariosState(prev => ({
-            activeScenarioId: newId,
-            scenarios: { ...prev.scenarios, [newId]: newScenario },
-        }));
-    }, [activeScenarioId, activeScenario]);
+        setScenariosState(prev => {
+            const id = prev.activeScenarioId;
+            if (!id || !prev.scenarios[id]) return prev;
+            const active = prev.scenarios[id];
+            const newId = `scenario-${Date.now()}`;
+            const newScenario: Scenario = {
+                id: newId,
+                name: `${active.name} Copy`,
+                plan: structuredClone(active.plan),
+            };
+            return {
+                activeScenarioId: newId,
+                scenarios: { ...prev.scenarios, [newId]: newScenario },
+            };
+        });
+    }, []);
 
     const updateScenarioName = useCallback((newName: string) => {
-        if (!activeScenarioId) return;
-        setScenariosState(prev => ({
-            ...prev,
-            scenarios: {
-                ...prev.scenarios,
-                [activeScenarioId]: { ...prev.scenarios[activeScenarioId], name: newName },
-            },
-        }));
-    }, [activeScenarioId]);
+        setScenariosState(prev => {
+            const id = prev.activeScenarioId;
+            if (!id || !prev.scenarios[id]) return prev;
+            return {
+                ...prev,
+                scenarios: {
+                    ...prev.scenarios,
+                    [id]: { ...prev.scenarios[id], name: newName },
+                },
+            };
+        });
+    }, []);
 
     const resetAllScenarios = useCallback(() => {
         const defaultScenario = getDefaultScenario();

@@ -14,7 +14,7 @@ export const ResultsPanel: React.FC<ResultsPanelProps> = React.memo(({ results, 
     );
     
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 sticky top-[64px] z-10 bg-brand-background py-4 shadow-sm -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 bg-brand-background py-4 shadow-sm -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8">
             <IndicatorCard 
                 title="Avg. Monthly Net Income" 
                 value={results && !isLoading ? formatCurrency(results.avgMonthlyNetIncomeFuture) : '---'}
