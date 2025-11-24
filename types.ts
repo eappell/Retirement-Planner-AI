@@ -176,6 +176,8 @@ export interface YearlyProjection {
 export interface CalculationResult {
   avgMonthlyNetIncomeToday: number; // In today's dollars
   avgMonthlyNetIncomeFuture: number; // In future dollars
+  avgMonthlySurplusToday: number; // In today's dollars
+  avgMonthlySurplusFuture: number; // In future dollars
   netWorthAtEnd: number; // In today's dollars
   netWorthAtEndFuture: number; // In future dollars
   federalTaxRate: number;

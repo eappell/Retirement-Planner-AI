@@ -57,6 +57,7 @@ const calculateSummary = (projections: YearlyProjection[], plan: RetirementPlan)
         const finalNetWorth = projections.length > 0 ? projections[projections.length - 1].netWorth : 0;
         return {
             avgMonthlyNetIncomeToday: 0, avgMonthlyNetIncomeFuture: 0,
+            avgMonthlySurplusToday: 0, avgMonthlySurplusFuture: 0,
             netWorthAtEnd: finalNetWorth / Math.pow(1 + inflation, projections.length),
             netWorthAtEndFuture: finalNetWorth, federalTaxRate: 0, stateTaxRate: 0, yearsInRetirement: 0,
             yearlyProjections: projections,
@@ -76,6 +77,12 @@ const calculateSummary = (projections: YearlyProjection[], plan: RetirementPlan)
     
     const netIncomesInTodaysDollars = retirementNetIncomes.map((income, i) => income / Math.pow(1 + inflation, retirementStartYearIndex + i));
     const avgAnnualNetIncomeToday = netIncomesInTodaysDollars.length > 0 ? netIncomesInTodaysDollars.reduce((a, b) => a + b, 0) / netIncomesInTodaysDollars.length : 0;
+
+    // Calculate average annual surplus (future and today's $) from yearly projections
+    const retirementSurpluses = retirementProjections.map(p => p.surplus);
+    const avgAnnualSurplusFuture = retirementSurpluses.length > 0 ? retirementSurpluses.reduce((a, b) => a + b, 0) / retirementSurpluses.length : 0;
+    const surplusesInTodaysDollars = retirementSurpluses.map((s, i) => s / Math.pow(1 + inflation, retirementStartYearIndex + i));
+    const avgAnnualSurplusToday = surplusesInTodaysDollars.length > 0 ? surplusesInTodaysDollars.reduce((a, b) => a + b, 0) / surplusesInTodaysDollars.length : 0;
     
     const netWorthInTodaysDollars = finalNetWorth / Math.pow(1 + inflation, projections.length - 1);
 
@@ -85,7 +92,9 @@ const calculateSummary = (projections: YearlyProjection[], plan: RetirementPlan)
 
     return {
         avgMonthlyNetIncomeToday: avgAnnualNetIncomeToday / 12,
+        avgMonthlySurplusToday: avgAnnualSurplusToday / 12,
         avgMonthlyNetIncomeFuture: avgAnnualNetIncomeFuture / 12,
+        avgMonthlySurplusFuture: avgAnnualSurplusFuture / 12,
         netWorthAtEnd: netWorthInTodaysDollars,
         netWorthAtEndFuture: finalNetWorth,
         federalTaxRate: avgGrossIncome > 0 ? (avgFederalTax / avgGrossIncome) * 100 : 0,

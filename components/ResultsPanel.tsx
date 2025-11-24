@@ -1,6 +1,7 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useContext } from 'react';
 import { CalculationResult } from '../types';
 import { IndicatorCard } from './IndicatorCard';
+import { ThemeContext } from '../contexts/ThemeContext';
 
 interface ResultsPanelProps {
     results: CalculationResult | null;
@@ -8,19 +9,33 @@ interface ResultsPanelProps {
 }
 
 export const ResultsPanel: React.FC<ResultsPanelProps> = React.memo(({ results, isLoading }) => {
+    const themeCtx = useContext(ThemeContext);
+    const theme = themeCtx?.theme ?? 'light';
+    const surplusColorClass = theme === 'dark' ? 'bg-indigo-500' : 'bg-teal-500';
     const formatCurrency = useMemo(
         () => (value: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value),
         []
     );
     
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 bg-brand-background py-4 shadow-sm -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6 bg-brand-background py-4 shadow-sm -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8">
             <IndicatorCard 
                 title="Avg. Monthly Net Income" 
                 value={results && !isLoading ? formatCurrency(results.avgMonthlyNetIncomeFuture) : '---'}
                 subValue={results && !isLoading ? `(${formatCurrency(results.avgMonthlyNetIncomeToday)} today's $)` : ''}
                 icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="1" y="6" width="22" height="12" rx="2" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" /><path strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" d="M12 9.5v5M10 9a1 1 0 012 0 1 1 0 01-2 0M14 15a1 1 0 01-2 0 1 1 0 012 0" /></svg>}
                 colorClass="bg-green-500"
+            />
+                <IndicatorCard
+                title="Avg. Monthly Surplus"
+                value={results && !isLoading ? formatCurrency(results.avgMonthlySurplusFuture) : '---'}
+                subValue={results && !isLoading ? `(${formatCurrency(results.avgMonthlySurplusToday)} today's $)` : ''}
+                icon={
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-6 w-6 text-white">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                    </svg>
+                }
+                colorClass={surplusColorClass}
             />
                 <IndicatorCard 
                 title="Final Net Worth" 
