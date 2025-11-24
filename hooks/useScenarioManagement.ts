@@ -145,6 +145,19 @@ export const useScenarioManagement = (initialState?: ScenariosState) => {
         });
     }, []);
 
+    const updateScenarioNameById = useCallback((id: string, newName: string) => {
+        setScenariosState(prev => {
+            if (!id || !prev.scenarios[id]) return prev;
+            return {
+                ...prev,
+                scenarios: {
+                    ...prev.scenarios,
+                    [id]: { ...prev.scenarios[id], name: newName },
+                },
+            };
+        });
+    }, []);
+
     const resetAllScenarios = useCallback(() => {
         const defaultScenario = getDefaultScenario();
         setScenariosState({
@@ -207,6 +220,7 @@ export const useScenarioManagement = (initialState?: ScenariosState) => {
         deleteScenario,
         copyScenario,
         updateScenarioName,
+        updateScenarioNameById,
         resetAllScenarios,
         uploadScenarios,
     };

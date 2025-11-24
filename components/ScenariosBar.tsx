@@ -39,7 +39,7 @@ const ScenariosBar: React.FC<ScenariosBarProps> = ({ scenarios = [], activeScena
     const handleRename = (val: string) => {
         setName(val);
         if (!selected) return;
-        if (typeof onRenameScenario === 'function') onRenameScenario(val);
+        if (typeof onRenameScenario === 'function') onRenameScenario(selected, val);
         else window.dispatchEvent(new CustomEvent('scenarios:rename', { detail: { id: selected, name: val } }));
     };
 
@@ -266,8 +266,9 @@ const ScenariosBar: React.FC<ScenariosBarProps> = ({ scenarios = [], activeScena
                         aria-label="Delete scenario"
                         disabled={list.length <= 1}
                         className="relative group py-2 px-3 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center font-semibold text-base"
+                        style={{ backgroundColor: computedTheme === 'dark' ? '#7f1d1d' : undefined }}
                     >
-                        <TrashIcon className="h-4 w-4" />
+                        <TrashIcon className="h-4 w-4" style={{ color: computedTheme === 'dark' ? '#ff6b6b' : undefined }} />
                         <span className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-gray-800 dark:bg-gray-700 text-white dark:text-white text-xs rounded py-1 px-2 whitespace-nowrap z-40 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-none">Delete the current scenario</span>
                     </button>
                     <button
@@ -282,7 +283,6 @@ const ScenariosBar: React.FC<ScenariosBarProps> = ({ scenarios = [], activeScena
                     >
                         <ArrowDownTrayIcon className="h-4 w-4 text-white" strokeWidth={2} />
                         <span className="text-sm font-semibold text-white whitespace-nowrap">Download Scenarios</span>
-                        <span className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-gray-800 dark:bg-gray-700 text-white dark:text-white text-xs rounded py-1 px-2 whitespace-nowrap z-40 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-none">Download Scenarios</span>
                     </button>
                     <label className="relative group px-3 h-8 bg-[#28702d] text-white rounded-md text-base hover:bg-[#225b27] transition-colors cursor-pointer flex items-center space-x-2 font-semibold">
                         <ArrowUpTrayIcon className="h-4 w-4 text-white" strokeWidth={2} />
@@ -299,7 +299,6 @@ const ScenariosBar: React.FC<ScenariosBarProps> = ({ scenarios = [], activeScena
                             accept=".retire"
                         />
                         <span className="text-sm font-semibold text-white whitespace-nowrap">Restore Scenarios</span>
-                        <span className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-gray-800 dark:bg-gray-700 text-white dark:text-white text-xs rounded py-1 px-2 whitespace-nowrap z-40 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-none">Restore Scenarios</span>
                     </label>
                     <div
                         ref={helpRef}

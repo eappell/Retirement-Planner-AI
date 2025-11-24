@@ -66,6 +66,7 @@ const App: React.FC = () => {
         deleteScenario,
         copyScenario,
         updateScenarioName,
+        updateScenarioNameById,
         resetAllScenarios,
         uploadScenarios,
         updateAllScenarios,
@@ -256,9 +257,20 @@ const App: React.FC = () => {
         clearCalculationResults();
     }, [copyScenario, clearCalculationResults]);
     
-    const handleUpdateScenarioName = useCallback((newName: string) => {
-        updateScenarioName(newName);
-    }, [updateScenarioName]);
+    const handleUpdateScenarioName = useCallback((idOrName: string, maybeName?: string) => {
+        if (typeof maybeName === 'string') {
+            // called with (id, name)
+            try {
+                updateScenarioNameById(idOrName, maybeName);
+            } catch (e) {
+                // fallback to old behavior
+                updateScenarioName(maybeName);
+            }
+        } else {
+            // called with (name)
+            updateScenarioName(idOrName);
+        }
+    }, [updateScenarioName, updateScenarioNameById]);
     
     // --- Backup & Restore Handlers ---
     const handleDownloadScenarios = async (): Promise<boolean> => {
