@@ -64,6 +64,32 @@ const ScenariosBar: React.FC<ScenariosBarProps> = ({ scenarios = [], activeScena
     const hideTimerRef = React.useRef<number | null>(null);
     const isTouchRef = React.useRef<boolean>(false);
 
+    const [isDark, setIsDark] = React.useState<boolean>(() => {
+        try {
+            if (typeof document !== 'undefined' && document.documentElement) {
+                return document.documentElement.classList.contains('theme-dark') || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            }
+        } catch (e) {
+            // ignore
+        }
+        return false;
+    });
+
+    React.useEffect(() => {
+        try {
+            const mq = window.matchMedia('(prefers-color-scheme: dark)');
+            const handler = () => setIsDark(document.documentElement.classList.contains('theme-dark') || mq.matches);
+            if (mq.addEventListener) mq.addEventListener('change', handler);
+            else mq.addListener(handler as any);
+            return () => {
+                if (mq.removeEventListener) mq.removeEventListener('change', handler);
+                else mq.removeListener(handler as any);
+            };
+        } catch (e) {
+            // ignore
+        }
+    }, []);
+
     React.useEffect(() => {
         const onDocClick = (e: MouseEvent) => {
             if (!helpRef.current) return;
@@ -81,7 +107,7 @@ const ScenariosBar: React.FC<ScenariosBarProps> = ({ scenarios = [], activeScena
     }, []);
 
     return (
-        <div className="w-full bg-[#f1f5fb] dark:bg-slate-900 py-2 px-3">
+        <div className="w-full bg-[#f1f5fb] dark:bg-slate-900 py-2 px-3" style={{ backgroundColor: isDark ? undefined : '#f1f5fb' }}>
             <div className="max-w-full mx-auto flex items-center space-x-3">
                 <div className="flex items-center space-x-2 w-64">
                     <label htmlFor="scenarios-select" className="text-lg font-semibold text-[#0b6b04] dark:text-green-300 flex items-center space-x-2">
