@@ -65,6 +65,7 @@ const ScenariosBar: React.FC<ScenariosBarProps> = ({ scenarios = [], activeScena
     const isTouchRef = React.useRef<boolean>(false);
 
     const [isDark, setIsDark] = React.useState<boolean>(false);
+    const [isLight, setIsLight] = React.useState<boolean>(false);
 
     React.useEffect(() => {
         try {
@@ -73,17 +74,26 @@ const ScenariosBar: React.FC<ScenariosBarProps> = ({ scenarios = [], activeScena
                 const el = document.documentElement;
                 return el.classList.contains('theme-dark') || el.classList.contains('dark') || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
             };
+            const getIsLight = () => {
+                if (!document || !document.documentElement) return false;
+                const el = document.documentElement;
+                return el.classList.contains('theme-light') || el.classList.contains('light');
+            };
 
             // initialize
             setIsDark(getIsDark());
+            setIsLight(getIsLight());
 
             const mq = window.matchMedia('(prefers-color-scheme: dark)');
-            const handler = () => setIsDark(getIsDark());
+            const handler = () => {
+                setIsDark(getIsDark());
+                setIsLight(getIsLight());
+            };
             if (mq.addEventListener) mq.addEventListener('change', handler);
             else mq.addListener(handler as any);
 
             // observe class changes on <html> so toggling theme class is detected
-            const obs = new MutationObserver(() => setIsDark(getIsDark()));
+            const obs = new MutationObserver(handler);
             obs.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
 
             return () => {
@@ -113,7 +123,7 @@ const ScenariosBar: React.FC<ScenariosBarProps> = ({ scenarios = [], activeScena
     }, []);
 
     return (
-        <div className="w-full bg-[#f1f5fb] dark:bg-slate-900 py-2 px-3" style={{ backgroundColor: isDark ? undefined : '#f1f5fb' }}>
+        <div className="w-full bg-[#f1f5fb] dark:bg-slate-900 py-2 px-3" style={{ backgroundColor: isLight ? '#f1f5fb' : (isDark ? undefined : '#f1f5fb') }}>
             <div className="max-w-full mx-auto flex items-center space-x-3">
                 <div className="flex items-center space-x-2 w-64">
                     <label htmlFor="scenarios-select" className="text-lg font-semibold text-[#0b6b04] dark:text-green-300 flex items-center space-x-2">
