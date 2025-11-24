@@ -72,14 +72,20 @@ const ScenariosBar: React.FC<ScenariosBarProps> = ({ scenarios = [], activeScena
     React.useEffect(() => {
         try {
             const getIsDark = () => {
-                if (!document || !document.documentElement) return false;
-                const el = document.documentElement;
-                return el.classList.contains('theme-dark') || el.classList.contains('dark') || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                if (!document) return false;
+                const html = document.documentElement;
+                const body = document.body;
+                const htmlDark = html && (html.classList.contains('theme-dark') || html.classList.contains('dark'));
+                const bodyDark = body && (body.classList.contains('theme-dark') || body.classList.contains('dark'));
+                return htmlDark || bodyDark || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
             };
             const getIsLight = () => {
-                if (!document || !document.documentElement) return false;
-                const el = document.documentElement;
-                return el.classList.contains('theme-light') || el.classList.contains('light');
+                if (!document) return false;
+                const html = document.documentElement;
+                const body = document.body;
+                const htmlLight = html && (html.classList.contains('theme-light') || html.classList.contains('light'));
+                const bodyLight = body && (body.classList.contains('theme-light') || body.classList.contains('light'));
+                return htmlLight || bodyLight;
             };
 
             // initialize
@@ -107,14 +113,20 @@ const ScenariosBar: React.FC<ScenariosBarProps> = ({ scenarios = [], activeScena
             if (mq.addEventListener) mq.addEventListener('change', handler);
             else mq.addListener(handler as any);
 
-            // observe class changes on <html> so toggling theme class is detected
+            // observe class changes on <html> and <body> so toggling theme class is detected
             const obs = new MutationObserver(handler);
-            obs.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+            if (document.documentElement) obs.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+            if (document.body) obs.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+
+            // listen for a possible custom event some theme toggles may emit
+            const themeEventListener = () => handler();
+            window.addEventListener('theme:change', themeEventListener as EventListener);
 
             return () => {
                 if (mq.removeEventListener) mq.removeEventListener('change', handler);
                 else mq.removeListener(handler as any);
                 obs.disconnect();
+                window.removeEventListener('theme:change', themeEventListener as EventListener);
             };
         } catch (e) {
             // ignore
