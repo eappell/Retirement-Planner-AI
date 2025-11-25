@@ -1,0 +1,124 @@
+{
+  "slice": [
+    {
+      "year": 2025,
+      "age1": 87,
+      "age2": 84,
+      "withdrawal": 84000,
+      "grossIncome": 84000,
+      "netIncome": 76152.81999999999,
+      "investmentBalance": 441000,
+      "retirementBalance": 1575000
+    },
+    {
+      "year": 2026,
+      "age1": 88,
+      "age2": 85,
+      "withdrawal": 84672,
+      "grossIncome": 84672,
+      "netIncome": 70175.206,
+      "investmentBalance": 378378,
+      "retirementBalance": 1653750
+    },
+    {
+      "year": 2027,
+      "age1": 89,
+      "age2": 86,
+      "withdrawal": 108799.34210526316,
+      "grossIncome": 108799.34210526316,
+      "netIncome": 86750.69002631579,
+      "investmentBalance": 288497.5578947369,
+      "retirementBalance": 1736437.5
+    },
+    {
+      "year": 2028,
+      "age1": 90,
+      "age2": 87,
+      "withdrawal": 120585.9375,
+      "grossIncome": 120585.9375,
+      "netIncome": 94739.1023125,
+      "investmentBalance": 182336.49828947376,
+      "retirementBalance": 1823259.375
+    },
+    {
+      "year": 2029,
+      "age1": 91,
+      "age2": 88,
+      "withdrawal": 133084.62591240875,
+      "grossIncome": 133084.62591240875,
+      "netIncome": 103075.72748357663,
+      "investmentBalance": 58368.6972915387,
+      "retirementBalance": 1914422.34375
+    },
+    {
+      "year": 2030,
+      "age1": 92,
+      "age2": 89,
+      "withdrawal": 148404.8328488372,
+      "grossIncome": 148404.8328488372,
+      "netIncome": 113294.3055101744,
+      "investmentBalance": 0,
+      "retirementBalance": 1923025.7602447784
+    },
+    {
+      "year": 2031,
+      "age1": 93,
+      "age2": 90,
+      "withdrawal": 157625.06231514577,
+      "grossIncome": 157625.06231514577,
+      "netIncome": 119444.19856420222,
+      "investmentBalance": 0,
+      "retirementBalance": 1861551.9859418715
+    },
+    {
+      "year": 2032,
+      "age1": 94,
+      "age2": 91,
+      "withdrawal": 161874.08573407578,
+      "grossIncome": 161874.08573407578,
+      "netIncome": 122278.29718462855,
+      "investmentBalance": 0,
+      "retirementBalance": 1792755.4995048896
+    },
+    {
+      "year": 2033,
+      "age1": 95,
+      "age2": 92,
+      "withdrawal": 165995.87958378607,
+      "grossIncome": 165995.87958378607,
+      "netIncome": 125027.5336823853,
+      "investmentBalance": 0,
+      "retirementBalance": 1716397.3948963482
+    },
+    {
+      "year": 2034,
+      "age1": 96,
+      "age2": 93,
+      "withdrawal": 169940.3361283513,
+      "grossIncome": 169940.3361283513,
+      "netIncome": 127658.48619761034,
+      "investmentBalance": 0,
+      "retirementBalance": 1632276.9285128145
+    },
+    {
+      "year": 2035,
+      "age1": 97,
+      "age2": 94,
+      "withdrawal": 171818.62405398046,
+      "grossIncome": 171818.62405398046,
+      "netIncome": 128911.30424400498,
+      "investmentBalance": 0,
+      "retirementBalance": 1542072.1508844749
+    },
+    {
+      "year": 2036,
+      "age1": 98,
+      "age2": 95,
+      "withdrawal": 173266.53380724436,
+      "grossIncome": 173266.53380724436,
+      "netIncome": 129877.06004943198,
+      "investmentBalance": 0,
+      "retirementBalance": 1445909.2246214543
+    }
+  ]
+}

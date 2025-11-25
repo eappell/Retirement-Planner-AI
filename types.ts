@@ -147,6 +147,9 @@ export interface RetirementPlan {
   fatTailDf?: number;
   annualWithdrawalRate: number;
   dieWithZero: boolean;
+  // When true, if one spouse dies their account balances are treated as
+  // transferred to the surviving spouse for the purposes of funding income.
+  useBalancesForSurvivorIncome?: boolean;
   legacyAmount: number;
 }
 

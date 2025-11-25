@@ -262,6 +262,18 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                     <NumberInput label="Avg. Return" suffix="%" value={plan.avgReturn} onChange={e => handlePlanChange('avgReturn', Number(e.target.value))}/>
                     <NumberInput label="Withdrawal Rate" suffix="%" value={plan.annualWithdrawalRate} onChange={e => handlePlanChange('annualWithdrawalRate', Number(e.target.value))} disabled={plan.dieWithZero}/>
                 </div>
+                {isCouple && (
+                    <div className="mt-3 col-span-full flex items-center">
+                        <input
+                            id="useBalancesForSurvivorIncome"
+                            type="checkbox"
+                            checked={!!plan.useBalancesForSurvivorIncome}
+                            onChange={e => handlePlanChange('useBalancesForSurvivorIncome', e.target.checked)}
+                            className="h-5 w-5 rounded text-brand-primary focus:ring-brand-primary"
+                        />
+                        <label htmlFor="useBalancesForSurvivorIncome" className="ml-2 text-sm font-medium">Allow survivor to use deceased balances</label>
+                    </div>
+                )}
                 <details className="mt-3 col-span-full">
                     <summary className="cursor-pointer text-sm font-medium text-brand-text-primary">Advanced Market Assumptions</summary>
                     <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 mt-3">
@@ -359,7 +371,8 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                     </span>
                 </div>
 
-                <div className={`flex items-center space-x-2 flex-shrink-0 transition-opacity ${!plan.dieWithZero ? 'opacity-60' : ''}`}>
+                <div className="flex items-center space-x-4">
+                    <div className={`flex items-center space-x-2 flex-shrink-0 transition-opacity ${!plan.dieWithZero ? 'opacity-60' : ''}`}>
                     <label htmlFor="legacyAmountInput" className={`text-sm font-medium ${!plan.dieWithZero ? 'text-gray-500' : 'text-brand-text-secondary'}`}>Leave Behind:</label>
                     <div className="relative">
                         <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500 text-sm">
@@ -378,6 +391,9 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                             }`}
                         />
                     </div>
+                </div>
+
+                    {/* checkbox moved into Plan Information section per UX request */}
                 </div>
                 
                 <p className="text-sm text-brand-text-secondary italic flex-1 min-w-0">
@@ -948,7 +964,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                         <div id="panel-pensions" role="tabpanel" aria-labelledby="tab-pensions" className="relative pt-3 space-y-2">
                             <p className="text-sm text-gray-500">Enter your monthly pre-tax income (gross)</p>
                             {((plan.pensions || []) as Pension[]).map(item => (
-                                <div key={item.id} className={`grid gap-x-4 items-end p-2 rounded-md bg-sky-50/50 ${isCouple ? 'grid-cols-8' : 'grid-cols-7'}`}>
+                                <div key={item.id} className={`grid gap-x-4 items-end p-2 rounded-md bg-sky-50/50 ${isCouple ? 'grid-cols-9' : 'grid-cols-8'}`}>
                                     {isCouple && (
                                         <div className="col-span-1">
                                             <SelectInput label="Owner" value={item.owner || 'person1'} onChange={e => handleDynamicListChange('pensions', item.id, 'owner', e.target.value)}>
@@ -973,12 +989,15 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                         <NumberInput id={`pensions-monthlyBenefit-${item.id}`} label="Monthly Benefit" prefix="$" value={item.monthlyBenefit || 0} onChange={e => handleDynamicListChange('pensions', item.id, 'monthlyBenefit', e.target.value)}/>
                                     )}
 
-                                    <div className="col-span-2 flex items-end space-x-2">
+                                    <div className="col-span-3 flex items-end space-x-2">
                                         <div className="flex-1 min-w-0">
                                             <NumberInput label="Start Age" value={item.startAge} onChange={e => handleDynamicListChange('pensions', item.id, 'startAge', e.target.value)}/>
                                         </div>
-                                        <div className="flex-1 min-w-0">
+                                        <div className="w-28">
                                             <NumberInput label="COLA" suffix="%" value={item.cola} onChange={e => handleDynamicListChange('pensions', item.id, 'cola', e.target.value)}/>
+                                        </div>
+                                        <div className="w-28">
+                                            <NumberInput label="Surv. %" value={(item.survivorBenefit ?? 100)} onChange={e => handleDynamicListChange('pensions', item.id, 'survivorBenefit', e.target.value)} />
                                         </div>
                                     </div>
                                     <div className="flex flex-col items-center justify-end h-full pb-1">
