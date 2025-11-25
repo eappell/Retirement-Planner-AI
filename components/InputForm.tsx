@@ -44,6 +44,21 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
     const [estateTab, setEstateTab] = useState<'gifts' | 'legacy'>('gifts');
     const [expensesTab, setExpensesTab] = useState<'periods' | 'oneTime'>('periods');
 
+    // Generate plan year offsets and labels for couple dropdowns
+    const getPlanYearOptions = () => {
+        const p1 = plan.person1;
+        const p2 = plan.person2;
+        const maxYears = Math.max(p1.lifeExpectancy - p1.currentAge, (p2 ? p2.lifeExpectancy - p2.currentAge : 0));
+        const opts: { value: number; label: string }[] = [];
+        for (let offset = 0; offset <= maxYears; offset++) {
+            const age1 = p1.currentAge + offset;
+            const age2 = p2 ? (p2.currentAge + offset) : undefined;
+            const label = age2 !== undefined ? `${age1} / ${age2} (in ${offset} yr${offset === 1 ? '' : 's'})` : `${age1} (in ${offset} yr${offset === 1 ? '' : 's'})`;
+            opts.push({ value: offset, label });
+        }
+        return opts;
+    };
+
     // Local scenario UI state
     const [selectedScenario, setSelectedScenario] = useState<string | null>(activeScenarioId ?? (scenarios[0] && scenarios[0].id) ?? null);
     const [scenarioName, setScenarioName] = useState<string>('');
@@ -1404,27 +1419,61 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                         <TextInput id={`expensePeriods-name-${ep.id}`} className="max-w-[10rem]" label="Name" value={ep.name || ''} onChange={e => handleDynamicListChange('expensePeriods', ep.id, 'name', e.target.value)} />
                                     </div>
                                     <NumberInput label="Monthly Amount" prefix="$" value={ep.monthlyAmount} onChange={e => handleDynamicListChange('expensePeriods', ep.id, 'monthlyAmount', e.target.value)} />
-                                    {isCouple && (
-                                        <div className="w-28">
-                                            <SelectInput aria-label="Start owner" value={ep.startAgeRef || 'person1'} onChange={e => handleDynamicListChange('expensePeriods', ep.id, 'startAgeRef', e.target.value)}>
-                                                <option value="person1">{plan.person1.name}</option>
-                                                <option value="person2">{plan.person2.name}</option>
-                                            </SelectInput>
-                                        </div>
-                                    )}
                                     <div className="w-28">
-                                        <NumberInput label="Start Age" value={ep.startAge} onChange={e => handleDynamicListChange('expensePeriods', ep.id, 'startAge', e.target.value)} />
+                                        <SelectInput aria-label="Start owner" value={ep.startAgeRef || 'person1'} onChange={e => {
+                                            const oldRef = ep.startAgeRef || 'person1';
+                                            const newRef = e.target.value as 'person1' | 'person2';
+                                            const oldOwnerAge = oldRef === 'person1' ? plan.person1.currentAge : plan.person2.currentAge;
+                                            const offset = (ep.startAge || 0) - oldOwnerAge;
+                                            const newOwnerAge = newRef === 'person1' ? plan.person1.currentAge : plan.person2.currentAge;
+                                            handleDynamicListChange('expensePeriods', ep.id, 'startAgeRef', newRef);
+                                            handleDynamicListChange('expensePeriods', ep.id, 'startAge', Number(newOwnerAge + offset));
+                                        }}>
+                                            <option value="person1">{plan.person1.name}</option>
+                                            {isCouple && <option value="person2">{plan.person2.name}</option>}
+                                        </SelectInput>
                                     </div>
-                                    {isCouple && (
-                                        <div className="w-28">
-                                            <SelectInput aria-label="End owner" value={ep.endAgeRef || 'person1'} onChange={e => handleDynamicListChange('expensePeriods', ep.id, 'endAgeRef', e.target.value)}>
-                                                <option value="person1">{plan.person1.name}</option>
-                                                <option value="person2">{plan.person2.name}</option>
-                                            </SelectInput>
-                                        </div>
-                                    )}
                                     <div className="w-28">
-                                        <NumberInput label="End Age" value={ep.endAge} onChange={e => handleDynamicListChange('expensePeriods', ep.id, 'endAge', e.target.value)} />
+                                        {isCouple ? (
+                                            <SelectInput label="Start Age" value={String(((ep.startAge || 0) - (ep.startAgeRef === 'person2' ? plan.person2.currentAge : plan.person1.currentAge)) || 0)} onChange={e => {
+                                                const offset = Number(e.target.value);
+                                                const ownerRef = ep.startAgeRef || 'person1';
+                                                const ownerBase = ownerRef === 'person1' ? plan.person1.currentAge : plan.person2.currentAge;
+                                                handleDynamicListChange('expensePeriods', ep.id, 'startAge', Number(ownerBase + offset));
+                                            }}>
+                                                {getPlanYearOptions().map(opt => <option key={opt.value} value={String(opt.value)}>{opt.label}</option>)}
+                                            </SelectInput>
+                                        ) : (
+                                            <NumberInput label="Start Age" value={ep.startAge} onChange={e => handleDynamicListChange('expensePeriods', ep.id, 'startAge', e.target.value)} />
+                                        )}
+                                    </div>
+                                    <div className="w-28">
+                                        <SelectInput aria-label="End owner" value={ep.endAgeRef || 'person1'} onChange={e => {
+                                            const oldRef = ep.endAgeRef || 'person1';
+                                            const newRef = e.target.value as 'person1' | 'person2';
+                                            const oldOwnerAge = oldRef === 'person1' ? plan.person1.currentAge : plan.person2.currentAge;
+                                            const offset = (ep.endAge || 0) - oldOwnerAge;
+                                            const newOwnerAge = newRef === 'person1' ? plan.person1.currentAge : plan.person2.currentAge;
+                                            handleDynamicListChange('expensePeriods', ep.id, 'endAgeRef', newRef);
+                                            handleDynamicListChange('expensePeriods', ep.id, 'endAge', Number(newOwnerAge + offset));
+                                        }}>
+                                            <option value="person1">{plan.person1.name}</option>
+                                            {isCouple && <option value="person2">{plan.person2.name}</option>}
+                                        </SelectInput>
+                                    </div>
+                                    <div className="w-28">
+                                        {isCouple ? (
+                                            <SelectInput label="End Age" value={String(((ep.endAge || 0) - (ep.endAgeRef === 'person2' ? plan.person2.currentAge : plan.person1.currentAge)) || 0)} onChange={e => {
+                                                const offset = Number(e.target.value);
+                                                const ownerRef = ep.endAgeRef || 'person1';
+                                                const ownerBase = ownerRef === 'person1' ? plan.person1.currentAge : plan.person2.currentAge;
+                                                handleDynamicListChange('expensePeriods', ep.id, 'endAge', Number(ownerBase + offset));
+                                            }}>
+                                                {getPlanYearOptions().map(opt => <option key={opt.value} value={String(opt.value)}>{opt.label}</option>)}
+                                            </SelectInput>
+                                        ) : (
+                                            <NumberInput label="End Age" value={ep.endAge} onChange={e => handleDynamicListChange('expensePeriods', ep.id, 'endAge', e.target.value)} />
+                                        )}
                                     </div>
                                     <div className="flex items-end">
                                         <ActionIcons onAdd={() => { const id = Date.now().toString(); const newEp: ExpensePeriod = { id, name: ep.name || `Phase ${(plan.expensePeriods || []).length + 1}`, monthlyAmount: ep.monthlyAmount || 0, startAge: ep.startAge || plan.person1.retirementAge, startAgeRef: ep.startAgeRef || 'person1', endAge: ep.endAge || plan.person1.lifeExpectancy, endAgeRef: ep.endAgeRef || 'person1' }; addToList('expensePeriods', newEp); setFocusTargetId(`expensePeriods-name-${id}`); }} onRemove={() => removeFromList('expensePeriods', ep.id)} canRemove={(plan.expensePeriods || []).length > 0} />
@@ -1456,7 +1505,28 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                     </div>
                                     <NumberInput label="Amount" prefix="$" value={item.amount} onChange={e => handleDynamicListChange('oneTimeExpenses', item.id, 'amount', e.target.value)} />
                                     <div className="w-28">
-                                        <NumberInput label="Age" value={item.age} onChange={e => handleDynamicListChange('oneTimeExpenses', item.id, 'age', e.target.value)} />
+                                        {isCouple ? (
+                                            <div className="grid grid-cols-2 gap-2">
+                                                <div>
+                                                    <SelectInput label="Owner" value={item.owner || 'person1'} onChange={e => handleDynamicListChange('oneTimeExpenses', item.id, 'owner', e.target.value)}>
+                                                        <option value="person1">{plan.person1.name}</option>
+                                                        <option value="person2">{plan.person2.name}</option>
+                                                    </SelectInput>
+                                                </div>
+                                                <div>
+                                                    <SelectInput label="Age" value={String(((item.age || 0) - ((item.owner === 'person2') ? plan.person2.currentAge : plan.person1.currentAge)) || 0)} onChange={e => {
+                                                        const offset = Number(e.target.value);
+                                                        const ownerRef = item.owner || 'person1';
+                                                        const ownerBase = ownerRef === 'person1' ? plan.person1.currentAge : plan.person2.currentAge;
+                                                        handleDynamicListChange('oneTimeExpenses', item.id, 'age', Number(ownerBase + offset));
+                                                    }}>
+                                                        {getPlanYearOptions().map(opt => <option key={opt.value} value={String(opt.value)}>{opt.label}</option>)}
+                                                    </SelectInput>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <NumberInput label="Age" value={item.age} onChange={e => handleDynamicListChange('oneTimeExpenses', item.id, 'age', e.target.value)} />
+                                        )}
                                     </div>
                                     <div className="flex items-end">
                                         <ActionIcons onAdd={() => { const id = Date.now().toString(); const newOne: OneTimeExpense = { id, owner: 'person1', amount: 0, age: plan.person1.currentAge, description: '' }; addToList('oneTimeExpenses', newOne as any); setFocusTargetId(`oneTimeExpenses-desc-${id}`); }} onRemove={() => removeFromList('oneTimeExpenses', item.id)} canRemove={(plan.oneTimeExpenses || []).length > 0} />
