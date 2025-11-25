@@ -23,6 +23,25 @@ const manualContent = [
         )
     },
     {
+        id: 'assumptions',
+        title: 'Assumptions',
+        icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" /></svg>,
+        content: (
+            <>
+                <p>This planner uses a set of practical simplifications to keep projections readable and useful for planning. Key assumptions include:</p>
+                <ul>
+                    <li><strong>Contributions stop at retirement:</strong> Regular contributions to retirement and investment accounts are assumed to end at the retirement age you enter for each person.</li>
+                    <li><strong>Pensions & Social Security:</strong> Pensions and Social Security begin at the start ages you provide and are paid according to the monthly amounts and survivor percentages you enter.</li>
+                    <li><strong>Investment returns & inflation:</strong> Returns are modeled using the average return and volatility settings in Plan Information (optionally with fat-tail sampling). These are simplified statistical models, not full market simulations.</li>
+                    <li><strong>Taxes and RMDs:</strong> Tax calculations use simplified bracket estimates and do not replace a full tax return simulation; Required Minimum Distributions and other regulatory rules are approximated where applicable.</li>
+                    <li><strong>Timing:</strong> Most model events (contributions, withdrawals, income payments) are applied on an annual basis at a deterministic point in the year rather than continuously.</li>
+                    <li><strong>Survivor handling:</strong> If you enable plan-level options that allow deceased spouse balances to fund survivor income, the planner models a simplified transfer of account ownership so the survivor can access balances; this is a practical approximation and may not reflect the exact legal/tax treatment in all cases.</li>
+                </ul>
+                <p className="mt-3 p-2 bg-indigo-50 border-l-4 border-indigo-400 rounded-r-md"><strong>Note:</strong> These assumptions are intended to make the tool practical for high-level planning. They trade some realism and regulatory detail for clarity and speed—consult a qualified professional for decisions that require precise tax, legal, or actuarial treatment.</p>
+            </>
+        )
+    },
+    {
         id: 'planInfo',
         title: 'Plan Information',
         icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>,
