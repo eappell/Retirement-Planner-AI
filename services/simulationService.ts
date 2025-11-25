@@ -457,6 +457,16 @@ export const runSimulation = (plan: RetirementPlan, volatility?: number): Calcul
                 annualGrossIncome = totalGrossIncome;
             }
 
+            const safe = (n: number) => Number.isFinite(n) ? n : 0;
+
+            // sanitize core numeric outputs to avoid NaN/Infinity when one spouse dies or unexpected data occurs
+            annualGrossIncome = safe(annualGrossIncome);
+            federalTax = safe(federalTax);
+            stateTax = safe(stateTax);
+            netAnnualIncome = safe(netAnnualIncome);
+            inflatedExpenses = safe(inflatedExpenses);
+            const surplusVal = safe(netAnnualIncome - inflatedExpenses);
+
             yearlyProjections.push({
                 year: new Date().getFullYear() + year,
                 age1: currentAge1,
@@ -472,7 +482,7 @@ export const runSimulation = (plan: RetirementPlan, volatility?: number): Calcul
                 federalTax: federalTax,
                 stateTax: stateTax,
                 netIncome: netAnnualIncome,
-                surplus: netAnnualIncome - inflatedExpenses,
+                surplus: surplusVal,
                 gifts: totalGiftThisYear || 0,
                 netWorth: [...investmentAccounts, ...retirementAccounts].reduce((sum, acc) => sum + acc.balance, 0),
                 rmd: totalRmd,
