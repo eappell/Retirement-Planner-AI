@@ -574,11 +574,14 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                             {accountsTab === 'retirement' && (
                                 <div id="panel-retirement" role="tabpanel" aria-labelledby="tab-retirement" className="relative pt-3 space-y-2">
                                     {((plan.retirementAccounts || []) as RetirementAccount[]).filter(a => a.type !== 'HSA').map(item => (
-                                        <div key={item.id} className="grid gap-x-4 items-end p-2 rounded-md bg-cyan-50/50 grid-cols-7">
-                                            <SelectInput label="Owner" value={item.owner} onChange={e => handleDynamicListChange('retirementAccounts', item.id, 'owner', e.target.value)}>
-                                                <option value="person1">{plan.person1.name}</option>
-                                                {isCouple && <option value="person2">{plan.person2.name}</option>}
-                                            </SelectInput>
+                                        <div key={item.id} className={`grid gap-x-4 items-end p-2 rounded-md bg-cyan-50/50 ${isCouple ? 'grid-cols-7' : 'grid-cols-6'}`}>
+                                            {isCouple && (
+                                                <SelectInput label="Owner" value={item.owner} onChange={e => handleDynamicListChange('retirementAccounts', item.id, 'owner', e.target.value)}>
+                                                    <option value="person1">{plan.person1.name}</option>
+                                                    <option value="person2">{plan.person2.name}</option>
+                                                    <option value="joint">Joint</option>
+                                                </SelectInput>
+                                            )}
                                             <TextInput id={`retirementAccounts-name-${item.id}`} label="Name" value={item.name} onChange={e => handleDynamicListChange('retirementAccounts', item.id, 'name', e.target.value)} />
                                             <SelectInput label="Type" value={item.type} onChange={e => handleDynamicListChange('retirementAccounts', item.id, 'type', e.target.value)}>
                                                 <option>401k</option>
@@ -626,11 +629,14 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                 {accountsTab === 'hsa' && (
                                     <div id="panel-hsa" role="tabpanel" aria-labelledby="tab-hsa" className="relative pt-3 space-y-2">
                                         {((plan.retirementAccounts || []) as RetirementAccount[]).filter(a => a.type === 'HSA').map(item => (
-                                            <div key={item.id} className="grid gap-x-4 items-end p-2 rounded-md bg-emerald-50/50 grid-cols-6">
-                                                <SelectInput label="Owner" value={item.owner} onChange={e => handleDynamicListChange('retirementAccounts', item.id, 'owner', e.target.value)}>
-                                                    <option value="person1">{plan.person1.name}</option>
-                                                    {isCouple && <option value="person2">{plan.person2.name}</option>}
-                                                </SelectInput>
+                                            <div key={item.id} className={`grid gap-x-4 items-end p-2 rounded-md bg-emerald-50/50 ${isCouple ? 'grid-cols-6' : 'grid-cols-5'}`}>
+                                                    {isCouple && (
+                                                        <SelectInput label="Owner" value={item.owner} onChange={e => handleDynamicListChange('retirementAccounts', item.id, 'owner', e.target.value)}>
+                                                            <option value="person1">{plan.person1.name}</option>
+                                                            <option value="person2">{plan.person2.name}</option>
+                                                            <option value="joint">Joint</option>
+                                                        </SelectInput>
+                                                    )}
                                                 <TextInput id={`retirementAccounts-name-${item.id}`} label="Name" value={item.name} onChange={e => handleDynamicListChange('retirementAccounts', item.id, 'name', e.target.value)} />
                                                 <NumberInput label="Balance" prefix="$" value={item.balance} onChange={e => handleDynamicListChange('retirementAccounts', item.id, 'balance', e.target.value)}/>
                                                 <NumberInput label="Annual Contrib." prefix="$" value={item.annualContribution} onChange={e => handleDynamicListChange('retirementAccounts', item.id, 'annualContribution', e.target.value)}/>
@@ -666,11 +672,14 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                         return (
                                             <>
                                                 {invs.map(item => (
-                                                    <div key={item.id} className="grid gap-x-4 items-end p-2 rounded-md bg-teal-50/50 grid-cols-9">
-                                                        <SelectInput label="Owner" value={item.owner || 'person1'} onChange={e => handleDynamicListChange('investmentAccounts', item.id, 'owner', e.target.value)}>
-                                                            <option value="person1">{plan.person1.name}</option>
-                                                            {isCouple && <option value="person2">{plan.person2.name}</option>}
-                                                        </SelectInput>
+                                                        <div key={item.id} className={`grid gap-x-4 items-end p-2 rounded-md bg-teal-50/50 ${isCouple ? 'grid-cols-9' : 'grid-cols-8'}`}>
+                                                        {isCouple && (
+                                                            <SelectInput label="Owner" value={item.owner || 'person1'} onChange={e => handleDynamicListChange('investmentAccounts', item.id, 'owner', e.target.value)}>
+                                                                <option value="person1">{plan.person1.name}</option>
+                                                                <option value="person2">{plan.person2.name}</option>
+                                                                <option value="joint">Joint</option>
+                                                            </SelectInput>
+                                                        )}
                                                         <TextInput id={`investmentAccounts-name-${item.id}`} label="Name" value={item.name} onChange={e => handleDynamicListChange('investmentAccounts', item.id, 'name', e.target.value)} />
                                                         <NumberInput label="Balance" prefix="$" value={item.balance} onChange={e => handleDynamicListChange('investmentAccounts', item.id, 'balance', e.target.value)}/>
                                                         <NumberInput label="Annual Contrib." prefix="$" value={item.annualContribution} onChange={e => handleDynamicListChange('investmentAccounts', item.id, 'annualContribution', e.target.value)}/>
@@ -895,7 +904,16 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                         <div id="panel-pensions" role="tabpanel" aria-labelledby="tab-pensions" className="relative pt-3 space-y-2">
                             <p className="text-sm text-gray-500">Enter your monthly pre-tax income (gross)</p>
                             {((plan.pensions || []) as Pension[]).map(item => (
-                                <div key={item.id} className="grid gap-x-4 items-end p-2 rounded-md bg-sky-50/50 grid-cols-8">
+                                <div key={item.id} className={`grid gap-x-4 items-end p-2 rounded-md bg-sky-50/50 ${isCouple ? 'grid-cols-8' : 'grid-cols-7'}`}>
+                                    {isCouple && (
+                                        <div className="col-span-1">
+                                            <SelectInput label="Owner" value={item.owner || 'person1'} onChange={e => handleDynamicListChange('pensions', item.id, 'owner', e.target.value)}>
+                                                <option value="person1">{plan.person1.name}</option>
+                                                <option value="person2">{plan.person2.name}</option>
+                                                <option value="joint">Joint</option>
+                                            </SelectInput>
+                                        </div>
+                                    )}
                                     <div className="col-span-1">
                                         <TextInput id={`pensions-name-${item.id}`} label="Name" value={item.name || ''} onChange={e => handleDynamicListChange('pensions', item.id, 'name', e.target.value)} />
                                     </div>
@@ -911,9 +929,14 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                         <NumberInput id={`pensions-monthlyBenefit-${item.id}`} label="Monthly Benefit" prefix="$" value={item.monthlyBenefit || 0} onChange={e => handleDynamicListChange('pensions', item.id, 'monthlyBenefit', e.target.value)}/>
                                     )}
 
-                                    <NumberInput label="Start Age" value={item.startAge} onChange={e => handleDynamicListChange('pensions', item.id, 'startAge', e.target.value)}/>
-                                    <NumberInput label="COLA" suffix="%" value={item.cola} onChange={e => handleDynamicListChange('pensions', item.id, 'cola', e.target.value)}/>
-                                    <NumberInput label="Survivor" suffix="%" value={item.survivorBenefit} onChange={e => handleDynamicListChange('pensions', item.id, 'survivorBenefit', e.target.value)}/>
+                                    <div className="col-span-2 flex items-end space-x-2">
+                                        <div className="flex-1 min-w-0">
+                                            <NumberInput label="Start Age" value={item.startAge} onChange={e => handleDynamicListChange('pensions', item.id, 'startAge', e.target.value)}/>
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <NumberInput label="COLA" suffix="%" value={item.cola} onChange={e => handleDynamicListChange('pensions', item.id, 'cola', e.target.value)}/>
+                                        </div>
+                                    </div>
                                     <div className="flex flex-col items-center justify-end h-full pb-1">
                                         <label htmlFor={`taxable-${item.id}`} className="mb-1 text-sm font-medium text-brand-text-secondary">Taxable</label>
                                         <input
@@ -927,7 +950,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                     <div className="flex items-end">
                                         <ActionIcons onAdd={() => {
                                             const id = Date.now().toString();
-                                            const newPension: Pension = { id, owner: 'person1', name: 'New Pension', payoutType: 'monthly', monthlyBenefit: 0, startAge: Math.min(plan.person1.retirementAge, isCouple ? plan.person2.retirementAge : Infinity), cola: 0, survivorBenefit: 0, taxable: true };
+                                            const newPension: Pension = { id, owner: 'person1', name: 'New Pension', payoutType: 'monthly', monthlyBenefit: 0, startAge: Math.min(plan.person1.retirementAge, isCouple ? plan.person2.retirementAge : Infinity), cola: 0, taxable: true };
                                             addToList('pensions', newPension);
                                             setFocusTargetId(`pensions-name-${id}`);
                                         }} onRemove={() => removeFromList('pensions', item.id)} canRemove={(plan.pensions || []).length > 0} />
@@ -938,7 +961,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                 <div className="flex justify-center py-6">
                                             <AddButton label="+ Add Pension" icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zm1 8.414V6a1 1 0 10-2 0v5a1 1 0 00.293.707l3 3a1 1 0 101.414-1.414L11 10.414z" /></svg>} onClick={() => {
                                             const id = Date.now().toString();
-                                            const newPension: Pension = { id, owner: 'person1', name: 'New Pension', payoutType: 'monthly', monthlyBenefit: 0, startAge: plan.person1.retirementAge, cola: 0, survivorBenefit: 0, taxable: true };
+                                            const newPension: Pension = { id, owner: 'person1', name: 'New Pension', payoutType: 'monthly', monthlyBenefit: 0, startAge: plan.person1.retirementAge, cola: 0, taxable: true };
                                             addToList('pensions', newPension);
                                             setFocusTargetId(`pensions-name-${id}`);
                                         }} />
@@ -952,13 +975,16 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                         <div id="panel-annuities" role="tabpanel" aria-labelledby="tab-annuities" className="relative pt-3 space-y-2">
                             <p className="text-sm text-gray-500">Enter your monthly pre-tax income (gross)</p>
                             {((plan.annuities || []) as Annuity[]).map(item => (
-                                <div key={item.id} className="grid gap-x-4 items-end p-2 rounded-md bg-indigo-50/50 grid-cols-11">
-                                    <div className="col-span-1">
-                                        <SelectInput label="Owner" value={item.owner || 'person1'} onChange={e => handleDynamicListChange('annuities', item.id, 'owner', e.target.value)}>
-                                            <option value="person1">{plan.person1.name}</option>
-                                            {isCouple && <option value="person2">{plan.person2.name}</option>}
-                                        </SelectInput>
-                                    </div>
+                                <div key={item.id} className={`grid gap-x-4 items-end p-2 rounded-md bg-indigo-50/50 ${isCouple ? 'grid-cols-11' : 'grid-cols-10'}`}>
+                                    {isCouple && (
+                                        <div className="col-span-1">
+                                            <SelectInput label="Owner" value={item.owner || 'person1'} onChange={e => handleDynamicListChange('annuities', item.id, 'owner', e.target.value)}>
+                                                <option value="person1">{plan.person1.name}</option>
+                                                <option value="person2">{plan.person2.name}</option>
+                                                <option value="joint">Joint</option>
+                                            </SelectInput>
+                                        </div>
+                                    )}
                                     <div className="col-span-2">
                                         <TextInput id={`annuities-name-${item.id}`} label="Name" value={item.name || ''} onChange={e => handleDynamicListChange('annuities', item.id, 'name', e.target.value)} />
                                     </div>
@@ -1020,8 +1046,17 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                         <div id="panel-otherincomes" role="tabpanel" aria-labelledby="tab-otherincomes" className="relative pt-3 space-y-2">
                             <p className="text-sm text-gray-500">Enter your monthly pre-tax income (gross)</p>
                             {((plan.otherIncomes || []) as OtherIncome[]).map(item => (
-                                <div key={item.id} className="grid gap-x-4 items-end p-2 rounded-md bg-lime-50/50 grid-cols-8">
-                                    <div className="col-span-2">
+                                <div key={item.id} className={`grid gap-x-4 items-end p-2 rounded-md bg-lime-50/50 ${isCouple ? 'grid-cols-8' : 'grid-cols-7'}`}>
+                                    {isCouple && (
+                                        <div className="col-span-1">
+                                            <SelectInput label="Owner" value={item.owner || 'person1'} onChange={e => handleDynamicListChange('otherIncomes', item.id, 'owner', e.target.value)}>
+                                                <option value="person1">{plan.person1.name}</option>
+                                                <option value="person2">{plan.person2.name}</option>
+                                                <option value="joint">Joint</option>
+                                            </SelectInput>
+                                        </div>
+                                    )}
+                                    <div className="col-span-1">
                                         <TextInput id={`otherIncomes-name-${item.id}`} label="Name" value={item.name || ''} onChange={e => handleDynamicListChange('otherIncomes', item.id, 'name', e.target.value)} />
                                     </div>
                                     <NumberInput id={`otherIncomes-monthlyAmount-${item.id}`} label="Monthly Amount" prefix="$" value={item.monthlyAmount} onChange={e => handleDynamicListChange('otherIncomes', item.id, 'monthlyAmount', e.target.value)}/>
@@ -1177,13 +1212,15 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                     {estateTab === 'gifts' && (
                         <div id="panel-gifts" role="tabpanel" aria-labelledby="tab-gifts" className="relative pt-3 space-y-2">
                             {((plan.gifts || []) as Gift[]).map(item => (
-                                <div key={item.id} className="grid gap-x-4 items-end p-2 rounded-md bg-purple-50/50 grid-cols-6">
-                                    <div className="w-full">
-                                        <SelectInput label="Owner" value={item.owner || 'person1'} onChange={e => handleDynamicListChange('gifts', item.id, 'owner', e.target.value)}>
-                                            <option value="person1">{plan.person1.name}</option>
-                                            {isCouple && <option value="person2">{plan.person2.name}</option>}
-                                        </SelectInput>
-                                    </div>
+                                <div key={item.id} className={`grid gap-x-4 items-end p-2 rounded-md bg-purple-50/50 ${isCouple ? 'grid-cols-6' : 'grid-cols-5'}`}>
+                                    {isCouple && (
+                                        <div className="w-full">
+                                            <SelectInput label="Owner" value={item.owner || 'person1'} onChange={e => handleDynamicListChange('gifts', item.id, 'owner', e.target.value)}>
+                                                <option value="person1">{plan.person1.name}</option>
+                                                <option value="person2">{plan.person2.name}</option>
+                                            </SelectInput>
+                                        </div>
+                                    )}
                                     <div className="w-48">
                                         <TextInput id={`gift-beneficiary-${item.id}`} label="Beneficiary" value={item.beneficiary} onChange={e => handleDynamicListChange('gifts', item.id, 'beneficiary', e.target.value)} />
                                     </div>
@@ -1362,26 +1399,30 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                     {expensesTab === 'periods' && (
                         <div id="panel-expense-periods" role="tabpanel" aria-labelledby="tab-expense-periods" className="relative pt-3 space-y-2">
                             {((plan.expensePeriods || []) as ExpensePeriod[]).map(ep => (
-                                <div key={ep.id} className="grid gap-x-4 items-end p-2 rounded-md bg-red-50/50 grid-cols-7">
+                                <div key={ep.id} className={`grid gap-x-4 items-end p-2 rounded-md bg-red-50/50 ${isCouple ? 'grid-cols-7' : 'grid-cols-5'}`}>
                                     <div className="col-span-1">
                                         <TextInput id={`expensePeriods-name-${ep.id}`} className="max-w-[10rem]" label="Name" value={ep.name || ''} onChange={e => handleDynamicListChange('expensePeriods', ep.id, 'name', e.target.value)} />
                                     </div>
                                     <NumberInput label="Monthly Amount" prefix="$" value={ep.monthlyAmount} onChange={e => handleDynamicListChange('expensePeriods', ep.id, 'monthlyAmount', e.target.value)} />
-                                    <div className="w-28">
-                                        <SelectInput aria-label="Start owner" value={ep.startAgeRef || 'person1'} onChange={e => handleDynamicListChange('expensePeriods', ep.id, 'startAgeRef', e.target.value)}>
-                                            <option value="person1">{plan.person1.name}</option>
-                                            {isCouple && <option value="person2">{plan.person2.name}</option>}
-                                        </SelectInput>
-                                    </div>
+                                    {isCouple && (
+                                        <div className="w-28">
+                                            <SelectInput aria-label="Start owner" value={ep.startAgeRef || 'person1'} onChange={e => handleDynamicListChange('expensePeriods', ep.id, 'startAgeRef', e.target.value)}>
+                                                <option value="person1">{plan.person1.name}</option>
+                                                <option value="person2">{plan.person2.name}</option>
+                                            </SelectInput>
+                                        </div>
+                                    )}
                                     <div className="w-28">
                                         <NumberInput label="Start Age" value={ep.startAge} onChange={e => handleDynamicListChange('expensePeriods', ep.id, 'startAge', e.target.value)} />
                                     </div>
-                                    <div className="w-28">
-                                        <SelectInput aria-label="End owner" value={ep.endAgeRef || 'person1'} onChange={e => handleDynamicListChange('expensePeriods', ep.id, 'endAgeRef', e.target.value)}>
-                                            <option value="person1">{plan.person1.name}</option>
-                                            {isCouple && <option value="person2">{plan.person2.name}</option>}
-                                        </SelectInput>
-                                    </div>
+                                    {isCouple && (
+                                        <div className="w-28">
+                                            <SelectInput aria-label="End owner" value={ep.endAgeRef || 'person1'} onChange={e => handleDynamicListChange('expensePeriods', ep.id, 'endAgeRef', e.target.value)}>
+                                                <option value="person1">{plan.person1.name}</option>
+                                                <option value="person2">{plan.person2.name}</option>
+                                            </SelectInput>
+                                        </div>
+                                    )}
                                     <div className="w-28">
                                         <NumberInput label="End Age" value={ep.endAge} onChange={e => handleDynamicListChange('expensePeriods', ep.id, 'endAge', e.target.value)} />
                                     </div>
