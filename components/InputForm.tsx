@@ -4,6 +4,7 @@ import ActionIcons from './ActionIcons';
 import { RetirementPlan, Person, PlanType, RetirementAccount, InvestmentAccount, Pension, OtherIncome, Annuity, ExpensePeriod, Gift, LegacyDisbursement, OneTimeExpense } from '../types';
 import { InputSection } from './InputSection';
 import { NumberInput, SelectInput, TextInput } from './FormControls';
+import AgeSelect from './AgeSelect';
 import { STATES } from '../constants';
 import { validateAssetDefaults } from '../utils/assetValidation';
 
@@ -49,12 +50,40 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
         const p1 = plan.person1;
         const p2 = plan.person2;
         const maxYears = Math.max(p1.lifeExpectancy - p1.currentAge, (p2 ? p2.lifeExpectancy - p2.currentAge : 0));
-        const opts: { value: number; label: string }[] = [];
+        const opts: Array<any> = [];
+
+        const truncateName = (name: string, max = 15) => {
+            if (!name) return name;
+            return name.length > max ? name.slice(0, max - 1) + '…' : name;
+        };
+
         for (let offset = 0; offset <= maxYears; offset++) {
             const age1 = p1.currentAge + offset;
             const age2 = p2 ? (p2.currentAge + offset) : undefined;
-            const label = age2 !== undefined ? `${age1} / ${age2} (in ${offset} yr${offset === 1 ? '' : 's'})` : `${age1} (in ${offset} yr${offset === 1 ? '' : 's'})`;
-            opts.push({ value: offset, label });
+            const yearsLabel = `in ${offset} yr${offset === 1 ? '' : 's'}`;
+
+            const age1Allowed = typeof p1.lifeExpectancy === 'number' ? age1 <= p1.lifeExpectancy : true;
+            const age2Allowed = p2 ? (typeof p2.lifeExpectancy === 'number' ? (age2! <= p2.lifeExpectancy) : true) : false;
+
+            // If both ages are beyond their life expectancies, skip this offset
+            if (p2 && !age1Allowed && !age2Allowed) continue;
+
+            // Build labels that always include both persons for couple (so we can gray parts in a custom control)
+            let fullLabel: string;
+            let label: string;
+
+            if (p2) {
+                const name1 = p1.name || 'Person 1';
+                const name2 = p2.name || 'Person 2';
+                fullLabel = `${name1} ${age1} / ${name2} ${age2} ${yearsLabel}`;
+                label = `${truncateName(name1)} ${age1} / ${truncateName(name2)} ${age2} ${yearsLabel}`;
+                opts.push({ value: offset, label, fullLabel, age1, age2, age1Allowed, age2Allowed, name1, name2, yearsLabel });
+            } else {
+                const name1 = p1.name || 'Person 1';
+                fullLabel = `${name1} ${age1} ${yearsLabel}`;
+                label = `${truncateName(name1)} ${age1} ${yearsLabel}`;
+                opts.push({ value: offset, label, fullLabel, age1, age2: undefined, age1Allowed, age2Allowed: false, name1, name2: undefined, yearsLabel });
+            }
         }
         return opts;
     };
@@ -323,7 +352,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                         <span className="text-gray-400 hover:text-gray-600 focus:text-gray-700" aria-hidden="true" tabIndex={0}>
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
                         </span>
-                        <div id="die-with-zero-tooltip" role="tooltip" aria-hidden={!dieTooltipOpen} className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-72 bg-gray-100 text-gray-900 text-[0.95rem] p-2.5 rounded shadow border border-gray-200 ${dieTooltipOpen ? 'block' : 'hidden'} z-10`}>
+                        <div id="die-with-zero-tooltip" role="tooltip" className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-72 bg-gray-100 text-gray-900 text-[0.95rem] p-2.5 rounded shadow border border-gray-200 ${dieTooltipOpen ? 'block' : 'hidden'} z-10`}>
                             <div className="font-medium">Die With Zero</div>
                             <div className="mt-1 text-sm">Calculates the maximum withdrawal that leaves your target legacy (for example, $0). When enabled, the fixed withdrawal rate is ignored and legacy disbursements are disabled — this can significantly change spending and final legacy.</div>
                         </div>
@@ -364,7 +393,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                         Person 1
                     </h3>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-2 items-end">
-                        <TextInput id="person1-name" label="Name" value={plan.person1.name} onChange={e => handlePersonChange('person1', 'name', e.target.value)} />
+                        <TextInput id="person1-name" label="Name" value={plan.person1.name} onChange={e => handlePersonChange('person1', 'name', e.target.value)} maxLength={35} />
                         <NumberInput label="Current Age" value={plan.person1.currentAge} onChange={e => handlePersonChange('person1', 'currentAge', e.target.value)} />
                         <NumberInput label="Retirement Age" value={plan.person1.retirementAge} onChange={e => handlePersonChange('person1', 'retirementAge', e.target.value)} />
                         <NumberInput label="Life Expectancy" value={plan.person1.lifeExpectancy} onChange={e => handlePersonChange('person1', 'lifeExpectancy', e.target.value)} />
@@ -377,7 +406,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                             Person 2
                         </h3>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-2 items-end">
-                            <TextInput id="person2-name" label="Name" value={plan.person2.name} onChange={e => handlePersonChange('person2', 'name', e.target.value)} />
+                            <TextInput id="person2-name" label="Name" value={plan.person2.name} onChange={e => handlePersonChange('person2', 'name', e.target.value)} maxLength={35} />
                             <NumberInput label="Current Age" value={plan.person2.currentAge} onChange={e => handlePersonChange('person2', 'currentAge', e.target.value)} />
                             <NumberInput label="Retirement Age" value={plan.person2.retirementAge} onChange={e => handlePersonChange('person2', 'retirementAge', e.target.value)} />
                             <NumberInput label="Life Expectancy" value={plan.person2.lifeExpectancy} onChange={e => handlePersonChange('person2', 'lifeExpectancy', e.target.value)} />
@@ -1293,13 +1322,13 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                     <div className="col-span-2">
                                         <TextInput id={`legacy-beneficiary-${ld.id}`} label="Beneficiary" value={ld.beneficiary} disabled={plan.dieWithZero} onChange={e => handleDynamicListChange('legacyDisbursements', ld.id, 'beneficiary', e.target.value)} />
                                     </div>
-                                    <div className="w-28">
+                                    <div className="w-56">
                                         <SelectInput label="Beneficiary Type" value={ld.beneficiaryType || 'person'} onChange={e => handleDynamicListChange('legacyDisbursements', ld.id, 'beneficiaryType', e.target.value)}>
                                             <option value="person">Person</option>
                                             <option value="organization">Organization</option>
                                         </SelectInput>
                                     </div>
-                                    <div className="w-28">
+                                    <div className="w-56">
                                         <NumberInput label="Percentage" suffix="%" value={ld.percentage} disabled={plan.dieWithZero} onChange={e => handleDynamicListChange('legacyDisbursements', ld.id, 'percentage', e.target.value)} />
                                     </div>
                                     <div className="flex items-end">
@@ -1414,69 +1443,76 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                     {expensesTab === 'periods' && (
                         <div id="panel-expense-periods" role="tabpanel" aria-labelledby="tab-expense-periods" className="relative pt-3 space-y-2">
                             {((plan.expensePeriods || []) as ExpensePeriod[]).map(ep => (
-                                <div key={ep.id} className={`grid gap-x-4 items-end p-2 rounded-md bg-red-50/50 ${isCouple ? 'grid-cols-7' : 'grid-cols-5'}`}>
+                                <div key={ep.id} className={`grid gap-x-4 items-end p-2 rounded-md bg-red-50/50 grid-cols-5`}>
                                     <div className="col-span-1">
                                         <TextInput id={`expensePeriods-name-${ep.id}`} className="max-w-[10rem]" label="Name" value={ep.name || ''} onChange={e => handleDynamicListChange('expensePeriods', ep.id, 'name', e.target.value)} />
                                     </div>
                                     <NumberInput label="Monthly Amount" prefix="$" value={ep.monthlyAmount} onChange={e => handleDynamicListChange('expensePeriods', ep.id, 'monthlyAmount', e.target.value)} />
-                                    <div className="w-28">
-                                        <SelectInput aria-label="Start owner" value={ep.startAgeRef || 'person1'} onChange={e => {
-                                            const oldRef = ep.startAgeRef || 'person1';
-                                            const newRef = e.target.value as 'person1' | 'person2';
-                                            const oldOwnerAge = oldRef === 'person1' ? plan.person1.currentAge : plan.person2.currentAge;
-                                            const offset = (ep.startAge || 0) - oldOwnerAge;
-                                            const newOwnerAge = newRef === 'person1' ? plan.person1.currentAge : plan.person2.currentAge;
-                                            handleDynamicListChange('expensePeriods', ep.id, 'startAgeRef', newRef);
-                                            handleDynamicListChange('expensePeriods', ep.id, 'startAge', Number(newOwnerAge + offset));
-                                        }}>
-                                            <option value="person1">{plan.person1.name}</option>
-                                            {isCouple && <option value="person2">{plan.person2.name}</option>}
-                                        </SelectInput>
-                                    </div>
-                                    <div className="w-28">
+                                    <div className="w-56">
                                         {isCouple ? (
-                                            <SelectInput label="Start Age" value={String(((ep.startAge || 0) - (ep.startAgeRef === 'person2' ? plan.person2.currentAge : plan.person1.currentAge)) || 0)} onChange={e => {
-                                                const offset = Number(e.target.value);
-                                                const ownerRef = ep.startAgeRef || 'person1';
-                                                const ownerBase = ownerRef === 'person1' ? plan.person1.currentAge : plan.person2.currentAge;
-                                                handleDynamicListChange('expensePeriods', ep.id, 'startAge', Number(ownerBase + offset));
-                                            }}>
-                                                {getPlanYearOptions().map(opt => <option key={opt.value} value={String(opt.value)}>{opt.label}</option>)}
-                                            </SelectInput>
+                                            <AgeSelect
+                                                label="Start Age"
+                                                value={String(((ep.startAge || 0) - (ep.startAgeRef === 'person2' ? plan.person2.currentAge : plan.person1.currentAge)) || 0)}
+                                                options={getPlanYearOptions()}
+                                                onChange={(val) => {
+                                                    const offset = Number(val);
+                                                    const ownerRef = ep.startAgeRef || 'person1';
+                                                    const ownerBase = ownerRef === 'person1' ? plan.person1.currentAge : plan.person2.currentAge;
+                                                    handleDynamicListChange('expensePeriods', ep.id, 'startAge', Number(ownerBase + offset));
+                                                }}
+                                            />
                                         ) : (
                                             <NumberInput label="Start Age" value={ep.startAge} onChange={e => handleDynamicListChange('expensePeriods', ep.id, 'startAge', e.target.value)} />
                                         )}
                                     </div>
-                                    <div className="w-28">
-                                        <SelectInput aria-label="End owner" value={ep.endAgeRef || 'person1'} onChange={e => {
-                                            const oldRef = ep.endAgeRef || 'person1';
-                                            const newRef = e.target.value as 'person1' | 'person2';
-                                            const oldOwnerAge = oldRef === 'person1' ? plan.person1.currentAge : plan.person2.currentAge;
-                                            const offset = (ep.endAge || 0) - oldOwnerAge;
-                                            const newOwnerAge = newRef === 'person1' ? plan.person1.currentAge : plan.person2.currentAge;
-                                            handleDynamicListChange('expensePeriods', ep.id, 'endAgeRef', newRef);
-                                            handleDynamicListChange('expensePeriods', ep.id, 'endAge', Number(newOwnerAge + offset));
-                                        }}>
-                                            <option value="person1">{plan.person1.name}</option>
-                                            {isCouple && <option value="person2">{plan.person2.name}</option>}
-                                        </SelectInput>
-                                    </div>
-                                    <div className="w-28">
+                                    <div className="w-56">
                                         {isCouple ? (
-                                            <SelectInput label="End Age" value={String(((ep.endAge || 0) - (ep.endAgeRef === 'person2' ? plan.person2.currentAge : plan.person1.currentAge)) || 0)} onChange={e => {
-                                                const offset = Number(e.target.value);
-                                                const ownerRef = ep.endAgeRef || 'person1';
-                                                const ownerBase = ownerRef === 'person1' ? plan.person1.currentAge : plan.person2.currentAge;
-                                                handleDynamicListChange('expensePeriods', ep.id, 'endAge', Number(ownerBase + offset));
-                                            }}>
-                                                {getPlanYearOptions().map(opt => <option key={opt.value} value={String(opt.value)}>{opt.label}</option>)}
-                                            </SelectInput>
+                                            <AgeSelect
+                                                label="End Age"
+                                                value={String(((ep.endAge || 0) - (ep.endAgeRef === 'person2' ? plan.person2.currentAge : plan.person1.currentAge)) || 0)}
+                                                options={getPlanYearOptions()}
+                                                onChange={(val) => {
+                                                    const offset = Number(val);
+                                                    const ownerRef = ep.endAgeRef || 'person1';
+                                                    const ownerBase = ownerRef === 'person1' ? plan.person1.currentAge : plan.person2.currentAge;
+                                                    handleDynamicListChange('expensePeriods', ep.id, 'endAge', Number(ownerBase + offset));
+                                                }}
+                                            />
                                         ) : (
                                             <NumberInput label="End Age" value={ep.endAge} onChange={e => handleDynamicListChange('expensePeriods', ep.id, 'endAge', e.target.value)} />
                                         )}
                                     </div>
                                     <div className="flex items-end">
-                                        <ActionIcons onAdd={() => { const id = Date.now().toString(); const newEp: ExpensePeriod = { id, name: ep.name || `Phase ${(plan.expensePeriods || []).length + 1}`, monthlyAmount: ep.monthlyAmount || 0, startAge: ep.startAge || plan.person1.retirementAge, startAgeRef: ep.startAgeRef || 'person1', endAge: ep.endAge || plan.person1.lifeExpectancy, endAgeRef: ep.endAgeRef || 'person1' }; addToList('expensePeriods', newEp); setFocusTargetId(`expensePeriods-name-${id}`); }} onRemove={() => removeFromList('expensePeriods', ep.id)} canRemove={(plan.expensePeriods || []).length > 0} />
+                                        <ActionIcons onAdd={() => {
+                                            const id = Date.now().toString();
+                                            // New period should start the year after this period's end age when possible
+                                            const inferredStartAge = (typeof ep.endAge === 'number') ? Number(ep.endAge) + 1 : (ep.startAge || plan.person1.retirementAge);
+                                            const inferredStartRef = ep.endAgeRef || ep.startAgeRef || 'person1';
+                                            const ownerForEnd = inferredStartRef === 'person2' ? plan.person2 : plan.person1;
+                                            const inferredEndAge = ownerForEnd.lifeExpectancy || plan.person1.lifeExpectancy;
+                                            const newEp: ExpensePeriod = {
+                                                id,
+                                                name: ep.name || `Phase ${(plan.expensePeriods || []).length + 1}`,
+                                                monthlyAmount: ep.monthlyAmount || 0,
+                                                startAge: inferredStartAge,
+                                                startAgeRef: inferredStartRef,
+                                                endAge: inferredEndAge,
+                                                endAgeRef: inferredStartRef
+                                            };
+                                            addToList('expensePeriods', newEp);
+                                            setFocusTargetId(`expensePeriods-name-${id}`);
+
+                                            // Validation: warn if inferred startAge exceeds owner's life expectancy
+                                            if (typeof ownerForEnd.lifeExpectancy === 'number' && inferredStartAge > ownerForEnd.lifeExpectancy) {
+                                                const ownerName = (inferredStartRef === 'person2' ? plan.person2.name : plan.person1.name) || inferredStartRef;
+                                                try {
+                                                    window.dispatchEvent(new CustomEvent('app:toast', { detail: { message: `Warning: new period start age ${inferredStartAge} exceeds ${ownerName}'s life expectancy (${ownerForEnd.lifeExpectancy}).` } }));
+                                                } catch (e) {
+                                                    // fallback: console.warn
+                                                    console.warn(`New expense period start ${inferredStartAge} exceeds ${ownerName}'s life expectancy (${ownerForEnd.lifeExpectancy}).`);
+                                                }
+                                            }
+                                        }} onRemove={() => removeFromList('expensePeriods', ep.id)} canRemove={(plan.expensePeriods || []).length > 0} />
                                     </div>
                                 </div>
                             ))}
@@ -1504,26 +1540,19 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                         <TextInput id={`oneTimeExpenses-desc-${item.id}`} label="Description" value={item.description || ''} onChange={e => handleDynamicListChange('oneTimeExpenses', item.id, 'description', e.target.value)} />
                                     </div>
                                     <NumberInput label="Amount" prefix="$" value={item.amount} onChange={e => handleDynamicListChange('oneTimeExpenses', item.id, 'amount', e.target.value)} />
-                                    <div className="w-28">
+                                    <div className="w-56">
                                         {isCouple ? (
-                                            <div className="grid grid-cols-2 gap-2">
-                                                <div>
-                                                    <SelectInput label="Owner" value={item.owner || 'person1'} onChange={e => handleDynamicListChange('oneTimeExpenses', item.id, 'owner', e.target.value)}>
-                                                        <option value="person1">{plan.person1.name}</option>
-                                                        <option value="person2">{plan.person2.name}</option>
-                                                    </SelectInput>
-                                                </div>
-                                                <div>
-                                                    <SelectInput label="Age" value={String(((item.age || 0) - ((item.owner === 'person2') ? plan.person2.currentAge : plan.person1.currentAge)) || 0)} onChange={e => {
-                                                        const offset = Number(e.target.value);
-                                                        const ownerRef = item.owner || 'person1';
-                                                        const ownerBase = ownerRef === 'person1' ? plan.person1.currentAge : plan.person2.currentAge;
-                                                        handleDynamicListChange('oneTimeExpenses', item.id, 'age', Number(ownerBase + offset));
-                                                    }}>
-                                                        {getPlanYearOptions().map(opt => <option key={opt.value} value={String(opt.value)}>{opt.label}</option>)}
-                                                    </SelectInput>
-                                                </div>
-                                            </div>
+                                            <AgeSelect
+                                                label="Age"
+                                                value={String(((item.age || 0) - ((item.owner === 'person2') ? plan.person2.currentAge : plan.person1.currentAge)) || 0)}
+                                                options={getPlanYearOptions()}
+                                                onChange={(val) => {
+                                                    const offset = Number(val);
+                                                    const ownerRef = item.owner || 'person1';
+                                                    const ownerBase = ownerRef === 'person1' ? plan.person1.currentAge : plan.person2.currentAge;
+                                                    handleDynamicListChange('oneTimeExpenses', item.id, 'age', Number(ownerBase + offset));
+                                                }}
+                                            />
                                         ) : (
                                             <NumberInput label="Age" value={item.age} onChange={e => handleDynamicListChange('oneTimeExpenses', item.id, 'age', e.target.value)} />
                                         )}
