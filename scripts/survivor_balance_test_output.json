@@ -1,0 +1,25 @@
+{
+  "totalYears": 31,
+  "firstYearAfterDeathIndex": 1,
+  "firstYearAfterDeath": {
+    "year": 2026,
+    "age1": 66,
+    "age2": 66,
+    "investmentBalance": 33516,
+    "retirementBalance": 220500,
+    "pensionIncome": 0,
+    "socialSecurityIncome": 0,
+    "otherIncome": 0,
+    "withdrawal": 10584,
+    "grossIncome": 10584,
+    "expenses": 0,
+    "federalTax": 0,
+    "stateTax": 52.21,
+    "netIncome": 10531.79,
+    "surplus": 10531.79,
+    "gifts": 0,
+    "netWorth": 254016,
+    "rmd": 0
+  },
+  "assertFailures": []
+}

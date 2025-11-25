@@ -139,6 +139,21 @@ export const runSimulation = (plan: RetirementPlan, volatility?: number): Calcul
             const p1Alive = currentAge1 <= plan.person1.lifeExpectancy;
             const p2Alive = isCouple && currentAge2 <= plan.person2.lifeExpectancy;
 
+            // Transfer-on-death behavior: if enabled and one spouse has died, treat
+            // the deceased spouse's account balances as transferred to the survivor
+            // for the remainder of the simulation (simpler model of inheritance).
+            if (isCouple && plan.useBalancesForSurvivorIncome) {
+                if (!p1Alive && p2Alive) {
+                    // transfer ownership from person1 -> person2
+                    retirementAccounts.forEach(acc => { if ((acc as any).owner === 'person1') (acc as any).owner = 'person2'; });
+                    investmentAccounts.forEach(acc => { if ((acc as any).owner === 'person1') (acc as any).owner = 'person2'; });
+                } else if (!p2Alive && p1Alive) {
+                    // transfer ownership from person2 -> person1
+                    retirementAccounts.forEach(acc => { if ((acc as any).owner === 'person2') (acc as any).owner = 'person1'; });
+                    investmentAccounts.forEach(acc => { if ((acc as any).owner === 'person2') (acc as any).owner = 'person1'; });
+                }
+            }
+
             const filingStatus = (isCouple && p1Alive && p2Alive)
                 ? FilingStatus.MARRIED_FILING_JOINTLY
                 : FilingStatus.SINGLE;
@@ -229,8 +244,12 @@ export const runSimulation = (plan: RetirementPlan, volatility?: number): Calcul
             const isP1Retired = currentAge1 >= plan.person1.retirementAge;
             const isP2Retired = isCouple && currentAge2 >= plan.person2.retirementAge;
             const inRetirement = isP1Retired || isP2Retired;
+            const oneSpouseDied = isCouple && ((!p1Alive && p2Alive) || (!p2Alive && p1Alive));
 
-            if (inRetirement && (p1Alive || p2Alive)) {
+            // Run retirement & withdrawal logic when in retirement, or when the
+            // survivor-balance feature is enabled and one spouse has died so the
+            // surviving spouse can use transferred balances to fund income.
+            if ((inRetirement || (plan.useBalancesForSurvivorIncome && oneSpouseDied)) && (p1Alive || p2Alive)) {
                 const ssInflationFactor = Math.pow(1 + inflation, year);
                 const p1Benefit = plan.socialSecurity.person1EstimatedBenefit * 12 * ssInflationFactor;
                 const p2Benefit = isCouple ? plan.socialSecurity.person2EstimatedBenefit * 12 * ssInflationFactor : 0;
@@ -260,7 +279,8 @@ export const runSimulation = (plan: RetirementPlan, volatility?: number): Calcul
                         const spouseAge = p.owner === 'person1' ? currentAge2 : currentAge1;
                         const isSpouseAlive = p.owner === 'person1' ? p2Alive : p1Alive;
                         if (isSpouseAlive && spouseAge >= p.startAge) {
-                            const survivorBenefit = benefit * (p.survivorBenefit / 100);
+                            const survivorPct = (typeof p.survivorBenefit === 'number') ? p.survivorBenefit : 100;
+                            const survivorBenefit = benefit * (survivorPct / 100);
                             incomeFromPensions += survivorBenefit;
                             if (p.taxable !== false) taxableIncomeFromPensions += survivorBenefit;
                         }
@@ -457,6 +477,16 @@ export const runSimulation = (plan: RetirementPlan, volatility?: number): Calcul
                 annualGrossIncome = totalGrossIncome;
             }
 
+            const safe = (n: number) => Number.isFinite(n) ? n : 0;
+
+            // sanitize core numeric outputs to avoid NaN/Infinity when one spouse dies or unexpected data occurs
+            annualGrossIncome = safe(annualGrossIncome);
+            federalTax = safe(federalTax);
+            stateTax = safe(stateTax);
+            netAnnualIncome = safe(netAnnualIncome);
+            inflatedExpenses = safe(inflatedExpenses);
+            const surplusVal = safe(netAnnualIncome - inflatedExpenses);
+
             yearlyProjections.push({
                 year: new Date().getFullYear() + year,
                 age1: currentAge1,
@@ -472,7 +502,7 @@ export const runSimulation = (plan: RetirementPlan, volatility?: number): Calcul
                 federalTax: federalTax,
                 stateTax: stateTax,
                 netIncome: netAnnualIncome,
-                surplus: netAnnualIncome - inflatedExpenses,
+                surplus: surplusVal,
                 gifts: totalGiftThisYear || 0,
                 netWorth: [...investmentAccounts, ...retirementAccounts].reduce((sum, acc) => sum + acc.balance, 0),
                 rmd: totalRmd,

@@ -24,6 +24,7 @@ const initialPlanState: RetirementPlan = {
   avgReturn: 7,
   annualWithdrawalRate: 4,
   dieWithZero: false,
+    useBalancesForSurvivorIncome: false,
   legacyAmount: 0,
     useFatTails: true,
     fatTailDf: 4,
