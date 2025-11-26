@@ -87,6 +87,10 @@ Tip: Use per-tab Add buttons to create items and the UI will focus the primary i
   <img src="/manual-screens/accounts.png" alt="Accounts tab screenshot" style="max-width:100%;height:auto;border:1px solid #e5e7eb;border-radius:6px;" />
 </p>
 
+<p>
+  <img src="/manual-screens/investments.png" alt="Investment accounts screenshot" style="max-width:100%;height:auto;border:1px solid #e5e7eb;border-radius:6px;" />
+</p>
+
 ---
 
 ## Income
@@ -112,6 +116,10 @@ Tip: Keep pension survivor percentages compact and on a single row for easier ed
 <!-- Pensions screenshot -->
 <p>
   <img src="/manual-screens/pensions.png" alt="Pensions tab screenshot" style="max-width:100%;height:auto;border:1px solid #e5e7eb;border-radius:6px;" />
+</p>
+
+<p>
+  <img src="/manual-screens/annuities.png" alt="Annuities tab screenshot" style="max-width:100%;height:auto;border:1px solid #e5e7eb;border-radius:6px;" />
 </p>
 
 ---
@@ -165,6 +173,10 @@ Tip: Keep a periodically updated backup file if you rely on multiple scenarios.
 <!-- Scenario Manager screenshot -->
 <p>
   <img src="/manual-screens/scenariomanager.png" alt="Scenario Manager screenshot" style="max-width:100%;height:auto;border:1px solid #e5e7eb;border-radius:6px;" />
+</p>
+
+<p>
+  <img src="/manual-screens/expenseperiods.png" alt="Expense periods screenshot" style="max-width:100%;height:auto;border:1px solid #e5e7eb;border-radius:6px;" />
 </p>
 
 ---

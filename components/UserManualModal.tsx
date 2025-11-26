@@ -70,6 +70,10 @@ const manualContent = [
                     <div className="mt-2">
                         <img src="/manual-screens/accounts.png" alt="Accounts Tab" className="w-full max-h-36 object-contain border rounded" />
                     </div>
+                    <div className="mt-2">
+                        <h5 className="font-medium text-sm mt-2">Investment Accounts (example)</h5>
+                        <img src="/manual-screens/investments.png" alt="Investment Accounts" className="w-full max-h-24 object-contain border rounded mt-1" />
+                    </div>
                 </div>
                 <p className="mt-3 p-2 bg-indigo-50 border-l-4 border-indigo-400 rounded-r-md"><strong>Tip:</strong> Keep HSAs separated from other retirement accounts to maintain correct tax treatment in projections.</p>
             </>
@@ -102,6 +106,10 @@ const manualContent = [
                 <h4 className="font-semibold mt-3">Annuities & Other</h4>
                 <p>Use the <strong>Annuities</strong> and <strong>Other Incomes</strong> tabs for purchased income products and irregular or rental income. Each item supports start/end ages and COLA.</p>
 
+                <div className="mt-2">
+                    <img src="/manual-screens/annuities.png" alt="Annuities" className="w-full max-h-36 object-contain border rounded" />
+                </div>
+
                 <p className="mt-3 p-2 bg-indigo-50 border-l-4 border-indigo-400 rounded-r-md"><strong>Tip:</strong> Use the header-level <strong>Update All Scenarios</strong> to copy only the active income tab to other scenarios.</p>
             </>
         )
@@ -118,6 +126,9 @@ const manualContent = [
                     <li><strong>Start/End Ages:</strong> Assign start and end ages for each period; the planner will apply the monthly expenses during those ages.</li>
                 </ul>
                 <p className="mt-3 p-2 bg-indigo-50 border-l-4 border-indigo-400 rounded-r-md"><strong>Tip:</strong> Stagger expense periods to reflect lifestyle changes (higher spending early in retirement, lower later).</p>
+                <div className="mt-3">
+                    <img src="/manual-screens/expenseperiods.png" alt="Expense Periods" className="w-full max-h-36 object-contain border rounded" />
+                </div>
             </>
         )
     },
