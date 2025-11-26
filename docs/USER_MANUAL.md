@@ -82,6 +82,11 @@ Bulk updates:
 
 Tip: Use per-tab Add buttons to create items and the UI will focus the primary input for quick editing.
 
+<!-- Accounts screenshot -->
+<p>
+  <img src="/manual-screens/accounts.png" alt="Accounts tab screenshot" style="max-width:100%;height:auto;border:1px solid #e5e7eb;border-radius:6px;" />
+</p>
+
 ---
 
 ## Income
@@ -103,6 +108,11 @@ Bulk updates:
 - `Update All Scenarios` in the income header copies only the active income tab (pensions, annuities, or other incomes) to the other scenarios.
 
 Tip: Keep pension survivor percentages compact and on a single row for easier editing.
+
+<!-- Pensions screenshot -->
+<p>
+  <img src="/manual-screens/pensions.png" alt="Pensions tab screenshot" style="max-width:100%;height:auto;border:1px solid #e5e7eb;border-radius:6px;" />
+</p>
 
 ---
 
@@ -151,6 +161,11 @@ Storage:
 - Scenarios are stored in browser `localStorage`. Clearing browser data will remove scenarios unless you export them.
 
 Tip: Keep a periodically updated backup file if you rely on multiple scenarios.
+
+<!-- Scenario Manager screenshot -->
+<p>
+  <img src="/manual-screens/scenariomanager.png" alt="Scenario Manager screenshot" style="max-width:100%;height:auto;border:1px solid #e5e7eb;border-radius:6px;" />
+</p>
 
 ---
 

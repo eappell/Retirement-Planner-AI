@@ -67,7 +67,9 @@ const manualContent = [
                 <div className="mt-3">
                     <h5 className="font-semibold">Bulk update behavior</h5>
                     <p>The header-level <strong>Update All Scenarios</strong> button copies the active tab's account list to other scenarios while preserving HSAs or non-HSA accounts as appropriate. This avoids accidentally overwriting unrelated account types.</p>
-                    <div className="mt-2 h-36 bg-gray-100 border rounded flex items-center justify-center text-sm text-gray-500">Screenshot placeholder: Accounts Tab</div>
+                    <div className="mt-2">
+                        <img src="/manual-screens/accounts.png" alt="Accounts Tab" className="w-full max-h-36 object-contain border rounded" />
+                    </div>
                 </div>
                 <p className="mt-3 p-2 bg-indigo-50 border-l-4 border-indigo-400 rounded-r-md"><strong>Tip:</strong> Keep HSAs separated from other retirement accounts to maintain correct tax treatment in projections.</p>
             </>
@@ -93,7 +95,9 @@ const manualContent = [
                     <li>Choose <em>Monthly</em> or <em>Lump</em> payout and enter the amount.</li>
                     <li>Set <em>Start Age</em>, <em>COLA</em>, and <em>Survivor %</em> (if applicable).</li>
                 </ol>
-                <div className="mt-2 h-36 bg-gray-100 border rounded flex items-center justify-center text-sm text-gray-500">Screenshot placeholder: Pensions</div>
+                <div className="mt-2">
+                    <img src="/manual-screens/pensions.png" alt="Pensions" className="w-full max-h-36 object-contain border rounded" />
+                </div>
 
                 <h4 className="font-semibold mt-3">Annuities & Other</h4>
                 <p>Use the <strong>Annuities</strong> and <strong>Other Incomes</strong> tabs for purchased income products and irregular or rental income. Each item supports start/end ages and COLA.</p>
@@ -164,7 +168,9 @@ const manualContent = [
                 <div className="mt-3">
                     <h5 className="font-semibold">Backup & Restore</h5>
                     <p>Download all scenarios to a <code>retirement_scenarios.retire</code> file or upload a file to restore. Uploading replaces all in-browser scenarios.</p>
-                    <div className="mt-2 h-28 bg-gray-100 border rounded flex items-center justify-center text-sm text-gray-500">Screenshot placeholder: Scenario Manager</div>
+                    <div className="mt-2">
+                        <img src="/manual-screens/scenariomanager.png" alt="Scenario Manager" className="w-full max-h-28 object-contain border rounded" />
+                    </div>
                 </div>
                 <p className="mt-3 p-2 bg-yellow-50 border-l-4 border-yellow-400 rounded-r-md"><strong>Important:</strong> Scenarios are stored in browser local storage — export frequently if you depend on them.</p>
             </>
