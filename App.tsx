@@ -545,7 +545,15 @@ const App: React.FC = () => {
                     </div>
                 </div>
                 
-                <UserManualModal isOpen={isManualOpen} onClose={() => setIsManualOpen(false)} />
+                <UserManualModal
+                    isOpen={isManualOpen}
+                    onClose={() => setIsManualOpen(false)}
+                    openDisclaimer={() => {
+                        // Open disclaimer above the manual and do not require accept
+                        setIsDisclaimerRequireAccept(false);
+                        setIsDisclaimerOpen(true);
+                    }}
+                />
                 <DisclaimerModal
                     isOpen={isDisclaimerOpen}
                     requireAccept={isDisclaimerRequireAccept}

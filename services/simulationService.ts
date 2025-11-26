@@ -68,7 +68,7 @@ const calculateSummary = (projections: YearlyProjection[], plan: RetirementPlan)
     const retirementNetIncomes = retirementProjections.map(p => p.netIncome);
     const retirementGrossIncomes = retirementProjections.map(p => p.grossIncome);
     const retirementFederalTaxes = retirementProjections.map(p => p.federalTax);
-    const retirementStateTtaxes = retirementProjections.map(p => p.stateTax);
+    const retirementStateTaxes = retirementProjections.map(p => p.stateTax);
     
     const yearsInRetirement = retirementProjections.length;
     const finalNetWorth = projections.length > 0 ? projections[projections.length - 1].netWorth : 0;
@@ -88,7 +88,7 @@ const calculateSummary = (projections: YearlyProjection[], plan: RetirementPlan)
 
     const avgGrossIncome = retirementGrossIncomes.length > 0 ? retirementGrossIncomes.reduce((a, b) => a + b, 0) / retirementGrossIncomes.length : 0;
     const avgFederalTax = retirementFederalTaxes.length > 0 ? retirementFederalTaxes.reduce((a, b) => a + b, 0) / retirementFederalTaxes.length : 0;
-    const avgStateTax = retirementStateTtaxes.length > 0 ? retirementStateTtaxes.reduce((a, b) => a + b, 0) / retirementStateTtaxes.length : 0;
+    const avgStateTax = retirementStateTaxes.length > 0 ? retirementStateTaxes.reduce((a, b) => a + b, 0) / retirementStateTaxes.length : 0;
 
     return {
         avgMonthlyNetIncomeToday: avgAnnualNetIncomeToday / 12,

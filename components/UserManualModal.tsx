@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 interface UserManualModalProps {
     isOpen: boolean;
     onClose: () => void;
+    openDisclaimer?: () => void;
 }
 
 const manualContent = [
@@ -257,7 +258,7 @@ useEffect(() => {
     }
 ];
 
-export const UserManualModal: React.FC<UserManualModalProps> = ({ isOpen, onClose }) => {
+export const UserManualModal: React.FC<UserManualModalProps> = ({ isOpen, onClose, openDisclaimer }) => {
     const [activeTopicId, setActiveTopicId] = useState(manualContent[0].id);
     
     if (!isOpen) return null;
@@ -323,7 +324,19 @@ export const UserManualModal: React.FC<UserManualModalProps> = ({ isOpen, onClos
                         )}
                     </div>
                 </div>
-                {/* Footer removed per user request (no external GitHub link). */}
+                {/* Footer: quick links */}
+                <div className="flex-shrink-0 border-t bg-gray-50 p-4 flex justify-end space-x-2">
+                    <button
+                        onClick={() => {
+                            // Close manual and open disclaimer (if provided)
+                            onClose();
+                            if (openDisclaimer) openDisclaimer();
+                        }}
+                        className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+                    >
+                        View Disclaimer
+                    </button>
+                </div>
             </div>
         </div>
     );
