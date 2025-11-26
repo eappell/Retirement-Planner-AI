@@ -482,14 +482,11 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                         title="Accounts"
                         subtitle="Manage retirement and investment accounts in separate tabs."
                         titleColorClass="text-cyan-600"
-                        actions={
-                            scenariosCount && scenariosCount > 1 ? (
-                                <button type="button" className="text-sm px-2 py-1 bg-gray-100 rounded transition-colors hover:bg-[#5b8dde] hover:text-white" onClick={() => doUpdateAll({ retirementAccounts: plan.retirementAccounts, investmentAccounts: plan.investmentAccounts }, 'Accounts')}>Update All Scenarios</button>
-                            ) : undefined
-                        }
+                        actions={undefined}
                     >
                         <div className="col-span-full">
-                            <div className="flex items-center space-x-6 mb-3" role="tablist" aria-label="Accounts Tabs" onKeyDown={handleAccountsKeyDown}>
+                            <div className="flex items-center justify-between mb-3">
+                                <div className="flex items-center space-x-6" role="tablist" aria-label="Accounts Tabs" onKeyDown={handleAccountsKeyDown}>
                                 {accountsTab === 'retirement' ? (
                                     <button
                                         type="button"
@@ -628,6 +625,41 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                         </span>
                                     </button>
                                 )}
+                                </div>
+                                <div className="flex items-center">
+                                    {scenariosCount && scenariosCount > 1 ? (
+                                        <button type="button" className="text-sm px-2 py-1 bg-gray-100 rounded transition-colors hover:bg-[#5b8dde] hover:text-white" onClick={() => {
+                                            // Build per-scenario partials so we only update the active tab's data
+                                            const per: Record<string, Partial<any>> = {};
+                                            if (accountsTab === 'retirement') {
+                                                // Update non-HSA retirement accounts only; preserve HSAs in each scenario
+                                                const currentNonHsa = (plan.retirementAccounts || []).filter((a: any) => a.type !== 'HSA');
+                                                scenarios.forEach((sc: any) => {
+                                                    if (!sc || sc.id === activeScenarioId) return;
+                                                    const otherHsa = (sc.plan.retirementAccounts || []).filter((a: any) => a.type === 'HSA');
+                                                    per[sc.id] = { retirementAccounts: [...structuredClone(currentNonHsa), ...structuredClone(otherHsa)] };
+                                                });
+                                                doUpdateAll({ __perScenario: per }, 'Retirement Accounts');
+                                            } else if (accountsTab === 'investment') {
+                                                const currentInv = structuredClone(plan.investmentAccounts || []);
+                                                scenarios.forEach((sc: any) => {
+                                                    if (!sc || sc.id === activeScenarioId) return;
+                                                    per[sc.id] = { investmentAccounts: structuredClone(currentInv) };
+                                                });
+                                                doUpdateAll({ __perScenario: per }, 'Investment Accounts');
+                                            } else {
+                                                // HSA tab: update HSAs only within retirementAccounts, preserve non-HSA accounts
+                                                const currentHsa = (plan.retirementAccounts || []).filter((a: any) => a.type === 'HSA');
+                                                scenarios.forEach((sc: any) => {
+                                                    if (!sc || sc.id === activeScenarioId) return;
+                                                    const otherNonHsa = (sc.plan.retirementAccounts || []).filter((a: any) => a.type !== 'HSA');
+                                                    per[sc.id] = { retirementAccounts: [...structuredClone(otherNonHsa), ...structuredClone(currentHsa)] };
+                                                });
+                                                doUpdateAll({ __perScenario: per }, 'HSAs');
+                                            }
+                                        }}>Update All Scenarios</button>
+                                    ) : null}
+                                </div>
                             </div>
 
                             {/* Retirement tab content */}
@@ -811,14 +843,11 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                 title="Income"
                 subtitle="Manage pensions and other income sources in tabs."
                 titleColorClass="text-sky-600"
-                actions={
-                    scenariosCount && scenariosCount > 1 ? (
-                        <button type="button" className="text-sm px-2 py-1 bg-gray-100 rounded transition-colors hover:bg-[#5b8dde] hover:text-white" onClick={() => doUpdateAll({ pensions: plan.pensions, annuities: plan.annuities, otherIncomes: plan.otherIncomes }, 'Income')}>Update All Scenarios</button>
-                    ) : undefined
-                }
+                actions={undefined}
             >
-                <div className="col-span-full">
-                    <div className="flex items-center space-x-6 mb-3" role="tablist" aria-label="Income Tabs" onKeyDown={handleIncomeKeyDown}>
+                    <div className="col-span-full">
+                    <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center space-x-6" role="tablist" aria-label="Income Tabs" onKeyDown={handleIncomeKeyDown}>
                         {incomeTab === 'pensions' ? (
                             <button
                                 type="button"
@@ -957,6 +986,36 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                 </span>
                             </button>
                         )}
+                        </div>
+                        <div className="flex items-center">
+                            {scenariosCount && scenariosCount > 1 ? (
+                                <button type="button" className="text-sm px-2 py-1 bg-gray-100 rounded transition-colors hover:bg-[#5b8dde] hover:text-white" onClick={() => {
+                                    const per: Record<string, Partial<any>> = {};
+                                    if (incomeTab === 'pensions') {
+                                        const currentPensions = structuredClone(plan.pensions || []);
+                                        scenarios.forEach((sc: any) => {
+                                            if (!sc || sc.id === activeScenarioId) return;
+                                            per[sc.id] = { pensions: structuredClone(currentPensions) };
+                                        });
+                                        doUpdateAll({ __perScenario: per }, 'Pensions');
+                                    } else if (incomeTab === 'annuities') {
+                                        const current = structuredClone(plan.annuities || []);
+                                        scenarios.forEach((sc: any) => {
+                                            if (!sc || sc.id === activeScenarioId) return;
+                                            per[sc.id] = { annuities: structuredClone(current) };
+                                        });
+                                        doUpdateAll({ __perScenario: per }, 'Annuities');
+                                    } else {
+                                        const current = structuredClone(plan.otherIncomes || []);
+                                        scenarios.forEach((sc: any) => {
+                                            if (!sc || sc.id === activeScenarioId) return;
+                                            per[sc.id] = { otherIncomes: structuredClone(current) };
+                                        });
+                                        doUpdateAll({ __perScenario: per }, 'Other Incomes');
+                                    }
+                                }}>Update All Scenarios</button>
+                            ) : null}
+                        </div>
                     </div>
 
                     {/* Pensions panel */}
@@ -999,6 +1058,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                         <div className="w-28">
                                             <NumberInput label="Surv. %" value={(item.survivorBenefit ?? 100)} onChange={e => handleDynamicListChange('pensions', item.id, 'survivorBenefit', e.target.value)} />
                                         </div>
+                                        
                                     </div>
                                     <div className="flex flex-col items-center justify-end h-full pb-1">
                                         <label htmlFor={`taxable-${item.id}`} className="mb-1 text-sm font-medium text-brand-text-secondary">Taxable</label>
@@ -1169,14 +1229,11 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                 title="Estate Planning"
                 subtitle="Manage gifts and legacy allocations."
                 titleColorClass="text-purple-600"
-                actions={
-                    scenariosCount && scenariosCount > 1 ? (
-                        <button type="button" className="text-sm px-2 py-1 bg-gray-100 rounded transition-colors hover:bg-[#5b8dde] hover:text-white" onClick={() => doUpdateAll({ gifts: plan.gifts, legacyDisbursements: plan.legacyDisbursements }, 'Estate Planning')}>Update All Scenarios</button>
-                    ) : undefined
-                }
+                actions={undefined}
             >
-                <div className="col-span-full">
-                    <div className="flex items-center space-x-6 mb-3" role="tablist" aria-label="Estate Tabs" onKeyDown={handleEstateKeyDown}>
+                    <div className="col-span-full">
+                    <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center space-x-6" role="tablist" aria-label="Estate Tabs" onKeyDown={handleEstateKeyDown}>
                         {estateTab === 'gifts' ? (
                             <button
                                 type="button"
@@ -1269,6 +1326,23 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                 </span>
                             </button>
                         )}
+                        </div>
+                        <div className="flex items-center">
+                            {scenariosCount && scenariosCount > 1 ? (
+                                <button type="button" className="text-sm px-2 py-1 bg-gray-100 rounded transition-colors hover:bg-[#5b8dde] hover:text-white" onClick={() => {
+                                    const per: Record<string, Partial<any>> = {};
+                                    if (estateTab === 'gifts') {
+                                        const curr = structuredClone(plan.gifts || []);
+                                        scenarios.forEach((sc: any) => { if (!sc || sc.id === activeScenarioId) return; per[sc.id] = { gifts: structuredClone(curr) }; });
+                                        doUpdateAll({ __perScenario: per }, 'Gifts');
+                                    } else {
+                                        const curr = structuredClone(plan.legacyDisbursements || []);
+                                        scenarios.forEach((sc: any) => { if (!sc || sc.id === activeScenarioId) return; per[sc.id] = { legacyDisbursements: structuredClone(curr) }; });
+                                        doUpdateAll({ __perScenario: per }, 'Legacy Disbursements');
+                                    }
+                                }}>Update All Scenarios</button>
+                            ) : null}
+                        </div>
                     </div>
 
                     {/* Gifts panel */}
@@ -1386,14 +1460,11 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
             
 
             <InputSection title="Expenses" subtitle="Model recurring expense phases and one-time expenses." titleColorClass="text-red-600" gridCols={1}
-                actions={
-                    scenariosCount && scenariosCount > 1 ? (
-                        <button type="button" className="text-sm px-2 py-1 bg-gray-100 rounded transition-colors hover:bg-[#5b8dde] hover:text-white" onClick={() => doUpdateAll({ expensePeriods: plan.expensePeriods, oneTimeExpenses: plan.oneTimeExpenses }, 'Expenses')}>Update All Scenarios</button>
-                    ) : undefined
-                }
+                actions={undefined}
             >
-                <div className="col-span-full">
-                    <div className="flex items-center space-x-6 mb-3" role="tablist" aria-label="Expenses Tabs">
+                    <div className="col-span-full">
+                    <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center space-x-6" role="tablist" aria-label="Expenses Tabs">
                         {expensesTab === 'periods' ? (
                             <button type="button" role="tab" id="tab-expense-periods" aria-selected="true" aria-controls="panel-expense-periods" onClick={() => setExpensesTab('periods')} className={`text-sm pb-2 ${'border-b-2 border-red-600 text-red-700 font-medium'} group`}>
                                 <span className="inline-flex items-center space-x-2">
@@ -1456,6 +1527,23 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                 </span>
                             </button>
                         )}
+                        </div>
+                        <div className="flex items-center">
+                            {scenariosCount && scenariosCount > 1 ? (
+                                <button type="button" className="text-sm px-2 py-1 bg-gray-100 rounded transition-colors hover:bg-[#5b8dde] hover:text-white" onClick={() => {
+                                    const per: Record<string, Partial<any>> = {};
+                                    if (expensesTab === 'periods') {
+                                        const curr = structuredClone(plan.expensePeriods || []);
+                                        scenarios.forEach((sc: any) => { if (!sc || sc.id === activeScenarioId) return; per[sc.id] = { expensePeriods: structuredClone(curr) }; });
+                                        doUpdateAll({ __perScenario: per }, 'Expense Periods');
+                                    } else {
+                                        const curr = structuredClone(plan.oneTimeExpenses || []);
+                                        scenarios.forEach((sc: any) => { if (!sc || sc.id === activeScenarioId) return; per[sc.id] = { oneTimeExpenses: structuredClone(curr) }; });
+                                        doUpdateAll({ __perScenario: per }, 'One-Time Expenses');
+                                    }
+                                }}>Update All Scenarios</button>
+                            ) : null}
+                        </div>
                     </div>
 
                     {/* Expense Periods panel */}

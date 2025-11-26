@@ -201,7 +201,27 @@ export const useScenarioManagement = (initialState?: ScenariosState) => {
         activeScenarioId,
         scenarios,
         updateActivePlan,
-        updateAllScenarios: (partialPlan: Partial<RetirementPlan>) => {
+        updateAllScenarios: (partialPlan: Partial<RetirementPlan> & any) => {
+            // Support a special per-scenario map: { __perScenario: { [scenarioId]: partial } }
+            if (partialPlan && typeof partialPlan === 'object' && (partialPlan as any).__perScenario) {
+                const per = (partialPlan as any).__perScenario as Record<string, Partial<RetirementPlan>>;
+                setScenariosState(prev => {
+                    const newScenarios: typeof prev.scenarios = { ...prev.scenarios } as any;
+                    Object.entries(per).forEach(([id, p]) => {
+                        if (!newScenarios[id]) return;
+                        newScenarios[id] = {
+                            ...newScenarios[id],
+                            plan: {
+                                ...structuredClone(newScenarios[id].plan),
+                                ...structuredClone(p),
+                            },
+                        };
+                    });
+                    return { ...prev, scenarios: newScenarios };
+                });
+                return;
+            }
+
             setScenariosState(prev => {
                 const newScenarios: typeof prev.scenarios = {} as any;
                 Object.entries(prev.scenarios).forEach(([id, sc]) => {
