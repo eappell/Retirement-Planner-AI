@@ -5,6 +5,7 @@ import { SparklesIcon, ChartBarIcon } from '@heroicons/react/24/outline';
 import { DynamicCharts } from './DynamicCharts';
 import { MonteCarloSimulator } from './MonteCarloSimulator';
 import { ProjectionTable } from './ProjectionTable';
+import { PremiumGate } from './PremiumGate';
 
 interface AnalysisSectionsProps {
     plan: RetirementPlan;
@@ -18,6 +19,8 @@ interface AnalysisSectionsProps {
     monteCarloResults: MonteCarloResult | null;
     isMcLoading: boolean;
     handleRunSimulation: (numSimulations: number, volatility: number) => void;
+    isPremium?: boolean;
+    isEmbedded?: boolean;
 }
 
 const markdownToHtml = (text: string): string => {
@@ -93,6 +96,8 @@ export const AnalysisSections: React.FC<AnalysisSectionsProps> = ({
     monteCarloResults,
     isMcLoading,
     handleRunSimulation,
+    isPremium = false,
+    isEmbedded = false,
 }) => {
     
     const isCouple = plan.planType === PlanType.COUPLE;
@@ -126,15 +131,22 @@ export const AnalysisSections: React.FC<AnalysisSectionsProps> = ({
             
             <InputSection title="AI Powered Insights" subtitle="Get personalized tips based on your plan." titleColorClass="text-purple-600">
                 <div className="col-span-full">
-                <button onClick={handleGetInsights} disabled={isAiLoading || !results} className="px-4 py-2 bg-purple-600 text-white rounded-md disabled:bg-gray-400 inline-flex items-center">
-                    <SparklesIcon className="h-4 w-4 mr-2" aria-hidden="true" />
-                    {isAiLoading ? 'Analyzing...' : 'Generate AI Insights'}
-                </button>
-                {aiInsights && (
-                    <div className="mt-4 p-4 border rounded-md bg-purple-50">
-                <div className="prose prose-sm max-w-none ai-insights" dangerouslySetInnerHTML={{__html: markdownToHtml(aiInsights)}}></div>
-                </div>
-                )}
+                <PremiumGate 
+                    isAllowed={isPremium} 
+                    featureName="AI-Powered Insights"
+                    message="Unlock AI-powered retirement planning insights with Premium. Get personalized recommendations based on your unique financial situation."
+                    showUpgradeButton={isEmbedded}
+                >
+                    <button onClick={handleGetInsights} disabled={isAiLoading || !results} className="px-4 py-2 bg-purple-600 text-white rounded-md disabled:bg-gray-400 inline-flex items-center">
+                        <SparklesIcon className="h-4 w-4 mr-2" aria-hidden="true" />
+                        {isAiLoading ? 'Analyzing...' : 'Generate AI Insights'}
+                    </button>
+                    {aiInsights && (
+                        <div className="mt-4 p-4 border rounded-md bg-purple-50">
+                    <div className="prose prose-sm max-w-none ai-insights" dangerouslySetInnerHTML={{__html: markdownToHtml(aiInsights)}}></div>
+                    </div>
+                    )}
+                </PremiumGate>
                 </div>
             </InputSection>
 
@@ -158,12 +170,19 @@ export const AnalysisSections: React.FC<AnalysisSectionsProps> = ({
                 titleColorClass="text-emerald-600"
             >
             <div className="col-span-full">
-                <MonteCarloSimulator
-                    onRunSimulation={handleRunSimulation}
-                    results={monteCarloResults}
-                    isLoading={isMcLoading}
-                    plan={plan}
-                />
+                <PremiumGate 
+                    isAllowed={isPremium} 
+                    featureName="Monte Carlo Simulation"
+                    message="Unlock advanced Monte Carlo simulations with Premium. Test your retirement plan against thousands of market scenarios to understand the probability of success."
+                    showUpgradeButton={isEmbedded}
+                >
+                    <MonteCarloSimulator
+                        onRunSimulation={handleRunSimulation}
+                        results={monteCarloResults}
+                        isLoading={isMcLoading}
+                        plan={plan}
+                    />
+                </PremiumGate>
             </div>
         </InputSection>
 

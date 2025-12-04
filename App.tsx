@@ -8,6 +8,7 @@ import { PrintableReport } from './components/PrintableReport';
 import Header from './components/Header';
 import Toast from './components/Toast';
 import AppSettingsMenu from './components/AppSettingsMenu';
+import { PremiumGate } from './components/PremiumGate';
 import { ResultsPanel } from './components/ResultsPanel';
 import ScenariosBar from './components/ScenariosBar';
 import { InputForm } from './components/InputForm';
@@ -19,7 +20,8 @@ import {
     usePlanCalculation, 
     useAIInsights,
     useSocialSecurityCalculation,
-    usePortalIntegration 
+    usePortalIntegration,
+    usePortalAuth 
 } from './hooks';
 import { buildExport, parseUpload } from './utils/exportImport';
 import useTheme from './hooks/useTheme';
@@ -487,6 +489,7 @@ const App: React.FC = () => {
     ], [handlePrint, handleResetPlan]);
 
     const { isEmbedded } = usePortalIntegration(toolbarButtons);
+    const { isPremium, isAdmin, isFree, isEmbedded: authIsEmbedded } = usePortalAuth();
 
     // --- Real-time Calculation with Debounce ---
     useEffect(() => {
@@ -593,6 +596,8 @@ const App: React.FC = () => {
                             isMcLoading={isMcLoading}
                             monteCarloResults={monteCarloResults}
                             handleRunSimulation={handleRunSimulation}
+                            isPremium={isPremium || isAdmin}
+                            isEmbedded={isEmbedded}
                         />
                     </div>
                 </div>
