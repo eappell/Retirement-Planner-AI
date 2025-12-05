@@ -23,6 +23,7 @@ import {
     usePortalIntegration,
     usePortalAuth 
 } from './hooks';
+import { useHealthcareIntegration } from './hooks/useHealthcareIntegration';
 import { buildExport, parseUpload } from './utils/exportImport';
 import useTheme from './hooks/useTheme';
 
@@ -228,6 +229,21 @@ const App: React.FC = () => {
             return { ...prev, [listName]: existing.filter(item => item.id !== id) };
         });
     };
+    
+    // --- Healthcare Cost Integration ---
+    const { receivedData } = useHealthcareIntegration({
+        addExpensePeriod: (period) => addToList('expensePeriods', period),
+        addOneTimeExpense: (expense) => addToList('oneTimeExpenses', expense),
+        scenarios: scenarios ? Object.values(scenarios).map(s => ({ id: s.id, name: s.name })) : [],
+        activeScenarioId: activeScenarioId || null,
+    });
+    
+    // Show toast notification when healthcare data is received
+    useEffect(() => {
+        if (receivedData) {
+            showToast('Healthcare costs added to your retirement plan!', 3000);
+        }
+    }, [receivedData]);
 
     // --- Scenario Management Handlers (using hooks) ---
     const clearCalculationResults = useCallback(() => {
