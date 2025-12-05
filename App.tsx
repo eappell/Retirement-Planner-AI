@@ -138,6 +138,55 @@ const App: React.FC = () => {
         return () => window.removeEventListener('app:toast', handler as EventListener);
     }, []);
     
+    // --- Check for pending healthcare data transfer ---
+    useEffect(() => {
+        const checkPendingTransfer = () => {
+            const pendingData = localStorage.getItem('pendingHealthcareDataTransfer');
+            if (pendingData) {
+                try {
+                    const transfer = JSON.parse(pendingData);
+                    console.log('[App] Found pending healthcare data transfer:', transfer);
+                    
+                    // Import the data
+                    if (transfer.data && plan) {
+                        // Add expense period
+                        if (transfer.data.expensePeriod) {
+                            const newExpense = {
+                                ...transfer.data.expensePeriod,
+                                id: Date.now().toString(),
+                            };
+                            updateActivePlan({
+                                expensePeriods: [...plan.expensePeriods, newExpense],
+                            });
+                        }
+                        
+                        // Add one-time expense if present
+                        if (transfer.data.oneTimeExpense) {
+                            const newOneTime = {
+                                ...transfer.data.oneTimeExpense,
+                                id: (Date.now() + 1).toString(),
+                            };
+                            updateActivePlan({
+                                oneTimeExpenses: [...(plan.oneTimeExpenses || []), newOneTime],
+                            });
+                        }
+                        
+                        // Clear the pending transfer
+                        localStorage.removeItem('pendingHealthcareDataTransfer');
+                        
+                        // Show success message
+                        showToast('Healthcare costs imported successfully!', 3000);
+                    }
+                } catch (error) {
+                    console.error('[App] Error importing healthcare data:', error);
+                }
+            }
+        };
+        
+        // Check on mount and when plan changes
+        checkPendingTransfer();
+    }, [plan, updateActivePlan]);
+    
     // --- Update Browser Title ---
     useEffect(() => {
         if (activeScenario) {
