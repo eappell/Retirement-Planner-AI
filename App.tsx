@@ -174,8 +174,11 @@ const App: React.FC = () => {
                         });
                     }
                     
-                    // Show success message
-                    showToast('Healthcare costs imported successfully!', 3000);
+                    // Show success message via toast event
+                    console.log('[App] Healthcare costs imported successfully!');
+                    window.dispatchEvent(new CustomEvent('app:toast', { 
+                        detail: { message: 'Healthcare costs imported successfully!' } 
+                    }));
                 } else {
                     console.log('[App] Cannot import: data structure invalid or plan not ready');
                 }
