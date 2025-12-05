@@ -140,15 +140,17 @@ const App: React.FC = () => {
     
     // --- Check for pending healthcare data transfer from portal ---
     useEffect(() => {
-        console.log('[App] Requesting healthcare data from portal...');
+        console.log('[App] Setting up healthcare data listener...');
+        let hasImported = false;
         
         const handleHealthcareData = (event: MessageEvent) => {
-            if (event.data?.type === 'HEALTHCARE_DATA_RESPONSE') {
+            if (event.data?.type === 'HEALTHCARE_DATA_RESPONSE' && !hasImported) {
                 console.log('[App] Received healthcare data from portal:', event.data.data);
                 const transfer = event.data.data;
                 
                 if (transfer && transfer.data && plan) {
                     console.log('[App] Importing healthcare data...');
+                    hasImported = true;
                     
                     // Add expense period
                     if (transfer.data.expensePeriod) {
@@ -188,8 +190,8 @@ const App: React.FC = () => {
         // Listen for response from portal
         window.addEventListener('message', handleHealthcareData);
         
-        // Request healthcare data from portal
-        if (window.self !== window.top && plan) {
+        // Request healthcare data from portal only once on mount
+        if (window.self !== window.top && plan && !hasImported) {
             console.log('[App] Sending REQUEST_HEALTHCARE_DATA to portal');
             window.parent.postMessage({ type: 'REQUEST_HEALTHCARE_DATA' }, '*');
         }
@@ -197,7 +199,8 @@ const App: React.FC = () => {
         return () => {
             window.removeEventListener('message', handleHealthcareData);
         };
-    }, [plan, updateActivePlan]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
     
     // --- Update Browser Title ---
     useEffect(() => {
