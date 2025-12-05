@@ -8,12 +8,14 @@ interface UserData {
 }
 
 export const usePortalAuth = () => {
+  // Determine embedding synchronously so UI can make access decisions immediately
+  const initialEmbedded = (typeof window !== 'undefined') ? (window.self !== window.top) : false;
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isEmbedded, setIsEmbedded] = useState(false);
+  const [isEmbedded, setIsEmbedded] = useState<boolean>(initialEmbedded);
 
   useEffect(() => {
-    // Check if embedded
+    // Update embedded state in case it changed
     setIsEmbedded(window.self !== window.top);
 
     const handleMessage = (event: MessageEvent) => {
@@ -55,17 +57,21 @@ export const usePortalAuth = () => {
     };
   }, [userData]);
 
+  // If the app is running standalone (not embedded in a portal), treat it as
+  // having full access so users see all features.
+  const isStandalone = !isEmbedded;
+
   return {
     userData,
     loading,
     isEmbedded,
     isAuthenticated: !!userData,
     isFree: userData?.tier === 'free',
-    // Treat admin as having premium access so components that check `isPremium`
-    // will correctly allow admin users.
-    isPremium: userData ? (userData.tier === 'premium' || userData.tier === 'admin') : false,
+    // If running standalone and there's no portal user, expose premium features
+    isPremium: userData ? (userData.tier === 'premium' || userData.tier === 'admin') : isStandalone,
     isAdmin: userData?.tier === 'admin',
     hasAccess: (requiredTier: 'free' | 'premium' | 'admin') => {
+      if (isStandalone) return true;
       if (!userData) return false;
       if (userData.tier === 'admin') return true;
       if (requiredTier === 'premium') return ['premium', 'admin'].includes(userData.tier);
