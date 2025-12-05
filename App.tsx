@@ -191,7 +191,7 @@ const App: React.FC = () => {
         window.addEventListener('message', handleHealthcareData);
         
         // Request healthcare data from portal only once on mount
-        if (window.self !== window.top && plan && !hasImported) {
+        if (window.self !== window.top && !hasImported) {
             console.log('[App] Sending REQUEST_HEALTHCARE_DATA to portal');
             window.parent.postMessage({ type: 'REQUEST_HEALTHCARE_DATA' }, '*');
         }
