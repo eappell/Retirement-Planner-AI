@@ -140,21 +140,28 @@ const App: React.FC = () => {
     
     // --- Check for pending healthcare data transfer ---
     useEffect(() => {
+        console.log('[App] Checking for pending healthcare data transfer...');
         const checkPendingTransfer = () => {
             const pendingData = localStorage.getItem('pendingHealthcareDataTransfer');
+            console.log('[App] localStorage value:', pendingData);
+            
             if (pendingData) {
                 try {
                     const transfer = JSON.parse(pendingData);
                     console.log('[App] Found pending healthcare data transfer:', transfer);
+                    console.log('[App] Current plan:', plan);
                     
                     // Import the data
                     if (transfer.data && plan) {
+                        console.log('[App] Importing healthcare data...');
+                        
                         // Add expense period
                         if (transfer.data.expensePeriod) {
                             const newExpense = {
                                 ...transfer.data.expensePeriod,
                                 id: Date.now().toString(),
                             };
+                            console.log('[App] Adding expense period:', newExpense);
                             updateActivePlan({
                                 expensePeriods: [...plan.expensePeriods, newExpense],
                             });
@@ -166,6 +173,7 @@ const App: React.FC = () => {
                                 ...transfer.data.oneTimeExpense,
                                 id: (Date.now() + 1).toString(),
                             };
+                            console.log('[App] Adding one-time expense:', newOneTime);
                             updateActivePlan({
                                 oneTimeExpenses: [...(plan.oneTimeExpenses || []), newOneTime],
                             });
@@ -173,13 +181,21 @@ const App: React.FC = () => {
                         
                         // Clear the pending transfer
                         localStorage.removeItem('pendingHealthcareDataTransfer');
+                        console.log('[App] Cleared pending transfer from localStorage');
                         
                         // Show success message
                         showToast('Healthcare costs imported successfully!', 3000);
+                    } else {
+                        console.log('[App] Cannot import: transfer.data or plan is missing', {
+                            hasData: !!transfer.data,
+                            hasPlan: !!plan
+                        });
                     }
                 } catch (error) {
                     console.error('[App] Error importing healthcare data:', error);
                 }
+            } else {
+                console.log('[App] No pending healthcare data transfer found');
             }
         };
         
