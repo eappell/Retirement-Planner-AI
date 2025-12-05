@@ -13,6 +13,7 @@ export const usePortalAuth = () => {
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
   const [isEmbedded, setIsEmbedded] = useState<boolean>(initialEmbedded);
+  const [allowAllWhenNoPortal, setAllowAllWhenNoPortal] = useState(false);
 
   useEffect(() => {
     // Update embedded state in case it changed
@@ -56,7 +57,12 @@ export const usePortalAuth = () => {
     window.addEventListener('message', handleMessage);
 
     // Set loading to false after a short timeout if no message received
+    // and allow all features when embedded but parent doesn't provide auth.
     const timeout = setTimeout(() => {
+      if (!userData) {
+        // If embedded and parent didn't respond, allow all features
+        if (embeddedNow) setAllowAllWhenNoPortal(true);
+      }
       setLoading(false);
     }, 2000);
 
@@ -70,17 +76,20 @@ export const usePortalAuth = () => {
   // having full access so users see all features.
   const isStandalone = !isEmbedded;
 
+  const effectiveAllAccess = isStandalone || allowAllWhenNoPortal;
+
   return {
     userData,
     loading,
     isEmbedded,
     isAuthenticated: !!userData,
     isFree: userData?.tier === 'free',
-    // If running standalone and there's no portal user, expose premium features
-    isPremium: userData ? (userData.tier === 'premium' || userData.tier === 'admin') : isStandalone,
+    // If we have user data, honor it. Otherwise, if running standalone or
+    // parent didn't provide auth, expose premium features.
+    isPremium: userData ? (userData.tier === 'premium' || userData.tier === 'admin') : effectiveAllAccess,
     isAdmin: userData?.tier === 'admin',
     hasAccess: (requiredTier: 'free' | 'premium' | 'admin') => {
-      if (isStandalone) return true;
+      if (effectiveAllAccess) return true;
       if (!userData) return false;
       if (userData.tier === 'admin') return true;
       if (requiredTier === 'premium') return ['premium', 'admin'].includes(userData.tier);
