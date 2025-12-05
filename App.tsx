@@ -138,69 +138,62 @@ const App: React.FC = () => {
         return () => window.removeEventListener('app:toast', handler as EventListener);
     }, []);
     
-    // --- Check for pending healthcare data transfer ---
+    // --- Check for pending healthcare data transfer from portal ---
     useEffect(() => {
-        console.log('[App] Checking for pending healthcare data transfer...');
-        const checkPendingTransfer = () => {
-            const pendingData = localStorage.getItem('pendingHealthcareDataTransfer');
-            console.log('[App] localStorage value:', pendingData);
-            
-            if (pendingData) {
-                try {
-                    const transfer = JSON.parse(pendingData);
-                    console.log('[App] Found pending healthcare data transfer:', transfer);
-                    console.log('[App] Current plan:', plan);
+        console.log('[App] Requesting healthcare data from portal...');
+        
+        const handleHealthcareData = (event: MessageEvent) => {
+            if (event.data?.type === 'HEALTHCARE_DATA_RESPONSE') {
+                console.log('[App] Received healthcare data from portal:', event.data.data);
+                const transfer = event.data.data;
+                
+                if (transfer && transfer.data && plan) {
+                    console.log('[App] Importing healthcare data...');
                     
-                    // Import the data
-                    if (transfer.data && plan) {
-                        console.log('[App] Importing healthcare data...');
-                        
-                        // Add expense period
-                        if (transfer.data.expensePeriod) {
-                            const newExpense = {
-                                ...transfer.data.expensePeriod,
-                                id: Date.now().toString(),
-                            };
-                            console.log('[App] Adding expense period:', newExpense);
-                            updateActivePlan({
-                                expensePeriods: [...plan.expensePeriods, newExpense],
-                            });
-                        }
-                        
-                        // Add one-time expense if present
-                        if (transfer.data.oneTimeExpense) {
-                            const newOneTime = {
-                                ...transfer.data.oneTimeExpense,
-                                id: (Date.now() + 1).toString(),
-                            };
-                            console.log('[App] Adding one-time expense:', newOneTime);
-                            updateActivePlan({
-                                oneTimeExpenses: [...(plan.oneTimeExpenses || []), newOneTime],
-                            });
-                        }
-                        
-                        // Clear the pending transfer
-                        localStorage.removeItem('pendingHealthcareDataTransfer');
-                        console.log('[App] Cleared pending transfer from localStorage');
-                        
-                        // Show success message
-                        showToast('Healthcare costs imported successfully!', 3000);
-                    } else {
-                        console.log('[App] Cannot import: transfer.data or plan is missing', {
-                            hasData: !!transfer.data,
-                            hasPlan: !!plan
+                    // Add expense period
+                    if (transfer.data.expensePeriod) {
+                        const newExpense = {
+                            ...transfer.data.expensePeriod,
+                            id: Date.now().toString(),
+                        };
+                        console.log('[App] Adding expense period:', newExpense);
+                        updateActivePlan({
+                            expensePeriods: [...plan.expensePeriods, newExpense],
                         });
                     }
-                } catch (error) {
-                    console.error('[App] Error importing healthcare data:', error);
+                    
+                    // Add one-time expense if present
+                    if (transfer.data.oneTimeExpense) {
+                        const newOneTime = {
+                            ...transfer.data.oneTimeExpense,
+                            id: (Date.now() + 1).toString(),
+                        };
+                        console.log('[App] Adding one-time expense:', newOneTime);
+                        updateActivePlan({
+                            oneTimeExpenses: [...(plan.oneTimeExpenses || []), newOneTime],
+                        });
+                    }
+                    
+                    // Show success message
+                    showToast('Healthcare costs imported successfully!', 3000);
+                } else {
+                    console.log('[App] Cannot import: data structure invalid or plan not ready');
                 }
-            } else {
-                console.log('[App] No pending healthcare data transfer found');
             }
         };
         
-        // Check on mount and when plan changes
-        checkPendingTransfer();
+        // Listen for response from portal
+        window.addEventListener('message', handleHealthcareData);
+        
+        // Request healthcare data from portal
+        if (window.self !== window.top && plan) {
+            console.log('[App] Sending REQUEST_HEALTHCARE_DATA to portal');
+            window.parent.postMessage({ type: 'REQUEST_HEALTHCARE_DATA' }, '*');
+        }
+        
+        return () => {
+            window.removeEventListener('message', handleHealthcareData);
+        };
     }, [plan, updateActivePlan]);
     
     // --- Update Browser Title ---
