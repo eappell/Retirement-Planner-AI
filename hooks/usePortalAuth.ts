@@ -16,7 +16,18 @@ export const usePortalAuth = () => {
 
   useEffect(() => {
     // Update embedded state in case it changed
-    setIsEmbedded(window.self !== window.top);
+    const embeddedNow = window.self !== window.top;
+    setIsEmbedded(embeddedNow);
+
+    // If embedded, request auth from the parent in case it posted the token
+    // before this frame mounted.
+    if (embeddedNow && window.parent) {
+      try {
+        window.parent.postMessage({ type: 'REQUEST_AUTH' }, '*');
+      } catch (e) {
+        // ignore
+      }
+    }
 
     const handleMessage = (event: MessageEvent) => {
       if (event.data?.type === 'AUTH_TOKEN') {
@@ -46,16 +57,14 @@ export const usePortalAuth = () => {
 
     // Set loading to false after a short timeout if no message received
     const timeout = setTimeout(() => {
-      if (!userData) {
-        setLoading(false);
-      }
+      setLoading(false);
     }, 2000);
 
     return () => {
       window.removeEventListener('message', handleMessage);
       clearTimeout(timeout);
     };
-  }, [userData]);
+  }, []);
 
   // If the app is running standalone (not embedded in a portal), treat it as
   // having full access so users see all features.
