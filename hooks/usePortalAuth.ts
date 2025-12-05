@@ -18,16 +18,22 @@ export const usePortalAuth = () => {
 
     const handleMessage = (event: MessageEvent) => {
       if (event.data?.type === 'AUTH_TOKEN') {
+        // Normalize tier values (case-insensitive) and coerce unknown values to 'free'
+        const rawTier = (event.data.tier || '').toString().toLowerCase();
+        let normalizedTier: UserData['tier'] = 'free';
+        if (rawTier.startsWith('admin')) normalizedTier = 'admin';
+        else if (rawTier.startsWith('premium')) normalizedTier = 'premium';
+
         console.log('[usePortalAuth] Received auth token:', {
           userId: event.data.userId,
           email: event.data.email,
-          tier: event.data.tier,
+          tier: normalizedTier,
         });
-        
+
         setUserData({
           userId: event.data.userId,
           email: event.data.email,
-          tier: event.data.tier,
+          tier: normalizedTier,
           token: event.data.token,
         });
         setLoading(false);
@@ -55,7 +61,9 @@ export const usePortalAuth = () => {
     isEmbedded,
     isAuthenticated: !!userData,
     isFree: userData?.tier === 'free',
-    isPremium: userData?.tier === 'premium',
+    // Treat admin as having premium access so components that check `isPremium`
+    // will correctly allow admin users.
+    isPremium: userData ? (userData.tier === 'premium' || userData.tier === 'admin') : false,
     isAdmin: userData?.tier === 'admin',
     hasAccess: (requiredTier: 'free' | 'premium' | 'admin') => {
       if (!userData) return false;
