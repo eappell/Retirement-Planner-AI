@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
+import { functions, httpsCallable } from '../services/firebaseClient';
 import { RetirementPlan, CalculationResult, YearlyProjection } from '../types';
 import { runSimulation } from '../services/simulationService';
 // AI requests are proxied through the server-side API at /api/insights
@@ -68,6 +69,20 @@ export const useAIInsights = () => {
                 }
                 const data = await resp.json();
                 setAiInsights(data.text || 'No insights returned.');
+                // Report AI query to portal
+                try {
+                    const trackEvent = httpsCallable(functions, 'trackEvent');
+                    await trackEvent({
+                        eventType: 'query',
+                        application: 'retirement-planner',
+                        metadata: {
+                            timestamp: new Date().toISOString(),
+                        },
+                    });
+                } catch (err) {
+                    // Non-blocking
+                    console.warn('Failed to report AI query to portal:', err);
+                }
             } catch (err: any) {
                 console.error('AI proxy call failed:', err);
                 setAiInsights('AI Insights are currently unavailable. Please try again later.');

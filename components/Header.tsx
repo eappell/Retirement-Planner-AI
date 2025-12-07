@@ -16,6 +16,15 @@ import {
   ArrowUpTrayIcon 
 } from '@heroicons/react/24/outline';
 
+// HeroIcon SVG strings for portal toolbar
+const HEROICON_SVGS = {
+  print: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>',
+  help: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4m0-4h.01"></path></svg>',
+  settings: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M12 1v6m0 6v6M4.22 4.22l4.24 4.24m5.08 5.08l4.24 4.24M1 12h6m6 0h6M4.22 19.78l4.24-4.24m5.08-5.08l4.24-4.24"></path></svg>',
+  disclaimer: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>',
+  scenarios: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="6" rx="1" ry="1"></rect><rect x="3" y="13" width="18" height="6" rx="1" ry="1"></rect><path d="M7 7v2"></path><path d="M7 16v1"></path></svg>',
+};
+
 interface HeaderProps {
   activeScenario: Scenario;
   scenarios: Record<string, Scenario>;
@@ -55,6 +64,95 @@ const Header: React.FC<HeaderProps> = ({
   const [isSettingsOpen, setIsSettingsOpen] = React.useState(false);
   const scenarioMenuRef = React.useRef<HTMLDivElement | null>(null);
   const settingsRef = React.useRef<HTMLDivElement | null>(null);
+
+  // Send toolbar buttons and app metadata to parent portal
+  React.useEffect(() => {
+    // Check if we're running in an iframe (embedded in portal)
+    if (window.self !== window.top) {
+      // Send app metadata
+      window.parent.postMessage(
+        {
+          type: 'APP_METADATA',
+          title: 'Monthly Retirement Income AI',
+          description: 'Estimate your retirement income, taxes, and net worth.',
+        },
+        '*'
+      );
+
+      // Define toolbar buttons
+      const toolbarButtons = [
+        {
+          id: 'scenarios',
+          icon: HEROICON_SVGS.scenarios,
+          label: 'Scenarios',
+          tooltip: 'Manage scenarios',
+        },
+        {
+          id: 'settings',
+          icon: HEROICON_SVGS.settings,
+          label: 'Settings',
+          tooltip: 'App Settings',
+        },
+        {
+          id: 'print',
+          icon: HEROICON_SVGS.print,
+          label: 'Print',
+          tooltip: 'Print or save as PDF',
+        },
+        {
+          id: 'help',
+          icon: HEROICON_SVGS.help,
+          label: 'Help',
+          tooltip: 'User Manual',
+        },
+        {
+          id: 'disclaimer',
+          icon: HEROICON_SVGS.disclaimer,
+          label: 'Disclaimer',
+          tooltip: 'View disclaimer',
+        },
+      ];
+
+      // Send toolbar buttons to portal
+      window.parent.postMessage(
+        {
+          type: 'TOOLBAR_BUTTONS',
+          buttons: toolbarButtons,
+        },
+        '*'
+      );
+    }
+  }, []);
+
+  // Listen for button clicks from portal
+  React.useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data?.type === 'TOOLBAR_BUTTON_CLICKED') {
+        const { buttonId } = event.data;
+
+        switch (buttonId) {
+          case 'scenarios':
+            setIsScenarioMenuOpen(prev => !prev);
+            break;
+          case 'settings':
+            setIsSettingsOpen(prev => !prev);
+            break;
+          case 'print':
+            handlePrint();
+            break;
+          case 'help':
+            setIsManualOpen(true);
+            break;
+          case 'disclaimer':
+            setIsDisclaimerOpen(true, false);
+            break;
+        }
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, [handlePrint, setIsManualOpen, setIsDisclaimerOpen]);
 
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

@@ -1,0 +1,1287 @@
+{
+  "scenariosState": {
+    "scenarios": {
+      "scenario-1763346596826": {
+        "id": "scenario-1763346596826",
+        "name": "Optimistic",
+        "plan": {
+          "planType": "Couple",
+          "person1": {
+            "name": "Eddie",
+            "currentAge": 60,
+            "retirementAge": 62,
+            "lifeExpectancy": 90,
+            "currentSalary": 150000,
+            "claimingAge": 70
+          },
+          "person2": {
+            "name": "Lara",
+            "currentAge": 57,
+            "retirementAge": 63,
+            "lifeExpectancy": 92,
+            "currentSalary": 75000,
+            "claimingAge": 70
+          },
+          "retirementAccounts": [
+            {
+              "id": "1",
+              "owner": "person1",
+              "name": "Fidelity 457",
+              "balance": 215000,
+              "annualContribution": 2800,
+              "match": 4,
+              "type": "457b"
+            },
+            {
+              "id": "1763347613590",
+              "owner": "person1",
+              "name": "Fidelity Roth",
+              "balance": 91000,
+              "annualContribution": 0,
+              "match": 0,
+              "type": "Roth IRA"
+            },
+            {
+              "id": "1763347622597",
+              "owner": "person2",
+              "name": "IRA Rollover",
+              "balance": 200000,
+              "annualContribution": 0,
+              "match": 0,
+              "type": "IRA"
+            },
+            {
+              "id": "1763347646554",
+              "owner": "person2",
+              "name": "403b",
+              "balance": 35000,
+              "annualContribution": 0,
+              "match": 0,
+              "type": "401k"
+            },
+            {
+              "id": "1763347800188",
+              "owner": "person2",
+              "name": "SEP IRA ",
+              "balance": 4300,
+              "annualContribution": 0,
+              "match": 0,
+              "type": "IRA"
+            },
+            {
+              "id": "1763347815331",
+              "owner": "person2",
+              "name": "SEP Pension",
+              "balance": 77000,
+              "annualContribution": 0,
+              "match": 0,
+              "type": "IRA"
+            },
+            {
+              "id": "1763347828956",
+              "owner": "person2",
+              "name": "Roth",
+              "balance": 1900,
+              "annualContribution": 0,
+              "match": 0,
+              "type": "Roth IRA"
+            },
+            {
+              "id": "1763347869197",
+              "owner": "person2",
+              "name": "Keough (LLC)",
+              "balance": 8900,
+              "annualContribution": 0,
+              "match": 0,
+              "type": "401k"
+            },
+            {
+              "id": "1763347918602",
+              "owner": "person2",
+              "name": "Best Case Settlement",
+              "balance": 368000,
+              "annualContribution": 0,
+              "match": 0,
+              "type": "IRA"
+            }
+          ],
+          "investmentAccounts": [
+            {
+              "id": "1",
+              "owner": "person1",
+              "name": "Schwab",
+              "balance": 660000,
+              "annualContribution": 0
+            },
+            {
+              "id": "1763347948243",
+              "owner": "person1",
+              "name": "LPL",
+              "balance": 89000,
+              "annualContribution": 0
+            },
+            {
+              "id": "1763347956214",
+              "owner": "person1",
+              "name": "LPL",
+              "balance": 0,
+              "annualContribution": 0
+            }
+          ],
+          "pensions": [
+            {
+              "id": "1763347961921",
+              "owner": "person1",
+              "name": "SCERS",
+              "monthlyBenefit": 4500,
+              "startAge": 62,
+              "cola": 2,
+              "survivorBenefit": 60,
+              "taxable": true
+            },
+            {
+              "id": "1763347997515",
+              "owner": "person1",
+              "name": "UC",
+              "monthlyBenefit": 290,
+              "startAge": 60,
+              "cola": 2,
+              "survivorBenefit": 0,
+              "taxable": true
+            },
+            {
+              "id": "1763348013778",
+              "owner": "person1",
+              "name": "VA",
+              "monthlyBenefit": 180,
+              "startAge": 60,
+              "cola": 2,
+              "survivorBenefit": 0,
+              "taxable": false
+            },
+            {
+              "id": "1763348037943",
+              "owner": "person1",
+              "name": "Marshall",
+              "monthlyBenefit": 990,
+              "startAge": 65,
+              "cola": 0,
+              "survivorBenefit": 0,
+              "taxable": true
+            }
+          ],
+          "otherIncomes": [
+            {
+              "id": "1763348046972",
+              "owner": "person2",
+              "name": "Pre-license",
+              "monthlyAmount": 5300,
+              "startAge": 57,
+              "endAge": 58,
+              "cola": 0,
+              "taxable": true
+            },
+            {
+              "id": "1763348065844",
+              "owner": "person2",
+              "name": "Best Case Licensed",
+              "monthlyAmount": 9600,
+              "startAge": 59,
+              "endAge": 60,
+              "cola": 0,
+              "taxable": true
+            },
+            {
+              "id": "1763348099746",
+              "owner": "person2",
+              "name": "Licensed AZ+",
+              "monthlyAmount": 5000,
+              "startAge": 61,
+              "endAge": 64,
+              "cola": 0,
+              "taxable": true
+            },
+            {
+              "id": "1763348120249",
+              "owner": "person2",
+              "name": "Alimony",
+              "monthlyAmount": 4000,
+              "startAge": 57,
+              "endAge": 67,
+              "cola": 0,
+              "taxable": false
+            }
+          ],
+          "expensePeriods": [
+            {
+              "id": "1",
+              "name": "AZ",
+              "monthlyAmount": 10000,
+              "startAge": 62,
+              "startAgeRef": "person1",
+              "endAge": 64,
+              "endAgeRef": "person1"
+            },
+            {
+              "id": "1763348157053",
+              "name": "Thailand",
+              "monthlyAmount": 6000,
+              "startAge": 65,
+              "startAgeRef": "person1",
+              "endAge": 75,
+              "endAgeRef": "person1"
+            },
+            {
+              "id": "1763348182627",
+              "name": "Later Years",
+              "monthlyAmount": 11000,
+              "startAge": 76,
+              "startAgeRef": "person1",
+              "endAge": 92,
+              "endAgeRef": "person2"
+            }
+          ],
+          "socialSecurity": {
+            "person1EstimatedBenefit": 4661.3832,
+            "person2EstimatedBenefit": 3324.3408
+          },
+          "state": "AZ",
+          "inflationRate": 2.5,
+          "avgReturn": 7,
+          "annualWithdrawalRate": 5,
+          "dieWithZero": false,
+          "legacyAmount": 100000,
+          "useFatTails": true
+        }
+      },
+      "scenario-1763348269904": {
+        "id": "scenario-1763348269904",
+        "name": "Average",
+        "plan": {
+          "planType": "Couple",
+          "person1": {
+            "name": "Eddie",
+            "currentAge": 60,
+            "retirementAge": 62,
+            "lifeExpectancy": 90,
+            "currentSalary": 150000,
+            "claimingAge": 70
+          },
+          "person2": {
+            "name": "Lara",
+            "currentAge": 57,
+            "retirementAge": 63,
+            "lifeExpectancy": 92,
+            "currentSalary": 75000,
+            "claimingAge": 70
+          },
+          "retirementAccounts": [
+            {
+              "id": "1",
+              "owner": "person1",
+              "name": "Fidelity 457",
+              "balance": 215000,
+              "annualContribution": 2800,
+              "match": 4,
+              "type": "457b"
+            },
+            {
+              "id": "1763347613590",
+              "owner": "person1",
+              "name": "Fidelity Roth",
+              "balance": 91000,
+              "annualContribution": 0,
+              "match": 0,
+              "type": "Roth IRA"
+            },
+            {
+              "id": "1763347622597",
+              "owner": "person2",
+              "name": "IRA Rollover",
+              "balance": 200000,
+              "annualContribution": 0,
+              "match": 0,
+              "type": "IRA"
+            },
+            {
+              "id": "1763347646554",
+              "owner": "person2",
+              "name": "403b",
+              "balance": 35000,
+              "annualContribution": 0,
+              "match": 0,
+              "type": "401k"
+            },
+            {
+              "id": "1763347800188",
+              "owner": "person2",
+              "name": "SEP IRA ",
+              "balance": 4300,
+              "annualContribution": 0,
+              "match": 0,
+              "type": "IRA"
+            },
+            {
+              "id": "1763347815331",
+              "owner": "person2",
+              "name": "SEP Pension",
+              "balance": 77000,
+              "annualContribution": 0,
+              "match": 0,
+              "type": "IRA"
+            },
+            {
+              "id": "1763347828956",
+              "owner": "person2",
+              "name": "Roth",
+              "balance": 1900,
+              "annualContribution": 0,
+              "match": 0,
+              "type": "Roth IRA"
+            },
+            {
+              "id": "1763347869197",
+              "owner": "person2",
+              "name": "Keough (LLC)",
+              "balance": 8900,
+              "annualContribution": 0,
+              "match": 0,
+              "type": "401k"
+            },
+            {
+              "id": "1763347918602",
+              "owner": "person2",
+              "name": "Best Case Settlement",
+              "balance": 368000,
+              "annualContribution": 0,
+              "match": 0,
+              "type": "IRA"
+            }
+          ],
+          "investmentAccounts": [
+            {
+              "id": "1",
+              "owner": "person1",
+              "name": "Schwab",
+              "balance": 660000,
+              "annualContribution": 0
+            },
+            {
+              "id": "1763347948243",
+              "owner": "person1",
+              "name": "LPL",
+              "balance": 89000,
+              "annualContribution": 0
+            },
+            {
+              "id": "1763347956214",
+              "owner": "person1",
+              "name": "LPL",
+              "balance": 0,
+              "annualContribution": 0
+            }
+          ],
+          "pensions": [
+            {
+              "id": "1763347961921",
+              "owner": "person1",
+              "name": "SCERS",
+              "monthlyBenefit": 4500,
+              "startAge": 62,
+              "cola": 2,
+              "survivorBenefit": 60,
+              "taxable": true
+            },
+            {
+              "id": "1763347997515",
+              "owner": "person1",
+              "name": "UC",
+              "monthlyBenefit": 290,
+              "startAge": 60,
+              "cola": 2,
+              "survivorBenefit": 0,
+              "taxable": true
+            },
+            {
+              "id": "1763348013778",
+              "owner": "person1",
+              "name": "VA",
+              "monthlyBenefit": 180,
+              "startAge": 60,
+              "cola": 2,
+              "survivorBenefit": 0,
+              "taxable": false
+            },
+            {
+              "id": "1763348037943",
+              "owner": "person1",
+              "name": "Marshall",
+              "monthlyBenefit": 990,
+              "startAge": 65,
+              "cola": 0,
+              "survivorBenefit": 0,
+              "taxable": true
+            }
+          ],
+          "otherIncomes": [
+            {
+              "id": "1763348046972",
+              "owner": "person2",
+              "name": "Pre-license",
+              "monthlyAmount": 5300,
+              "startAge": 57,
+              "endAge": 58,
+              "cola": 0,
+              "taxable": true
+            },
+            {
+              "id": "1763348065844",
+              "owner": "person2",
+              "name": "Best Case Licensed",
+              "monthlyAmount": 9600,
+              "startAge": 59,
+              "endAge": 60,
+              "cola": 0,
+              "taxable": true
+            },
+            {
+              "id": "1763348099746",
+              "owner": "person2",
+              "name": "Licensed AZ+",
+              "monthlyAmount": 5000,
+              "startAge": 61,
+              "endAge": 64,
+              "cola": 0,
+              "taxable": true
+            },
+            {
+              "id": "1763348120249",
+              "owner": "person2",
+              "name": "Alimony",
+              "monthlyAmount": 4000,
+              "startAge": 57,
+              "endAge": 67,
+              "cola": 0,
+              "taxable": false
+            }
+          ],
+          "expensePeriods": [
+            {
+              "id": "1",
+              "name": "AZ",
+              "monthlyAmount": 10000,
+              "startAge": 62,
+              "startAgeRef": "person1",
+              "endAge": 64,
+              "endAgeRef": "person1"
+            },
+            {
+              "id": "1763348157053",
+              "name": "Thailand",
+              "monthlyAmount": 6000,
+              "startAge": 65,
+              "startAgeRef": "person1",
+              "endAge": 75,
+              "endAgeRef": "person1"
+            },
+            {
+              "id": "1763348182627",
+              "name": "Later Years",
+              "monthlyAmount": 11000,
+              "startAge": 76,
+              "startAgeRef": "person1",
+              "endAge": 92,
+              "endAgeRef": "person2"
+            }
+          ],
+          "socialSecurity": {
+            "person1EstimatedBenefit": 4661.3832,
+            "person2EstimatedBenefit": 3324.3408
+          },
+          "state": "AZ",
+          "inflationRate": 2.5,
+          "avgReturn": 6,
+          "annualWithdrawalRate": 5,
+          "dieWithZero": false,
+          "legacyAmount": 0
+        }
+      },
+      "scenario-1763348284804": {
+        "id": "scenario-1763348284804",
+        "name": "Pessimistic",
+        "plan": {
+          "planType": "Couple",
+          "person1": {
+            "name": "Eddie",
+            "currentAge": 60,
+            "retirementAge": 62,
+            "lifeExpectancy": 90,
+            "currentSalary": 150000,
+            "claimingAge": 70
+          },
+          "person2": {
+            "name": "Lara",
+            "currentAge": 57,
+            "retirementAge": 63,
+            "lifeExpectancy": 92,
+            "currentSalary": 75000,
+            "claimingAge": 70
+          },
+          "retirementAccounts": [
+            {
+              "id": "1",
+              "owner": "person1",
+              "name": "Fidelity 457",
+              "balance": 215000,
+              "annualContribution": 2800,
+              "match": 4,
+              "type": "457b"
+            },
+            {
+              "id": "1763347613590",
+              "owner": "person1",
+              "name": "Fidelity Roth",
+              "balance": 91000,
+              "annualContribution": 0,
+              "match": 0,
+              "type": "Roth IRA"
+            },
+            {
+              "id": "1763347622597",
+              "owner": "person2",
+              "name": "IRA Rollover",
+              "balance": 200000,
+              "annualContribution": 0,
+              "match": 0,
+              "type": "IRA"
+            },
+            {
+              "id": "1763347646554",
+              "owner": "person2",
+              "name": "403b",
+              "balance": 35000,
+              "annualContribution": 0,
+              "match": 0,
+              "type": "401k"
+            },
+            {
+              "id": "1763347800188",
+              "owner": "person2",
+              "name": "SEP IRA ",
+              "balance": 4300,
+              "annualContribution": 0,
+              "match": 0,
+              "type": "IRA"
+            },
+            {
+              "id": "1763347815331",
+              "owner": "person2",
+              "name": "SEP Pension",
+              "balance": 77000,
+              "annualContribution": 0,
+              "match": 0,
+              "type": "IRA"
+            },
+            {
+              "id": "1763347828956",
+              "owner": "person2",
+              "name": "Roth",
+              "balance": 1900,
+              "annualContribution": 0,
+              "match": 0,
+              "type": "Roth IRA"
+            },
+            {
+              "id": "1763347869197",
+              "owner": "person2",
+              "name": "Keough (LLC)",
+              "balance": 8900,
+              "annualContribution": 0,
+              "match": 0,
+              "type": "401k"
+            },
+            {
+              "id": "1763347918602",
+              "owner": "person2",
+              "name": "Best Case Settlement",
+              "balance": 368000,
+              "annualContribution": 0,
+              "match": 0,
+              "type": "IRA"
+            }
+          ],
+          "investmentAccounts": [
+            {
+              "id": "1",
+              "owner": "person1",
+              "name": "Schwab",
+              "balance": 660000,
+              "annualContribution": 0
+            },
+            {
+              "id": "1763347948243",
+              "owner": "person1",
+              "name": "LPL",
+              "balance": 89000,
+              "annualContribution": 0
+            },
+            {
+              "id": "1763347956214",
+              "owner": "person1",
+              "name": "LPL",
+              "balance": 0,
+              "annualContribution": 0
+            }
+          ],
+          "pensions": [
+            {
+              "id": "1763347961921",
+              "owner": "person1",
+              "name": "SCERS",
+              "monthlyBenefit": 4500,
+              "startAge": 62,
+              "cola": 2,
+              "survivorBenefit": 60,
+              "taxable": true
+            },
+            {
+              "id": "1763347997515",
+              "owner": "person1",
+              "name": "UC",
+              "monthlyBenefit": 290,
+              "startAge": 60,
+              "cola": 2,
+              "survivorBenefit": 0,
+              "taxable": true
+            },
+            {
+              "id": "1763348013778",
+              "owner": "person1",
+              "name": "VA",
+              "monthlyBenefit": 180,
+              "startAge": 60,
+              "cola": 2,
+              "survivorBenefit": 0,
+              "taxable": false
+            },
+            {
+              "id": "1763348037943",
+              "owner": "person1",
+              "name": "Marshall",
+              "monthlyBenefit": 990,
+              "startAge": 65,
+              "cola": 0,
+              "survivorBenefit": 0,
+              "taxable": true
+            }
+          ],
+          "otherIncomes": [
+            {
+              "id": "1763348046972",
+              "owner": "person2",
+              "name": "Pre-license",
+              "monthlyAmount": 5300,
+              "startAge": 57,
+              "endAge": 58,
+              "cola": 0,
+              "taxable": true
+            },
+            {
+              "id": "1763348065844",
+              "owner": "person2",
+              "name": "Best Case Licensed",
+              "monthlyAmount": 9600,
+              "startAge": 59,
+              "endAge": 60,
+              "cola": 0,
+              "taxable": true
+            },
+            {
+              "id": "1763348099746",
+              "owner": "person2",
+              "name": "Licensed AZ+",
+              "monthlyAmount": 5000,
+              "startAge": 61,
+              "endAge": 64,
+              "cola": 0,
+              "taxable": true
+            },
+            {
+              "id": "1763348120249",
+              "owner": "person2",
+              "name": "Alimony",
+              "monthlyAmount": 4000,
+              "startAge": 57,
+              "endAge": 67,
+              "cola": 0,
+              "taxable": false
+            }
+          ],
+          "expensePeriods": [
+            {
+              "id": "1",
+              "name": "AZ",
+              "monthlyAmount": 10000,
+              "startAge": 62,
+              "startAgeRef": "person1",
+              "endAge": 64,
+              "endAgeRef": "person1"
+            },
+            {
+              "id": "1763348157053",
+              "name": "Thailand",
+              "monthlyAmount": 6000,
+              "startAge": 65,
+              "startAgeRef": "person1",
+              "endAge": 75,
+              "endAgeRef": "person1"
+            },
+            {
+              "id": "1763348182627",
+              "name": "Later Years",
+              "monthlyAmount": 11000,
+              "startAge": 76,
+              "startAgeRef": "person1",
+              "endAge": 92,
+              "endAgeRef": "person2"
+            }
+          ],
+          "socialSecurity": {
+            "person1EstimatedBenefit": 4661.3832,
+            "person2EstimatedBenefit": 3324.3408
+          },
+          "state": "AZ",
+          "inflationRate": 2.5,
+          "avgReturn": 5,
+          "annualWithdrawalRate": 5,
+          "dieWithZero": false,
+          "legacyAmount": 0
+        }
+      },
+      "scenario-1763348458192": {
+        "id": "scenario-1763348458192",
+        "name": "Average Increased Alimony",
+        "plan": {
+          "planType": "Couple",
+          "person1": {
+            "name": "Eddie",
+            "currentAge": 60,
+            "retirementAge": 62,
+            "lifeExpectancy": 90,
+            "currentSalary": 150000,
+            "claimingAge": 70
+          },
+          "person2": {
+            "name": "Lara",
+            "currentAge": 57,
+            "retirementAge": 63,
+            "lifeExpectancy": 92,
+            "currentSalary": 75000,
+            "claimingAge": 70
+          },
+          "retirementAccounts": [
+            {
+              "id": "1",
+              "owner": "person1",
+              "name": "Fidelity 457",
+              "balance": 215000,
+              "annualContribution": 2800,
+              "match": 4,
+              "type": "457b"
+            },
+            {
+              "id": "1763347613590",
+              "owner": "person1",
+              "name": "Fidelity Roth",
+              "balance": 91000,
+              "annualContribution": 0,
+              "match": 0,
+              "type": "Roth IRA"
+            },
+            {
+              "id": "1763347622597",
+              "owner": "person2",
+              "name": "IRA Rollover",
+              "balance": 200000,
+              "annualContribution": 0,
+              "match": 0,
+              "type": "IRA"
+            },
+            {
+              "id": "1763347646554",
+              "owner": "person2",
+              "name": "403b",
+              "balance": 35000,
+              "annualContribution": 0,
+              "match": 0,
+              "type": "401k"
+            },
+            {
+              "id": "1763347800188",
+              "owner": "person2",
+              "name": "SEP IRA ",
+              "balance": 4300,
+              "annualContribution": 0,
+              "match": 0,
+              "type": "IRA"
+            },
+            {
+              "id": "1763347815331",
+              "owner": "person2",
+              "name": "SEP Pension",
+              "balance": 77000,
+              "annualContribution": 0,
+              "match": 0,
+              "type": "IRA"
+            },
+            {
+              "id": "1763347828956",
+              "owner": "person2",
+              "name": "Roth",
+              "balance": 1900,
+              "annualContribution": 0,
+              "match": 0,
+              "type": "Roth IRA"
+            },
+            {
+              "id": "1763347869197",
+              "owner": "person2",
+              "name": "Keough (LLC)",
+              "balance": 8900,
+              "annualContribution": 0,
+              "match": 0,
+              "type": "401k"
+            },
+            {
+              "id": "1763347918602",
+              "owner": "person2",
+              "name": "Best Case Settlement",
+              "balance": 368000,
+              "annualContribution": 0,
+              "match": 0,
+              "type": "IRA"
+            }
+          ],
+          "investmentAccounts": [
+            {
+              "id": "1",
+              "owner": "person1",
+              "name": "Schwab",
+              "balance": 660000,
+              "annualContribution": 0
+            },
+            {
+              "id": "1763347948243",
+              "owner": "person1",
+              "name": "LPL",
+              "balance": 89000,
+              "annualContribution": 0
+            },
+            {
+              "id": "1763347956214",
+              "owner": "person1",
+              "name": "LPL",
+              "balance": 0,
+              "annualContribution": 0
+            }
+          ],
+          "pensions": [
+            {
+              "id": "1763347961921",
+              "owner": "person1",
+              "name": "SCERS",
+              "monthlyBenefit": 4500,
+              "startAge": 62,
+              "cola": 2,
+              "survivorBenefit": 60,
+              "taxable": true
+            },
+            {
+              "id": "1763347997515",
+              "owner": "person1",
+              "name": "UC",
+              "monthlyBenefit": 290,
+              "startAge": 60,
+              "cola": 2,
+              "survivorBenefit": 0,
+              "taxable": true
+            },
+            {
+              "id": "1763348013778",
+              "owner": "person1",
+              "name": "VA",
+              "monthlyBenefit": 180,
+              "startAge": 60,
+              "cola": 2,
+              "survivorBenefit": 0,
+              "taxable": false
+            },
+            {
+              "id": "1763348037943",
+              "owner": "person1",
+              "name": "Marshall",
+              "monthlyBenefit": 990,
+              "startAge": 65,
+              "cola": 0,
+              "survivorBenefit": 0,
+              "taxable": true
+            }
+          ],
+          "otherIncomes": [
+            {
+              "id": "1763348046972",
+              "owner": "person2",
+              "name": "Pre-license",
+              "monthlyAmount": 5300,
+              "startAge": 57,
+              "endAge": 58,
+              "cola": 0,
+              "taxable": true
+            },
+            {
+              "id": "1763348065844",
+              "owner": "person2",
+              "name": "Best Case Licensed",
+              "monthlyAmount": 9600,
+              "startAge": 59,
+              "endAge": 60,
+              "cola": 0,
+              "taxable": true
+            },
+            {
+              "id": "1763348099746",
+              "owner": "person2",
+              "name": "Licensed AZ+",
+              "monthlyAmount": 5000,
+              "startAge": 61,
+              "endAge": 64,
+              "cola": 0,
+              "taxable": true
+            },
+            {
+              "id": "1763348120249",
+              "owner": "person2",
+              "name": "Alimony",
+              "monthlyAmount": 4500,
+              "startAge": 57,
+              "endAge": 67,
+              "cola": 0,
+              "taxable": false
+            }
+          ],
+          "expensePeriods": [
+            {
+              "id": "1",
+              "name": "AZ",
+              "monthlyAmount": 10000,
+              "startAge": 62,
+              "startAgeRef": "person1",
+              "endAge": 64,
+              "endAgeRef": "person1"
+            },
+            {
+              "id": "1763348157053",
+              "name": "Thailand",
+              "monthlyAmount": 6000,
+              "startAge": 65,
+              "startAgeRef": "person1",
+              "endAge": 75,
+              "endAgeRef": "person1"
+            },
+            {
+              "id": "1763348182627",
+              "name": "Later Years",
+              "monthlyAmount": 11000,
+              "startAge": 76,
+              "startAgeRef": "person1",
+              "endAge": 92,
+              "endAgeRef": "person2"
+            }
+          ],
+          "socialSecurity": {
+            "person1EstimatedBenefit": 4661.3832,
+            "person2EstimatedBenefit": 3324.3408
+          },
+          "state": "AZ",
+          "inflationRate": 2.5,
+          "avgReturn": 6,
+          "annualWithdrawalRate": 5,
+          "dieWithZero": false,
+          "legacyAmount": 0
+        }
+      },
+      "scenario-1763348674799": {
+        "id": "scenario-1763348674799",
+        "name": "Average Partial Buyout",
+        "plan": {
+          "planType": "Couple",
+          "person1": {
+            "name": "Eddie",
+            "currentAge": 60,
+            "retirementAge": 62,
+            "lifeExpectancy": 90,
+            "currentSalary": 150000,
+            "claimingAge": 70
+          },
+          "person2": {
+            "name": "Lara",
+            "currentAge": 57,
+            "retirementAge": 63,
+            "lifeExpectancy": 92,
+            "currentSalary": 75000,
+            "claimingAge": 70
+          },
+          "retirementAccounts": [
+            {
+              "id": "1",
+              "owner": "person1",
+              "name": "Fidelity 457",
+              "balance": 215000,
+              "annualContribution": 2800,
+              "match": 4,
+              "type": "457b"
+            },
+            {
+              "id": "1763347613590",
+              "owner": "person1",
+              "name": "Fidelity Roth",
+              "balance": 91000,
+              "annualContribution": 0,
+              "match": 0,
+              "type": "Roth IRA"
+            },
+            {
+              "id": "1763347622597",
+              "owner": "person2",
+              "name": "IRA Rollover",
+              "balance": 200000,
+              "annualContribution": 0,
+              "match": 0,
+              "type": "IRA"
+            },
+            {
+              "id": "1763347646554",
+              "owner": "person2",
+              "name": "403b",
+              "balance": 35000,
+              "annualContribution": 0,
+              "match": 0,
+              "type": "401k"
+            },
+            {
+              "id": "1763347800188",
+              "owner": "person2",
+              "name": "SEP IRA ",
+              "balance": 4300,
+              "annualContribution": 0,
+              "match": 0,
+              "type": "IRA"
+            },
+            {
+              "id": "1763347815331",
+              "owner": "person2",
+              "name": "SEP Pension",
+              "balance": 77000,
+              "annualContribution": 0,
+              "match": 0,
+              "type": "IRA"
+            },
+            {
+              "id": "1763347828956",
+              "owner": "person2",
+              "name": "Roth",
+              "balance": 1900,
+              "annualContribution": 0,
+              "match": 0,
+              "type": "Roth IRA"
+            },
+            {
+              "id": "1763347869197",
+              "owner": "person2",
+              "name": "Keough (LLC)",
+              "balance": 8900,
+              "annualContribution": 0,
+              "match": 0,
+              "type": "401k"
+            },
+            {
+              "id": "1763347918602",
+              "owner": "person2",
+              "name": "Best Case Settlement",
+              "balance": 368000,
+              "annualContribution": 0,
+              "match": 0,
+              "type": "IRA"
+            },
+            {
+              "id": "1763348707398",
+              "owner": "person2",
+              "name": "Rollover IRA",
+              "balance": 180000,
+              "annualContribution": 0,
+              "match": 0,
+              "type": "IRA"
+            }
+          ],
+          "investmentAccounts": [
+            {
+              "id": "1",
+              "owner": "person1",
+              "name": "Schwab",
+              "balance": 660000,
+              "annualContribution": 0
+            },
+            {
+              "id": "1763347948243",
+              "owner": "person1",
+              "name": "LPL",
+              "balance": 89000,
+              "annualContribution": 0
+            },
+            {
+              "id": "1763347956214",
+              "owner": "person2",
+              "name": "Buyout",
+              "balance": 257000,
+              "annualContribution": 0
+            }
+          ],
+          "pensions": [
+            {
+              "id": "1763347961921",
+              "owner": "person1",
+              "name": "SCERS",
+              "monthlyBenefit": 4500,
+              "startAge": 62,
+              "cola": 2,
+              "survivorBenefit": 60,
+              "taxable": true
+            },
+            {
+              "id": "1763347997515",
+              "owner": "person1",
+              "name": "UC",
+              "monthlyBenefit": 290,
+              "startAge": 60,
+              "cola": 2,
+              "survivorBenefit": 0,
+              "taxable": true
+            },
+            {
+              "id": "1763348013778",
+              "owner": "person1",
+              "name": "VA",
+              "monthlyBenefit": 180,
+              "startAge": 60,
+              "cola": 2,
+              "survivorBenefit": 0,
+              "taxable": false
+            },
+            {
+              "id": "1763348037943",
+              "owner": "person1",
+              "name": "Marshall",
+              "monthlyBenefit": 990,
+              "startAge": 65,
+              "cola": 0,
+              "survivorBenefit": 0,
+              "taxable": true
+            }
+          ],
+          "otherIncomes": [
+            {
+              "id": "1763348046972",
+              "owner": "person2",
+              "name": "Pre-license",
+              "monthlyAmount": 5300,
+              "startAge": 57,
+              "endAge": 58,
+              "cola": 0,
+              "taxable": true
+            },
+            {
+              "id": "1763348065844",
+              "owner": "person2",
+              "name": "Best Case Licensed",
+              "monthlyAmount": 9600,
+              "startAge": 59,
+              "endAge": 60,
+              "cola": 0,
+              "taxable": true
+            },
+            {
+              "id": "1763348099746",
+              "owner": "person2",
+              "name": "Licensed AZ+",
+              "monthlyAmount": 5000,
+              "startAge": 61,
+              "endAge": 64,
+              "cola": 0,
+              "taxable": true
+            },
+            {
+              "id": "1763348120249",
+              "owner": "person2",
+              "name": "Alimony",
+              "monthlyAmount": 4500,
+              "startAge": 57,
+              "endAge": 59,
+              "cola": 0,
+              "taxable": false
+            }
+          ],
+          "expensePeriods": [
+            {
+              "id": "1",
+              "name": "AZ",
+              "monthlyAmount": 10000,
+              "startAge": 62,
+              "startAgeRef": "person1",
+              "endAge": 64,
+              "endAgeRef": "person1"
+            },
+            {
+              "id": "1763348157053",
+              "name": "Thailand",
+              "monthlyAmount": 6000,
+              "startAge": 65,
+              "startAgeRef": "person1",
+              "endAge": 75,
+              "endAgeRef": "person1"
+            },
+            {
+              "id": "1763348182627",
+              "name": "Later Years",
+              "monthlyAmount": 11000,
+              "startAge": 76,
+              "startAgeRef": "person1",
+              "endAge": 92,
+              "endAgeRef": "person2"
+            }
+          ],
+          "socialSecurity": {
+            "person1EstimatedBenefit": 4661.3832,
+            "person2EstimatedBenefit": 3324.3408
+          },
+          "state": "AZ",
+          "inflationRate": 2.5,
+          "avgReturn": 6,
+          "annualWithdrawalRate": 5,
+          "dieWithZero": false,
+          "legacyAmount": 0
+        }
+      }
+    },
+    "activeScenarioId": "scenario-1763348284804"
+  },
+  "appSettings": {
+    "assetAssumptionDefaults": {
+      "stockMean": 8,
+      "stockStd": 15,
+      "bondMean": 3,
+      "bondStd": 6,
+      "useFatTails": true,
+      "fatTailDf": 4
+    }
+  }
+}
