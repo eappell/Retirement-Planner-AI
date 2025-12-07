@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 interface UserManualModalProps {
     isOpen: boolean;
     onClose: () => void;
+    openDisclaimer?: () => void;
 }
 
 const manualContent = [
@@ -14,11 +15,11 @@ const manualContent = [
             <>
                 <p>This panel shows the high-level results of your retirement projection. All values are automatically updated as you change your plan.</p>
                 <ul>
-                    <li><strong>Avg. Monthly Net Income:</strong> Your estimated after-tax monthly income in retirement, shown in today's dollars to reflect purchasing power.</li>
-                    <li><strong>Final Net Worth (Today's $):</strong> The projected value of all your assets at the end of the plan, also in today's dollars.</li>
                     <li><strong>Tax Rates:</strong> Your average effective federal and state tax rates during retirement.</li>
+                    <li><strong>Timing:</strong> Most model events (contributions, withdrawals, income payments) are applied on an annual basis at a deterministic point in the year rather than continuously.</li>
+                    <li><strong>Survivor handling:</strong> If you enable plan-level options that allow deceased spouse balances to fund survivor income, the planner models a simplified transfer of account ownership so the survivor can access balances; this is a practical approximation and may not reflect the exact legal/tax treatment in all cases.</li>
                 </ul>
-                <p className="mt-3 p-2 bg-indigo-50 border-l-4 border-indigo-400 rounded-r-md"><strong>Tip:</strong> After you make any change to your plan, glance up at these indicators to see the immediate impact on your retirement outlook!</p>
+                <p className="mt-3 p-2 bg-indigo-50 border-l-4 border-indigo-400 rounded-r-md"><strong>Note:</strong> These assumptions are intended to make the tool practical for high-level planning. They trade some realism and regulatory detail for clarity and speed—consult a qualified professional for decisions that require precise tax, legal, or actuarial treatment.</p>
             </>
         )
     },
@@ -56,12 +57,26 @@ const manualContent = [
         icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2z" /></svg>,
         content: (
             <>
-                <p>Manage your investment and retirement accounts here.</p>
-                <ul>
-                    <li><strong>Retirement Accounts:</strong> Add 401(k), 457(b), IRA, Roth IRA, or other tax-advantaged accounts. Provide balance, annual contributions, and employer match.</li>
-                    <li><strong>Investment Accounts:</strong> Taxable brokerage and other investment accounts. Track balances and contributions separately from retirement accounts.</li>
-                </ul>
-                <p className="mt-3 p-2 bg-indigo-50 border-l-4 border-indigo-400 rounded-r-md"><strong>Tip:</strong> Use the tabbed Accounts view to keep tax-advantaged and taxable accounts organized and to add accounts directly to the active tab.</p>
+                <p>Manage your investment and retirement accounts in the tabbed Accounts section.</p>
+                <h4 className="font-semibold mt-2">Quick steps</h4>
+                <ol className="list-decimal list-inside ml-4">
+                    <li>Select the tab for the account type (Retirement / Investment / HSA).</li>
+                    <li>Click the <strong>+ Add</strong> button to create a new account — the primary input will be focused for immediate editing.</li>
+                    <li>Fill in `Name`, `Owner`, `Balance`, and `Annual Contribution`. For employer plans, add `Match` if applicable.</li>
+                    <li>Repeat for each account. Use the action icons to duplicate or remove accounts.</li>
+                </ol>
+                <div className="mt-3">
+                    <h5 className="font-semibold">Bulk update behavior</h5>
+                    <p>The header-level <strong>Update All Scenarios</strong> button copies the active tab's account list to other scenarios while preserving HSAs or non-HSA accounts as appropriate. This avoids accidentally overwriting unrelated account types.</p>
+                    <div className="mt-2">
+                        <img src="/manual-screens/accounts.png" alt="Accounts Tab" className="w-full max-h-36 object-contain border rounded" />
+                    </div>
+                    <div className="mt-2">
+                        <h5 className="font-medium text-sm mt-2">Investment Accounts (example)</h5>
+                        <img src="/manual-screens/investments.png" alt="Investment Accounts" className="w-full max-h-24 object-contain border rounded mt-1" />
+                    </div>
+                </div>
+                <p className="mt-3 p-2 bg-indigo-50 border-l-4 border-indigo-400 rounded-r-md"><strong>Tip:</strong> Keep HSAs separated from other retirement accounts to maintain correct tax treatment in projections.</p>
             </>
         )
     },
@@ -78,12 +93,25 @@ const manualContent = [
         content: (
             <>
                 <p>The Income section is tabbed so you can manage different income types separately.</p>
-                <ul>
-                    <li><strong>Pensions:</strong> Add employer or government pensions with monthly benefits, COLA, and survivor options.</li>
-                    <li><strong>Annuities:</strong> Add annuity contracts that pay regular monthly amounts. Use the Annuities tab to track start age, COLA and taxable status.</li>
-                    <li><strong>Other Incomes:</strong> Add any additional recurring income (rental income, part-time work, etc.).</li>
-                </ul>
-                <p className="mt-3 p-2 bg-indigo-50 border-l-4 border-indigo-400 rounded-r-md"><strong>Tip:</strong> Add each income source in its corresponding tab to keep projections accurate and easier to review.</p>
+                <h4 className="font-semibold mt-2">Pensions (Step-by-step)</h4>
+                <ol className="list-decimal list-inside ml-4">
+                    <li>Open the <strong>Pensions</strong> tab.</li>
+                    <li>Click <strong>+ Add Pension</strong> and provide a name and owner.</li>
+                    <li>Choose <em>Monthly</em> or <em>Lump</em> payout and enter the amount.</li>
+                    <li>Set <em>Start Age</em>, <em>COLA</em>, and <em>Survivor %</em> (if applicable).</li>
+                </ol>
+                <div className="mt-2">
+                    <img src="/manual-screens/pensions.png" alt="Pensions" className="w-full max-h-36 object-contain border rounded" />
+                </div>
+
+                <h4 className="font-semibold mt-3">Annuities & Other</h4>
+                <p>Use the <strong>Annuities</strong> and <strong>Other Incomes</strong> tabs for purchased income products and irregular or rental income. Each item supports start/end ages and COLA.</p>
+
+                <div className="mt-2">
+                    <img src="/manual-screens/annuities.png" alt="Annuities" className="w-full max-h-36 object-contain border rounded" />
+                </div>
+
+                <p className="mt-3 p-2 bg-indigo-50 border-l-4 border-indigo-400 rounded-r-md"><strong>Tip:</strong> Use the header-level <strong>Update All Scenarios</strong> to copy only the active income tab to other scenarios.</p>
             </>
         )
     },
@@ -99,6 +127,9 @@ const manualContent = [
                     <li><strong>Start/End Ages:</strong> Assign start and end ages for each period; the planner will apply the monthly expenses during those ages.</li>
                 </ul>
                 <p className="mt-3 p-2 bg-indigo-50 border-l-4 border-indigo-400 rounded-r-md"><strong>Tip:</strong> Stagger expense periods to reflect lifestyle changes (higher spending early in retirement, lower later).</p>
+                <div className="mt-3">
+                    <img src="/manual-screens/expenseperiods.png" alt="Expense Periods" className="w-full max-h-36 object-contain border rounded" />
+                </div>
             </>
         )
     },
@@ -138,22 +169,22 @@ const manualContent = [
         icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" /></svg>,
         content: (
             <>
-                <p>The Scenario Manager allows you to create and compare different retirement plans. You can access it via the "Scenarios" button in the top header.</p>
-                <ul>
-                    <li><strong>Current Scenario:</strong> Use the dropdown to switch between your saved scenarios.</li>
-                    <li><strong>Scenario Name:</strong> Edit the name of the currently selected scenario.</li>
-                    <li><strong>New:</strong> Creates a brand new, blank scenario with default values.</li>
-                    <li><strong>Copy:</strong> Creates an exact duplicate of the current scenario, allowing you to tweak it without starting over.</li>
-                    <li><strong>Delete:</strong> Removes the current scenario. You cannot delete the last remaining scenario.</li>
-                </ul>
-                <p className="mt-3 p-2 bg-yellow-50 border-l-4 border-yellow-400 rounded-r-md"><strong>Important:</strong> All your scenarios are saved in your browser's local storage. This data can be lost if you clear your cache. Always use the Backup feature to save your work!</p>
-                <h4 className="font-bold mt-4 mb-2">Backup & Restore</h4>
-                <p>This feature allows you to save all of your scenarios to a file and load them back later. This is useful for moving your plans to a different computer or browser, or just for keeping a safe backup.</p>
-                <ul>
-                    <li><strong>Download Scenarios:</strong> Saves a file named <code>retirement_scenarios.retire</code> containing all scenarios and current data.</li>
-                    <li><strong>Upload Scenarios:</strong> Opens a file prompt — choose a previously downloaded <code>.retire</code> file to restore your scenarios.</li>
-                </ul>
-                <p className="mt-3 p-2 bg-red-50 border-l-4 border-red-400 rounded-r-md"><strong>Warning:</strong> Uploading a scenarios file will completely overwrite all scenarios currently in the application. This action cannot be undone. Always keep a copy of important files.</p>
+                <p>The Scenario Manager (top header) helps you create, copy, rename, and delete scenarios for side-by-side comparisons.</p>
+                <h4 className="font-semibold mt-2">Common tasks</h4>
+                <ol className="list-decimal list-inside ml-4">
+                    <li><strong>New:</strong> Start a fresh scenario with defaults.</li>
+                    <li><strong>Copy:</strong> Duplicate the current scenario to experiment safely.</li>
+                    <li><strong>Rename:</strong> Click the scenario name to edit it.</li>
+                    <li><strong>Delete:</strong> Remove a scenario (disabled if it's the last one).</li>
+                </ol>
+                <div className="mt-3">
+                    <h5 className="font-semibold">Backup & Restore</h5>
+                    <p>Download all scenarios to a <code>retirement_scenarios.retire</code> file or upload a file to restore. Uploading replaces all in-browser scenarios.</p>
+                    <div className="mt-2">
+                        <img src="/manual-screens/scenariomanager.png" alt="Scenario Manager" className="w-full max-h-28 object-contain border rounded" />
+                    </div>
+                </div>
+                <p className="mt-3 p-2 bg-yellow-50 border-l-4 border-yellow-400 rounded-r-md"><strong>Important:</strong> Scenarios are stored in browser local storage — export frequently if you depend on them.</p>
             </>
         )
     },
@@ -227,7 +258,7 @@ useEffect(() => {
     }
 ];
 
-export const UserManualModal: React.FC<UserManualModalProps> = ({ isOpen, onClose }) => {
+export const UserManualModal: React.FC<UserManualModalProps> = ({ isOpen, onClose, openDisclaimer }) => {
     const [activeTopicId, setActiveTopicId] = useState(manualContent[0].id);
     
     if (!isOpen) return null;
@@ -292,6 +323,19 @@ export const UserManualModal: React.FC<UserManualModalProps> = ({ isOpen, onClos
                             </div>
                         )}
                     </div>
+                </div>
+                {/* Footer: quick links */}
+                <div className="flex-shrink-0 border-t bg-gray-50 p-4 flex justify-end space-x-2">
+                    <button
+                        onClick={() => {
+                            // Close manual and open disclaimer (if provided)
+                            onClose();
+                            if (openDisclaimer) openDisclaimer();
+                        }}
+                        className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+                    >
+                        View Disclaimer
+                    </button>
                 </div>
             </div>
         </div>

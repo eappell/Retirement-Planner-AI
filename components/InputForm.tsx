@@ -4,6 +4,7 @@ import ActionIcons from './ActionIcons';
 import { RetirementPlan, Person, PlanType, RetirementAccount, InvestmentAccount, Pension, OtherIncome, Annuity, ExpensePeriod, Gift, LegacyDisbursement, OneTimeExpense } from '../types';
 import { InputSection } from './InputSection';
 import { NumberInput, SelectInput, TextInput } from './FormControls';
+import AgeSelect from './AgeSelect';
 import { STATES } from '../constants';
 import { validateAssetDefaults } from '../utils/assetValidation';
 
@@ -43,6 +44,49 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
     const [incomeTab, setIncomeTab] = useState<'pensions' | 'annuities' | 'other'>('pensions');
     const [estateTab, setEstateTab] = useState<'gifts' | 'legacy'>('gifts');
     const [expensesTab, setExpensesTab] = useState<'periods' | 'oneTime'>('periods');
+
+    // Generate plan year offsets and labels for couple dropdowns
+    const getPlanYearOptions = () => {
+        const p1 = plan.person1;
+        const p2 = plan.person2;
+        const maxYears = Math.max(p1.lifeExpectancy - p1.currentAge, (p2 ? p2.lifeExpectancy - p2.currentAge : 0));
+        const opts: Array<any> = [];
+
+        const truncateName = (name: string, max = 15) => {
+            if (!name) return name;
+            return name.length > max ? name.slice(0, max - 1) + '…' : name;
+        };
+
+        for (let offset = 0; offset <= maxYears; offset++) {
+            const age1 = p1.currentAge + offset;
+            const age2 = p2 ? (p2.currentAge + offset) : undefined;
+            const yearsLabel = `in ${offset} yr${offset === 1 ? '' : 's'}`;
+
+            const age1Allowed = typeof p1.lifeExpectancy === 'number' ? age1 <= p1.lifeExpectancy : true;
+            const age2Allowed = p2 ? (typeof p2.lifeExpectancy === 'number' ? (age2! <= p2.lifeExpectancy) : true) : false;
+
+            // If both ages are beyond their life expectancies, skip this offset
+            if (p2 && !age1Allowed && !age2Allowed) continue;
+
+            // Build labels that always include both persons for couple (so we can gray parts in a custom control)
+            let fullLabel: string;
+            let label: string;
+
+            if (p2) {
+                const name1 = p1.name || 'Person 1';
+                const name2 = p2.name || 'Person 2';
+                fullLabel = `${name1} ${age1} / ${name2} ${age2} ${yearsLabel}`;
+                label = `${truncateName(name1)} ${age1} / ${truncateName(name2)} ${age2} ${yearsLabel}`;
+                opts.push({ value: offset, label, fullLabel, age1, age2, age1Allowed, age2Allowed, name1, name2, yearsLabel });
+            } else {
+                const name1 = p1.name || 'Person 1';
+                fullLabel = `${name1} ${age1} ${yearsLabel}`;
+                label = `${truncateName(name1)} ${age1} ${yearsLabel}`;
+                opts.push({ value: offset, label, fullLabel, age1, age2: undefined, age1Allowed, age2Allowed: false, name1, name2: undefined, yearsLabel });
+            }
+        }
+        return opts;
+    };
 
     // Local scenario UI state
     const [selectedScenario, setSelectedScenario] = useState<string | null>(activeScenarioId ?? (scenarios[0] && scenarios[0].id) ?? null);
@@ -218,6 +262,18 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                     <NumberInput label="Avg. Return" suffix="%" value={plan.avgReturn} onChange={e => handlePlanChange('avgReturn', Number(e.target.value))}/>
                     <NumberInput label="Withdrawal Rate" suffix="%" value={plan.annualWithdrawalRate} onChange={e => handlePlanChange('annualWithdrawalRate', Number(e.target.value))} disabled={plan.dieWithZero}/>
                 </div>
+                {isCouple && (
+                    <div className="mt-3 col-span-full flex items-center">
+                        <input
+                            id="useBalancesForSurvivorIncome"
+                            type="checkbox"
+                            checked={!!plan.useBalancesForSurvivorIncome}
+                            onChange={e => handlePlanChange('useBalancesForSurvivorIncome', e.target.checked)}
+                            className="h-5 w-5 rounded text-brand-primary focus:ring-brand-primary"
+                        />
+                        <label htmlFor="useBalancesForSurvivorIncome" className="ml-2 text-sm font-medium">Allow survivor to use deceased balances</label>
+                    </div>
+                )}
                 <details className="mt-3 col-span-full">
                     <summary className="cursor-pointer text-sm font-medium text-brand-text-primary">Advanced Market Assumptions</summary>
                     <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 mt-3">
@@ -308,14 +364,15 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                         <span className="text-gray-400 hover:text-gray-600 focus:text-gray-700" aria-hidden="true" tabIndex={0}>
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
                         </span>
-                        <div id="die-with-zero-tooltip" role="tooltip" aria-hidden={!dieTooltipOpen} className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-72 bg-gray-100 text-gray-900 text-[0.95rem] p-2.5 rounded shadow border border-gray-200 ${dieTooltipOpen ? 'block' : 'hidden'} z-10`}>
+                        <div id="die-with-zero-tooltip" role="tooltip" className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-72 bg-gray-100 text-gray-900 text-[0.95rem] p-2.5 rounded shadow border border-gray-200 ${dieTooltipOpen ? 'block' : 'hidden'} z-10`}>
                             <div className="font-medium">Die With Zero</div>
                             <div className="mt-1 text-sm">Calculates the maximum withdrawal that leaves your target legacy (for example, $0). When enabled, the fixed withdrawal rate is ignored and legacy disbursements are disabled — this can significantly change spending and final legacy.</div>
                         </div>
                     </span>
                 </div>
 
-                <div className={`flex items-center space-x-2 flex-shrink-0 transition-opacity ${!plan.dieWithZero ? 'opacity-60' : ''}`}>
+                <div className="flex items-center space-x-4">
+                    <div className={`flex items-center space-x-2 flex-shrink-0 transition-opacity ${!plan.dieWithZero ? 'opacity-60' : ''}`}>
                     <label htmlFor="legacyAmountInput" className={`text-sm font-medium ${!plan.dieWithZero ? 'text-gray-500' : 'text-brand-text-secondary'}`}>Leave Behind:</label>
                     <div className="relative">
                         <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500 text-sm">
@@ -335,6 +392,9 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                         />
                     </div>
                 </div>
+
+                    {/* checkbox moved into Plan Information section per UX request */}
+                </div>
                 
                 <p className="text-sm text-brand-text-secondary italic flex-1 min-w-0">
                     Calculates the maximum withdrawal to end with your target legacy, overriding the fixed withdrawal rate.
@@ -349,7 +409,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                         Person 1
                     </h3>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-2 items-end">
-                        <TextInput id="person1-name" label="Name" value={plan.person1.name} onChange={e => handlePersonChange('person1', 'name', e.target.value)} />
+                        <TextInput id="person1-name" label="Name" value={plan.person1.name} onChange={e => handlePersonChange('person1', 'name', e.target.value)} maxLength={35} />
                         <NumberInput label="Current Age" value={plan.person1.currentAge} onChange={e => handlePersonChange('person1', 'currentAge', e.target.value)} />
                         <NumberInput label="Retirement Age" value={plan.person1.retirementAge} onChange={e => handlePersonChange('person1', 'retirementAge', e.target.value)} />
                         <NumberInput label="Life Expectancy" value={plan.person1.lifeExpectancy} onChange={e => handlePersonChange('person1', 'lifeExpectancy', e.target.value)} />
@@ -362,7 +422,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                             Person 2
                         </h3>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-2 items-end">
-                            <TextInput id="person2-name" label="Name" value={plan.person2.name} onChange={e => handlePersonChange('person2', 'name', e.target.value)} />
+                            <TextInput id="person2-name" label="Name" value={plan.person2.name} onChange={e => handlePersonChange('person2', 'name', e.target.value)} maxLength={35} />
                             <NumberInput label="Current Age" value={plan.person2.currentAge} onChange={e => handlePersonChange('person2', 'currentAge', e.target.value)} />
                             <NumberInput label="Retirement Age" value={plan.person2.retirementAge} onChange={e => handlePersonChange('person2', 'retirementAge', e.target.value)} />
                             <NumberInput label="Life Expectancy" value={plan.person2.lifeExpectancy} onChange={e => handlePersonChange('person2', 'lifeExpectancy', e.target.value)} />
@@ -422,14 +482,11 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                         title="Accounts"
                         subtitle="Manage retirement and investment accounts in separate tabs."
                         titleColorClass="text-cyan-600"
-                        actions={
-                            scenariosCount && scenariosCount > 1 ? (
-                                <button type="button" className="text-sm px-2 py-1 bg-gray-100 rounded transition-colors hover:bg-[#5b8dde] hover:text-white" onClick={() => doUpdateAll({ retirementAccounts: plan.retirementAccounts, investmentAccounts: plan.investmentAccounts }, 'Accounts')}>Update All Scenarios</button>
-                            ) : undefined
-                        }
+                        actions={undefined}
                     >
                         <div className="col-span-full">
-                            <div className="flex items-center space-x-6 mb-3" role="tablist" aria-label="Accounts Tabs" onKeyDown={handleAccountsKeyDown}>
+                            <div className="flex items-center justify-between mb-3">
+                                <div className="flex items-center space-x-6" role="tablist" aria-label="Accounts Tabs" onKeyDown={handleAccountsKeyDown}>
                                 {accountsTab === 'retirement' ? (
                                     <button
                                         type="button"
@@ -568,6 +625,41 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                         </span>
                                     </button>
                                 )}
+                                </div>
+                                <div className="flex items-center">
+                                    {scenariosCount && scenariosCount > 1 ? (
+                                        <button type="button" className="text-sm px-2 py-1 bg-gray-100 rounded transition-colors hover:bg-[#5b8dde] hover:text-white" onClick={() => {
+                                            // Build per-scenario partials so we only update the active tab's data
+                                            const per: Record<string, Partial<any>> = {};
+                                            if (accountsTab === 'retirement') {
+                                                // Update non-HSA retirement accounts only; preserve HSAs in each scenario
+                                                const currentNonHsa = (plan.retirementAccounts || []).filter((a: any) => a.type !== 'HSA');
+                                                scenarios.forEach((sc: any) => {
+                                                    if (!sc || sc.id === activeScenarioId) return;
+                                                    const otherHsa = (sc.plan.retirementAccounts || []).filter((a: any) => a.type === 'HSA');
+                                                    per[sc.id] = { retirementAccounts: [...structuredClone(currentNonHsa), ...structuredClone(otherHsa)] };
+                                                });
+                                                doUpdateAll({ __perScenario: per }, 'Retirement Accounts');
+                                            } else if (accountsTab === 'investment') {
+                                                const currentInv = structuredClone(plan.investmentAccounts || []);
+                                                scenarios.forEach((sc: any) => {
+                                                    if (!sc || sc.id === activeScenarioId) return;
+                                                    per[sc.id] = { investmentAccounts: structuredClone(currentInv) };
+                                                });
+                                                doUpdateAll({ __perScenario: per }, 'Investment Accounts');
+                                            } else {
+                                                // HSA tab: update HSAs only within retirementAccounts, preserve non-HSA accounts
+                                                const currentHsa = (plan.retirementAccounts || []).filter((a: any) => a.type === 'HSA');
+                                                scenarios.forEach((sc: any) => {
+                                                    if (!sc || sc.id === activeScenarioId) return;
+                                                    const otherNonHsa = (sc.plan.retirementAccounts || []).filter((a: any) => a.type !== 'HSA');
+                                                    per[sc.id] = { retirementAccounts: [...structuredClone(otherNonHsa), ...structuredClone(currentHsa)] };
+                                                });
+                                                doUpdateAll({ __perScenario: per }, 'HSAs');
+                                            }
+                                        }}>Update All Scenarios</button>
+                                    ) : null}
+                                </div>
                             </div>
 
                             {/* Retirement tab content */}
@@ -751,14 +843,11 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                 title="Income"
                 subtitle="Manage pensions and other income sources in tabs."
                 titleColorClass="text-sky-600"
-                actions={
-                    scenariosCount && scenariosCount > 1 ? (
-                        <button type="button" className="text-sm px-2 py-1 bg-gray-100 rounded transition-colors hover:bg-[#5b8dde] hover:text-white" onClick={() => doUpdateAll({ pensions: plan.pensions, annuities: plan.annuities, otherIncomes: plan.otherIncomes }, 'Income')}>Update All Scenarios</button>
-                    ) : undefined
-                }
+                actions={undefined}
             >
-                <div className="col-span-full">
-                    <div className="flex items-center space-x-6 mb-3" role="tablist" aria-label="Income Tabs" onKeyDown={handleIncomeKeyDown}>
+                    <div className="col-span-full">
+                    <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center space-x-6" role="tablist" aria-label="Income Tabs" onKeyDown={handleIncomeKeyDown}>
                         {incomeTab === 'pensions' ? (
                             <button
                                 type="button"
@@ -897,6 +986,36 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                 </span>
                             </button>
                         )}
+                        </div>
+                        <div className="flex items-center">
+                            {scenariosCount && scenariosCount > 1 ? (
+                                <button type="button" className="text-sm px-2 py-1 bg-gray-100 rounded transition-colors hover:bg-[#5b8dde] hover:text-white" onClick={() => {
+                                    const per: Record<string, Partial<any>> = {};
+                                    if (incomeTab === 'pensions') {
+                                        const currentPensions = structuredClone(plan.pensions || []);
+                                        scenarios.forEach((sc: any) => {
+                                            if (!sc || sc.id === activeScenarioId) return;
+                                            per[sc.id] = { pensions: structuredClone(currentPensions) };
+                                        });
+                                        doUpdateAll({ __perScenario: per }, 'Pensions');
+                                    } else if (incomeTab === 'annuities') {
+                                        const current = structuredClone(plan.annuities || []);
+                                        scenarios.forEach((sc: any) => {
+                                            if (!sc || sc.id === activeScenarioId) return;
+                                            per[sc.id] = { annuities: structuredClone(current) };
+                                        });
+                                        doUpdateAll({ __perScenario: per }, 'Annuities');
+                                    } else {
+                                        const current = structuredClone(plan.otherIncomes || []);
+                                        scenarios.forEach((sc: any) => {
+                                            if (!sc || sc.id === activeScenarioId) return;
+                                            per[sc.id] = { otherIncomes: structuredClone(current) };
+                                        });
+                                        doUpdateAll({ __perScenario: per }, 'Other Incomes');
+                                    }
+                                }}>Update All Scenarios</button>
+                            ) : null}
+                        </div>
                     </div>
 
                     {/* Pensions panel */}
@@ -904,7 +1023,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                         <div id="panel-pensions" role="tabpanel" aria-labelledby="tab-pensions" className="relative pt-3 space-y-2">
                             <p className="text-sm text-gray-500">Enter your monthly pre-tax income (gross)</p>
                             {((plan.pensions || []) as Pension[]).map(item => (
-                                <div key={item.id} className={`grid gap-x-4 items-end p-2 rounded-md bg-sky-50/50 ${isCouple ? 'grid-cols-8' : 'grid-cols-7'}`}>
+                                <div key={item.id} className={`grid gap-x-4 items-end p-2 rounded-md bg-sky-50/50 ${isCouple ? 'grid-cols-9' : 'grid-cols-8'}`}>
                                     {isCouple && (
                                         <div className="col-span-1">
                                             <SelectInput label="Owner" value={item.owner || 'person1'} onChange={e => handleDynamicListChange('pensions', item.id, 'owner', e.target.value)}>
@@ -929,13 +1048,17 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                         <NumberInput id={`pensions-monthlyBenefit-${item.id}`} label="Monthly Benefit" prefix="$" value={item.monthlyBenefit || 0} onChange={e => handleDynamicListChange('pensions', item.id, 'monthlyBenefit', e.target.value)}/>
                                     )}
 
-                                    <div className="col-span-2 flex items-end space-x-2">
+                                    <div className="col-span-3 flex items-end space-x-2">
                                         <div className="flex-1 min-w-0">
                                             <NumberInput label="Start Age" value={item.startAge} onChange={e => handleDynamicListChange('pensions', item.id, 'startAge', e.target.value)}/>
                                         </div>
-                                        <div className="flex-1 min-w-0">
+                                        <div className="w-28">
                                             <NumberInput label="COLA" suffix="%" value={item.cola} onChange={e => handleDynamicListChange('pensions', item.id, 'cola', e.target.value)}/>
                                         </div>
+                                        <div className="w-28">
+                                            <NumberInput label="Surv. %" value={(item.survivorBenefit ?? 100)} onChange={e => handleDynamicListChange('pensions', item.id, 'survivorBenefit', e.target.value)} />
+                                        </div>
+                                        
                                     </div>
                                     <div className="flex flex-col items-center justify-end h-full pb-1">
                                         <label htmlFor={`taxable-${item.id}`} className="mb-1 text-sm font-medium text-brand-text-secondary">Taxable</label>
@@ -1106,14 +1229,11 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                 title="Estate Planning"
                 subtitle="Manage gifts and legacy allocations."
                 titleColorClass="text-purple-600"
-                actions={
-                    scenariosCount && scenariosCount > 1 ? (
-                        <button type="button" className="text-sm px-2 py-1 bg-gray-100 rounded transition-colors hover:bg-[#5b8dde] hover:text-white" onClick={() => doUpdateAll({ gifts: plan.gifts, legacyDisbursements: plan.legacyDisbursements }, 'Estate Planning')}>Update All Scenarios</button>
-                    ) : undefined
-                }
+                actions={undefined}
             >
-                <div className="col-span-full">
-                    <div className="flex items-center space-x-6 mb-3" role="tablist" aria-label="Estate Tabs" onKeyDown={handleEstateKeyDown}>
+                    <div className="col-span-full">
+                    <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center space-x-6" role="tablist" aria-label="Estate Tabs" onKeyDown={handleEstateKeyDown}>
                         {estateTab === 'gifts' ? (
                             <button
                                 type="button"
@@ -1206,6 +1326,23 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                 </span>
                             </button>
                         )}
+                        </div>
+                        <div className="flex items-center">
+                            {scenariosCount && scenariosCount > 1 ? (
+                                <button type="button" className="text-sm px-2 py-1 bg-gray-100 rounded transition-colors hover:bg-[#5b8dde] hover:text-white" onClick={() => {
+                                    const per: Record<string, Partial<any>> = {};
+                                    if (estateTab === 'gifts') {
+                                        const curr = structuredClone(plan.gifts || []);
+                                        scenarios.forEach((sc: any) => { if (!sc || sc.id === activeScenarioId) return; per[sc.id] = { gifts: structuredClone(curr) }; });
+                                        doUpdateAll({ __perScenario: per }, 'Gifts');
+                                    } else {
+                                        const curr = structuredClone(plan.legacyDisbursements || []);
+                                        scenarios.forEach((sc: any) => { if (!sc || sc.id === activeScenarioId) return; per[sc.id] = { legacyDisbursements: structuredClone(curr) }; });
+                                        doUpdateAll({ __perScenario: per }, 'Legacy Disbursements');
+                                    }
+                                }}>Update All Scenarios</button>
+                            ) : null}
+                        </div>
                     </div>
 
                     {/* Gifts panel */}
@@ -1278,13 +1415,13 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                     <div className="col-span-2">
                                         <TextInput id={`legacy-beneficiary-${ld.id}`} label="Beneficiary" value={ld.beneficiary} disabled={plan.dieWithZero} onChange={e => handleDynamicListChange('legacyDisbursements', ld.id, 'beneficiary', e.target.value)} />
                                     </div>
-                                    <div className="w-28">
+                                    <div className="w-56">
                                         <SelectInput label="Beneficiary Type" value={ld.beneficiaryType || 'person'} onChange={e => handleDynamicListChange('legacyDisbursements', ld.id, 'beneficiaryType', e.target.value)}>
                                             <option value="person">Person</option>
                                             <option value="organization">Organization</option>
                                         </SelectInput>
                                     </div>
-                                    <div className="w-28">
+                                    <div className="w-56">
                                         <NumberInput label="Percentage" suffix="%" value={ld.percentage} disabled={plan.dieWithZero} onChange={e => handleDynamicListChange('legacyDisbursements', ld.id, 'percentage', e.target.value)} />
                                     </div>
                                     <div className="flex items-end">
@@ -1323,14 +1460,11 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
             
 
             <InputSection title="Expenses" subtitle="Model recurring expense phases and one-time expenses." titleColorClass="text-red-600" gridCols={1}
-                actions={
-                    scenariosCount && scenariosCount > 1 ? (
-                        <button type="button" className="text-sm px-2 py-1 bg-gray-100 rounded transition-colors hover:bg-[#5b8dde] hover:text-white" onClick={() => doUpdateAll({ expensePeriods: plan.expensePeriods, oneTimeExpenses: plan.oneTimeExpenses }, 'Expenses')}>Update All Scenarios</button>
-                    ) : undefined
-                }
+                actions={undefined}
             >
-                <div className="col-span-full">
-                    <div className="flex items-center space-x-6 mb-3" role="tablist" aria-label="Expenses Tabs">
+                    <div className="col-span-full">
+                    <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center space-x-6" role="tablist" aria-label="Expenses Tabs">
                         {expensesTab === 'periods' ? (
                             <button type="button" role="tab" id="tab-expense-periods" aria-selected="true" aria-controls="panel-expense-periods" onClick={() => setExpensesTab('periods')} className={`text-sm pb-2 ${'border-b-2 border-red-600 text-red-700 font-medium'} group`}>
                                 <span className="inline-flex items-center space-x-2">
@@ -1393,41 +1527,99 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                 </span>
                             </button>
                         )}
+                        </div>
+                        <div className="flex items-center">
+                            {scenariosCount && scenariosCount > 1 ? (
+                                <button type="button" className="text-sm px-2 py-1 bg-gray-100 rounded transition-colors hover:bg-[#5b8dde] hover:text-white" onClick={() => {
+                                    const per: Record<string, Partial<any>> = {};
+                                    if (expensesTab === 'periods') {
+                                        const curr = structuredClone(plan.expensePeriods || []);
+                                        scenarios.forEach((sc: any) => { if (!sc || sc.id === activeScenarioId) return; per[sc.id] = { expensePeriods: structuredClone(curr) }; });
+                                        doUpdateAll({ __perScenario: per }, 'Expense Periods');
+                                    } else {
+                                        const curr = structuredClone(plan.oneTimeExpenses || []);
+                                        scenarios.forEach((sc: any) => { if (!sc || sc.id === activeScenarioId) return; per[sc.id] = { oneTimeExpenses: structuredClone(curr) }; });
+                                        doUpdateAll({ __perScenario: per }, 'One-Time Expenses');
+                                    }
+                                }}>Update All Scenarios</button>
+                            ) : null}
+                        </div>
                     </div>
 
                     {/* Expense Periods panel */}
                     {expensesTab === 'periods' && (
                         <div id="panel-expense-periods" role="tabpanel" aria-labelledby="tab-expense-periods" className="relative pt-3 space-y-2">
                             {((plan.expensePeriods || []) as ExpensePeriod[]).map(ep => (
-                                <div key={ep.id} className={`grid gap-x-4 items-end p-2 rounded-md bg-red-50/50 ${isCouple ? 'grid-cols-7' : 'grid-cols-5'}`}>
+                                <div key={ep.id} className={`grid gap-x-4 items-end p-2 rounded-md bg-red-50/50 grid-cols-5`}>
                                     <div className="col-span-1">
                                         <TextInput id={`expensePeriods-name-${ep.id}`} className="max-w-[10rem]" label="Name" value={ep.name || ''} onChange={e => handleDynamicListChange('expensePeriods', ep.id, 'name', e.target.value)} />
                                     </div>
                                     <NumberInput label="Monthly Amount" prefix="$" value={ep.monthlyAmount} onChange={e => handleDynamicListChange('expensePeriods', ep.id, 'monthlyAmount', e.target.value)} />
-                                    {isCouple && (
-                                        <div className="w-28">
-                                            <SelectInput aria-label="Start owner" value={ep.startAgeRef || 'person1'} onChange={e => handleDynamicListChange('expensePeriods', ep.id, 'startAgeRef', e.target.value)}>
-                                                <option value="person1">{plan.person1.name}</option>
-                                                <option value="person2">{plan.person2.name}</option>
-                                            </SelectInput>
-                                        </div>
-                                    )}
-                                    <div className="w-28">
-                                        <NumberInput label="Start Age" value={ep.startAge} onChange={e => handleDynamicListChange('expensePeriods', ep.id, 'startAge', e.target.value)} />
+                                    <div className="w-56">
+                                        {isCouple ? (
+                                            <AgeSelect
+                                                label="Start Age"
+                                                value={String(((ep.startAge || 0) - (ep.startAgeRef === 'person2' ? plan.person2.currentAge : plan.person1.currentAge)) || 0)}
+                                                options={getPlanYearOptions()}
+                                                onChange={(val) => {
+                                                    const offset = Number(val);
+                                                    const ownerRef = ep.startAgeRef || 'person1';
+                                                    const ownerBase = ownerRef === 'person1' ? plan.person1.currentAge : plan.person2.currentAge;
+                                                    handleDynamicListChange('expensePeriods', ep.id, 'startAge', Number(ownerBase + offset));
+                                                }}
+                                            />
+                                        ) : (
+                                            <NumberInput label="Start Age" value={ep.startAge} onChange={e => handleDynamicListChange('expensePeriods', ep.id, 'startAge', e.target.value)} />
+                                        )}
                                     </div>
-                                    {isCouple && (
-                                        <div className="w-28">
-                                            <SelectInput aria-label="End owner" value={ep.endAgeRef || 'person1'} onChange={e => handleDynamicListChange('expensePeriods', ep.id, 'endAgeRef', e.target.value)}>
-                                                <option value="person1">{plan.person1.name}</option>
-                                                <option value="person2">{plan.person2.name}</option>
-                                            </SelectInput>
-                                        </div>
-                                    )}
-                                    <div className="w-28">
-                                        <NumberInput label="End Age" value={ep.endAge} onChange={e => handleDynamicListChange('expensePeriods', ep.id, 'endAge', e.target.value)} />
+                                    <div className="w-56">
+                                        {isCouple ? (
+                                            <AgeSelect
+                                                label="End Age"
+                                                value={String(((ep.endAge || 0) - (ep.endAgeRef === 'person2' ? plan.person2.currentAge : plan.person1.currentAge)) || 0)}
+                                                options={getPlanYearOptions()}
+                                                onChange={(val) => {
+                                                    const offset = Number(val);
+                                                    const ownerRef = ep.endAgeRef || 'person1';
+                                                    const ownerBase = ownerRef === 'person1' ? plan.person1.currentAge : plan.person2.currentAge;
+                                                    handleDynamicListChange('expensePeriods', ep.id, 'endAge', Number(ownerBase + offset));
+                                                }}
+                                            />
+                                        ) : (
+                                            <NumberInput label="End Age" value={ep.endAge} onChange={e => handleDynamicListChange('expensePeriods', ep.id, 'endAge', e.target.value)} />
+                                        )}
                                     </div>
                                     <div className="flex items-end">
-                                        <ActionIcons onAdd={() => { const id = Date.now().toString(); const newEp: ExpensePeriod = { id, name: ep.name || `Phase ${(plan.expensePeriods || []).length + 1}`, monthlyAmount: ep.monthlyAmount || 0, startAge: ep.startAge || plan.person1.retirementAge, startAgeRef: ep.startAgeRef || 'person1', endAge: ep.endAge || plan.person1.lifeExpectancy, endAgeRef: ep.endAgeRef || 'person1' }; addToList('expensePeriods', newEp); setFocusTargetId(`expensePeriods-name-${id}`); }} onRemove={() => removeFromList('expensePeriods', ep.id)} canRemove={(plan.expensePeriods || []).length > 0} />
+                                        <ActionIcons onAdd={() => {
+                                            const id = Date.now().toString();
+                                            // New period should start the year after this period's end age when possible
+                                            const inferredStartAge = (typeof ep.endAge === 'number') ? Number(ep.endAge) + 1 : (ep.startAge || plan.person1.retirementAge);
+                                            const inferredStartRef = ep.endAgeRef || ep.startAgeRef || 'person1';
+                                            const ownerForEnd = inferredStartRef === 'person2' ? plan.person2 : plan.person1;
+                                            const inferredEndAge = ownerForEnd.lifeExpectancy || plan.person1.lifeExpectancy;
+                                            const newEp: ExpensePeriod = {
+                                                id,
+                                                name: ep.name || `Phase ${(plan.expensePeriods || []).length + 1}`,
+                                                monthlyAmount: ep.monthlyAmount || 0,
+                                                startAge: inferredStartAge,
+                                                startAgeRef: inferredStartRef,
+                                                endAge: inferredEndAge,
+                                                endAgeRef: inferredStartRef
+                                            };
+                                            addToList('expensePeriods', newEp);
+                                            setFocusTargetId(`expensePeriods-name-${id}`);
+
+                                            // Validation: warn if inferred startAge exceeds owner's life expectancy
+                                            if (typeof ownerForEnd.lifeExpectancy === 'number' && inferredStartAge > ownerForEnd.lifeExpectancy) {
+                                                const ownerName = (inferredStartRef === 'person2' ? plan.person2.name : plan.person1.name) || inferredStartRef;
+                                                try {
+                                                    window.dispatchEvent(new CustomEvent('app:toast', { detail: { message: `Warning: new period start age ${inferredStartAge} exceeds ${ownerName}'s life expectancy (${ownerForEnd.lifeExpectancy}).` } }));
+                                                } catch (e) {
+                                                    // fallback: console.warn
+                                                    console.warn(`New expense period start ${inferredStartAge} exceeds ${ownerName}'s life expectancy (${ownerForEnd.lifeExpectancy}).`);
+                                                }
+                                            }
+                                        }} onRemove={() => removeFromList('expensePeriods', ep.id)} canRemove={(plan.expensePeriods || []).length > 0} />
                                     </div>
                                 </div>
                             ))}
@@ -1455,8 +1647,22 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                         <TextInput id={`oneTimeExpenses-desc-${item.id}`} label="Description" value={item.description || ''} onChange={e => handleDynamicListChange('oneTimeExpenses', item.id, 'description', e.target.value)} />
                                     </div>
                                     <NumberInput label="Amount" prefix="$" value={item.amount} onChange={e => handleDynamicListChange('oneTimeExpenses', item.id, 'amount', e.target.value)} />
-                                    <div className="w-28">
-                                        <NumberInput label="Age" value={item.age} onChange={e => handleDynamicListChange('oneTimeExpenses', item.id, 'age', e.target.value)} />
+                                    <div className="w-56">
+                                        {isCouple ? (
+                                            <AgeSelect
+                                                label="Age"
+                                                value={String(((item.age || 0) - ((item.owner === 'person2') ? plan.person2.currentAge : plan.person1.currentAge)) || 0)}
+                                                options={getPlanYearOptions()}
+                                                onChange={(val) => {
+                                                    const offset = Number(val);
+                                                    const ownerRef = item.owner || 'person1';
+                                                    const ownerBase = ownerRef === 'person1' ? plan.person1.currentAge : plan.person2.currentAge;
+                                                    handleDynamicListChange('oneTimeExpenses', item.id, 'age', Number(ownerBase + offset));
+                                                }}
+                                            />
+                                        ) : (
+                                            <NumberInput label="Age" value={item.age} onChange={e => handleDynamicListChange('oneTimeExpenses', item.id, 'age', e.target.value)} />
+                                        )}
                                     </div>
                                     <div className="flex items-end">
                                         <ActionIcons onAdd={() => { const id = Date.now().toString(); const newOne: OneTimeExpense = { id, owner: 'person1', amount: 0, age: plan.person1.currentAge, description: '' }; addToList('oneTimeExpenses', newOne as any); setFocusTargetId(`oneTimeExpenses-desc-${id}`); }} onRemove={() => removeFromList('oneTimeExpenses', item.id)} canRemove={(plan.oneTimeExpenses || []).length > 0} />

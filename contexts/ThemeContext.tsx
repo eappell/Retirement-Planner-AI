@@ -12,6 +12,12 @@ export const ThemeContext = createContext<ThemeContextValue | undefined>(undefin
 
 export const ThemeProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
   const [theme, setTheme] = useState<Theme>('light');
+  const [isEmbedded, setIsEmbedded] = useState(false);
+
+  // Detect if running in iframe
+  useEffect(() => {
+    setIsEmbedded(window.self !== window.top);
+  }, []);
 
   useEffect(() => {
     try {
@@ -37,6 +43,23 @@ export const ThemeProvider: React.FC<React.PropsWithChildren<{}>> = ({ children 
       // ignore
     }
   }, []);
+
+  // Listen for theme changes from portal
+  useEffect(() => {
+    if (!isEmbedded) return;
+
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data?.type === 'THEME_CHANGE') {
+        const newTheme = event.data.theme as Theme;
+        if (newTheme === 'dark' || newTheme === 'light') {
+          setTheme(newTheme);
+        }
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, [isEmbedded]);
 
   useEffect(() => {
     try {

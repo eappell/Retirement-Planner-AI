@@ -1,19 +1,14 @@
 import React from 'react';
 import { Scenario } from '../types';
-import { SelectInput, TextInput } from './FormControls';
+// FormControls imports removed from header; scenario manager moved out of header
 import ThemeToggle from './ThemeToggle';
 import AppSettingsMenu from './AppSettingsMenu';
-import { 
-  QuestionMarkCircleIcon, 
-  PrinterIcon, 
-  AdjustmentsHorizontalIcon, 
-  Square3Stack3DIcon,
-  ShieldExclamationIcon, 
-  SunIcon, 
-  MoonIcon, 
+import {
+  QuestionMarkCircleIcon,
+  PrinterIcon,
+  AdjustmentsHorizontalIcon,
+  ShieldExclamationIcon,
   XCircleIcon,
-  ArrowDownTrayIcon, 
-  ArrowUpTrayIcon 
 } from '@heroicons/react/24/outline';
 
 // HeroIcon SVG strings for portal toolbar
@@ -60,9 +55,7 @@ const Header: React.FC<HeaderProps> = ({
   onSaveDefaults,
   plan,
 }) => {
-  const [isScenarioMenuOpen, setIsScenarioMenuOpen] = React.useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = React.useState(false);
-  const scenarioMenuRef = React.useRef<HTMLDivElement | null>(null);
   const settingsRef = React.useRef<HTMLDivElement | null>(null);
 
   // Send toolbar buttons and app metadata to parent portal
@@ -156,9 +149,6 @@ const Header: React.FC<HeaderProps> = ({
 
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (scenarioMenuRef.current && !scenarioMenuRef.current.contains(event.target as Node)) {
-        setIsScenarioMenuOpen(false);
-      }
       if (settingsRef.current && !settingsRef.current.contains(event.target as Node)) {
         setIsSettingsOpen(false);
       }
@@ -167,41 +157,7 @@ const Header: React.FC<HeaderProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const [toastMessage, setToastMessage] = React.useState<string>('');
-  const [showToast, setShowToast] = React.useState<boolean>(false);
-  const [toastType, setToastType] = React.useState<'success' | 'error'>('success');
-
-  const handleUploadAndClose = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    try {
-      const success = await handleUploadScenarios(e);
-      setIsScenarioMenuOpen(false);
-      // Global app toast will show the upload result; avoid duplicating toasts here.
-    } catch (err) {
-      setIsScenarioMenuOpen(false);
-      // Global app toast will display the failure; suppress header toast.
-    }
-  };
-
-  const handleDownloadAndClose = async () => {
-    try {
-      const success = await handleDownloadScenarios();
-      setIsScenarioMenuOpen(false);
-      setToastType(success ? 'success' : 'error');
-      setToastMessage(success ? 'Scenarios downloaded' : 'Download failed');
-      setShowToast(true);
-    } catch (err) {
-      setIsScenarioMenuOpen(false);
-      setToastType('error');
-      setToastMessage('Download failed');
-      setShowToast(true);
-    }
-  };
-
-  React.useEffect(() => {
-    if (!showToast) return;
-    const t = setTimeout(() => setShowToast(false), 3000);
-    return () => clearTimeout(t);
-  }, [showToast]);
+  // Scenario manager removed from header — upload/download/toast handled elsewhere.
 
   return (
     <header className="bg-brand-surface shadow-md h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 sticky top-0 z-20">
@@ -215,69 +171,7 @@ const Header: React.FC<HeaderProps> = ({
       </div>
 
       <div className="flex items-center space-x-2">
-        <div className="relative" ref={scenarioMenuRef}>
-          <button type="button" onClick={() => setIsScenarioMenuOpen(prev => !prev)} className="group relative p-2 rounded-md text-gray-600 hover:text-brand-primary hover:bg-gray-100 transition-colors">
-            <Square3Stack3DIcon className="h-5 w-5" aria-hidden="true" />
-            <span className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-40 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-none">Scenarios</span>
-          </button>
-
-          {isScenarioMenuOpen && (
-            <div className="origin-top-right absolute right-0 mt-2 w-96 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-30 p-4">
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-brand-text-primary flex items-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
-                    <rect x="3" y="4" width="18" height="6" rx="1" ry="1" />
-                    <rect x="3" y="13" width="18" height="6" rx="1" ry="1" />
-                    <path d="M7 7v2" strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} />
-                    <path d="M7 16v1" strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} />
-                  </svg>
-                  Scenario Manager
-                </h3>
-                <div>
-                  <SelectInput label="Current Scenario" value={activeScenario.id || ''} onChange={e => handleSelectScenario(e.target.value)}>
-                    {Object.values(scenarios).map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-                  </SelectInput>
-                </div>
-                <TextInput label="Scenario Name" value={activeScenario.name} onChange={e => handleUpdateScenarioName(e.target.value)} />
-                <div className="grid grid-cols-3 gap-2">
-                  <button onClick={handleNewScenario} className="w-full px-3 py-1.5 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors">New</button>
-                  <button onClick={handleCopyScenario} className="w-full px-3 py-1.5 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">Copy</button>
-                  <button onClick={handleDeleteScenario} disabled={Object.keys(scenarios).length <= 1} className="w-full px-3 py-1.5 text-sm bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-400 transition-colors">Delete</button>
-                </div>
-
-                <div className="col-span-full pt-2 border-t">
-                  <div className="grid grid-cols-2 gap-2">
-                            <button onClick={handleDownloadAndClose} className="flex items-center justify-center w-full px-4 py-2 text-sm rounded-md btn-download">
-                              <ArrowDownTrayIcon className="h-4 w-4 mr-2" aria-hidden="true" />
-                              <span>Download</span>
-                            </button>
-                            <label className="flex items-center justify-center w-full px-4 py-2 text-sm rounded-md cursor-pointer btn-upload">
-                              <ArrowUpTrayIcon className="h-4 w-4 mr-2" aria-hidden="true" />
-                              <span>Upload</span>
-                              <input type="file" onChange={handleUploadAndClose} accept=".retire" className="hidden" />
-                            </label>
-                  </div>
-                </div>
-
-                <div className="col-span-full pt-2">
-                  <p className="text-xs text-gray-500">This data is stored in your browser. If you clear your browser cache without saving the scenarios file, you <strong className="text-red-600">WILL LOSE</strong> your scenarios. Use the Backup feature to download your scenarios file to save all your hard work.</p>
-                </div>
-                <div className="col-span-full pt-4">
-                  <button
-                    onClick={() => {
-                      setIsScenarioMenuOpen(false);
-                      handleResetPlan();
-                    }}
-                    className="w-full inline-flex items-center justify-center px-4 py-3 bg-red-600 text-white text-sm font-semibold rounded-md hover:bg-red-700 transition-colors"
-                  >
-                    <XCircleIcon className="h-5 w-5 mr-2" aria-hidden="true" />
-                    Reset All Data
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
+          {/* Scenarios icon removed from header per request */}
 
         <div className="relative" ref={settingsRef}>
           <button type="button" onClick={() => setIsSettingsOpen(prev => !prev)} title="App Settings" aria-label="App Settings" className="group relative p-2 rounded-md text-gray-600 hover:text-brand-primary hover:bg-gray-100 transition-colors">
@@ -317,16 +211,17 @@ const Header: React.FC<HeaderProps> = ({
           <span className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-40 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-none">Disclaimer</span>
         </button>
 
-        {/* Reset moved to Scenario Manager popover */}
+        <button
+          type="button"
+          onClick={() => handleResetPlan()}
+          title="Reset all data"
+          aria-label="Reset all data"
+          className="group relative p-2 rounded-md text-red-600 hover:bg-red-50 transition-colors"
+        >
+          <XCircleIcon className="h-5 w-5" aria-hidden="true" />
+          <span className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-40 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-none">Reset All Data</span>
+        </button>
       </div>
-
-      {showToast && (
-        <div className="fixed right-4 top-4 z-50">
-          <div role="status" aria-live="polite" className={`text-sm px-3 py-2 rounded shadow flex items-center ${toastType === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'}`}>
-            <span>{toastMessage}</span>
-          </div>
-        </div>
-      )}
     </header>
   );
 };

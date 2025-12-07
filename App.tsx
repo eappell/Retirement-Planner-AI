@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { RetirementPlan, PlanType, Person, MonteCarloResult } from './types';
 import { UserManualModal } from './components/UserManualModal';
 import DisclaimerModal from './components/DisclaimerModal';
@@ -7,6 +7,8 @@ import { PrintableReport } from './components/PrintableReport';
 // Import canonical Header implementation
 import Header from './components/Header';
 import Toast from './components/Toast';
+import AppSettingsMenu from './components/AppSettingsMenu';
+import { PremiumGate } from './components/PremiumGate';
 import { ResultsPanel } from './components/ResultsPanel';
 import ScenariosBar from './components/ScenariosBar';
 import { InputForm } from './components/InputForm';
@@ -17,9 +19,13 @@ import {
     useScenarioManagement, 
     usePlanCalculation, 
     useAIInsights,
-    useSocialSecurityCalculation 
+    useSocialSecurityCalculation,
+    usePortalIntegration,
+    usePortalAuth 
 } from './hooks';
+import { useHealthcareIntegration } from './hooks/useHealthcareIntegration';
 import { buildExport, parseUpload } from './utils/exportImport';
+import useTheme from './hooks/useTheme';
 
 
 const initialPlanState: RetirementPlan = {
@@ -43,6 +49,7 @@ const initialPlanState: RetirementPlan = {
   avgReturn: 7,
   annualWithdrawalRate: 4,
   dieWithZero: false,
+    useBalancesForSurvivorIncome: false,
   legacyAmount: 0,
 };
 
@@ -54,6 +61,7 @@ type DynamicListKey = {
 const App: React.FC = () => {
     // --- Custom Hooks for State Management ---
     const { loadFromStorage, clearStorage } = useLocalStorage();
+    const { theme, toggleTheme } = useTheme();
     
     const {
         scenariosState,
@@ -113,11 +121,13 @@ const App: React.FC = () => {
     const [isDisclaimerOpen, setIsDisclaimerOpen] = useState(false);
     const [isDisclaimerRequireAccept, setIsDisclaimerRequireAccept] = useState(false);
     const [toastMessage, setToastMessage] = useState<string | null>(null);
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
     const showToast = (msg: string, ms = 2500) => {
         setToastMessage(msg);
         setTimeout(() => setToastMessage(null), ms);
     };
+
     // listen for cross-component toast events
     useEffect(() => {
         const handler = (e: any) => {
@@ -126,6 +136,70 @@ const App: React.FC = () => {
         };
         window.addEventListener('app:toast', handler as EventListener);
         return () => window.removeEventListener('app:toast', handler as EventListener);
+    }, []);
+    
+    // --- Check for pending healthcare data transfer from portal ---
+    useEffect(() => {
+        console.log('[App] Setting up healthcare data listener...');
+        let hasImported = false;
+        
+        const handleHealthcareData = (event: MessageEvent) => {
+            if (event.data?.type === 'HEALTHCARE_DATA_RESPONSE' && !hasImported) {
+                console.log('[App] Received healthcare data from portal:', event.data.data);
+                const transfer = event.data.data;
+                
+                if (transfer && transfer.data && plan) {
+                    console.log('[App] Importing healthcare data...');
+                    hasImported = true;
+                    
+                    // Add expense period
+                    if (transfer.data.expensePeriod) {
+                        const newExpense = {
+                            ...transfer.data.expensePeriod,
+                            id: Date.now().toString(),
+                        };
+                        console.log('[App] Adding expense period:', newExpense);
+                        updateActivePlan({
+                            expensePeriods: [...plan.expensePeriods, newExpense],
+                        });
+                    }
+                    
+                    // Add one-time expense if present
+                    if (transfer.data.oneTimeExpense) {
+                        const newOneTime = {
+                            ...transfer.data.oneTimeExpense,
+                            id: (Date.now() + 1).toString(),
+                        };
+                        console.log('[App] Adding one-time expense:', newOneTime);
+                        updateActivePlan({
+                            oneTimeExpenses: [...(plan.oneTimeExpenses || []), newOneTime],
+                        });
+                    }
+                    
+                    // Show success message via toast event
+                    console.log('[App] Healthcare costs imported successfully!');
+                    window.dispatchEvent(new CustomEvent('app:toast', { 
+                        detail: { message: 'Healthcare costs imported successfully!' } 
+                    }));
+                } else {
+                    console.log('[App] Cannot import: data structure invalid or plan not ready');
+                }
+            }
+        };
+        
+        // Listen for response from portal
+        window.addEventListener('message', handleHealthcareData);
+        
+        // Request healthcare data from portal only once on mount
+        if (window.self !== window.top && !hasImported) {
+            console.log('[App] Sending REQUEST_HEALTHCARE_DATA to portal');
+            window.parent.postMessage({ type: 'REQUEST_HEALTHCARE_DATA' }, '*');
+        }
+        
+        return () => {
+            window.removeEventListener('message', handleHealthcareData);
+        };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     
     // --- Update Browser Title ---
@@ -219,6 +293,21 @@ const App: React.FC = () => {
             return { ...prev, [listName]: existing.filter(item => item.id !== id) };
         });
     };
+    
+    // --- Healthcare Cost Integration ---
+    const { receivedData } = useHealthcareIntegration({
+        addExpensePeriod: (period) => addToList('expensePeriods', period),
+        addOneTimeExpense: (expense) => addToList('oneTimeExpenses', expense),
+        scenarios: scenarios ? Object.values(scenarios).map(s => ({ id: s.id, name: s.name })) : [],
+        activeScenarioId: activeScenarioId || null,
+    });
+    
+    // Show toast notification when healthcare data is received
+    useEffect(() => {
+        if (receivedData) {
+            showToast('Healthcare costs added to your retirement plan!', 3000);
+        }
+    }, [receivedData]);
 
     // --- Scenario Management Handlers (using hooks) ---
     const clearCalculationResults = useCallback(() => {
@@ -437,6 +526,51 @@ const App: React.FC = () => {
         }
     }, [clearStorage, resetAllScenarios, clearCalculationResults]);
 
+    // --- Portal Integration ---
+    const toolbarButtons = useMemo(() => [
+        {
+            id: 'settings',
+            label: 'Settings',
+            tooltip: 'App Settings',
+            icon: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" /></svg>',
+            onClick: () => setIsSettingsOpen(prev => !prev)
+        },
+        {
+            id: 'print',
+            label: 'Print',
+            tooltip: 'Print',
+            icon: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5zm-3 0h.008v.008H15V10.5z" /></svg>',
+            onClick: handlePrint
+        },
+        {
+            id: 'help',
+            label: 'User Manual',
+            tooltip: 'User Manual',
+            icon: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" /></svg>',
+            onClick: () => setIsManualOpen(true)
+        },
+        {
+            id: 'disclaimer',
+            label: 'Disclaimer',
+            tooltip: 'View Disclaimer',
+            icon: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0-10.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.75c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.249-8.25-3.286zm0 13.036h.008v.008H12v-.008z" /></svg>',
+            onClick: () => {
+                setIsDisclaimerRequireAccept(false);
+                setIsDisclaimerOpen(true);
+            }
+        },
+        {
+            id: 'reset',
+            label: 'Reset All Data',
+            tooltip: 'Reset All Data',
+            icon: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>',
+            onClick: handleResetPlan
+        }
+    ], [handlePrint, handleResetPlan]);
+
+    const { isEmbedded } = usePortalIntegration(toolbarButtons);
+    const { isPremium, isAdmin, isFree, isEmbedded: authIsEmbedded } = usePortalAuth();
+
     // --- Real-time Calculation with Debounce ---
     useEffect(() => {
         if (!plan) return;
@@ -454,41 +588,43 @@ const App: React.FC = () => {
         <div className="min-h-screen bg-brand-background text-brand-text-primary">
             <PrintableReport plan={plan} results={results} scenarioName={activeScenario.name} />
             <div className="print:hidden">
-                    <Header
-                    activeScenario={activeScenario}
-                    scenarios={scenarios}
-                    handleSelectScenario={handleSelectScenario}
-                    handleNewScenario={handleNewScenario}
-                    handleCopyScenario={handleCopyScenario}
-                    handleDeleteScenario={handleDeleteScenario}
-                    handleUpdateScenarioName={handleUpdateScenarioName}
-                    handleDownloadScenarios={handleDownloadScenarios}
-                    handleUploadScenarios={handleUploadScenarios}
-                    handleResetPlan={handleResetPlan}
-                    handlePrint={handlePrint}
-                        onSaveDefaults={(d) => {
-                            try { localStorage.setItem('assetAssumptionDefaults', JSON.stringify(d)); } catch (e) { /* ignore */ }
-                            // apply defaults to the active plan so UI mirrors settings immediately
-                            if (d) {
-                                if (typeof d.stockMean !== 'undefined') handlePlanChange('stockMean', d.stockMean as any);
-                                if (typeof d.stockStd !== 'undefined') handlePlanChange('stockStd', d.stockStd as any);
-                                if (typeof d.bondMean !== 'undefined') handlePlanChange('bondMean', d.bondMean as any);
-                                if (typeof d.bondStd !== 'undefined') handlePlanChange('bondStd', d.bondStd as any);
-                                if (typeof d.useFatTails !== 'undefined') handlePlanChange('useFatTails', d.useFatTails as any);
-                                if (typeof d.fatTailDf !== 'undefined') handlePlanChange('fatTailDf', d.fatTailDf as any);
-                            }
-                            showToast('Saved app defaults');
+                    {!isEmbedded && (
+                        <Header
+                        activeScenario={activeScenario}
+                        scenarios={scenarios}
+                        handleSelectScenario={handleSelectScenario}
+                        handleNewScenario={handleNewScenario}
+                        handleCopyScenario={handleCopyScenario}
+                        handleDeleteScenario={handleDeleteScenario}
+                        handleUpdateScenarioName={handleUpdateScenarioName}
+                        handleDownloadScenarios={handleDownloadScenarios}
+                        handleUploadScenarios={handleUploadScenarios}
+                        handleResetPlan={handleResetPlan}
+                        handlePrint={handlePrint}
+                            onSaveDefaults={(d) => {
+                                try { localStorage.setItem('assetAssumptionDefaults', JSON.stringify(d)); } catch (e) { /* ignore */ }
+                                // apply defaults to the active plan so UI mirrors settings immediately
+                                if (d) {
+                                    if (typeof d.stockMean !== 'undefined') handlePlanChange('stockMean', d.stockMean as any);
+                                    if (typeof d.stockStd !== 'undefined') handlePlanChange('stockStd', d.stockStd as any);
+                                    if (typeof d.bondMean !== 'undefined') handlePlanChange('bondMean', d.bondMean as any);
+                                    if (typeof d.bondStd !== 'undefined') handlePlanChange('bondStd', d.bondStd as any);
+                                    if (typeof d.useFatTails !== 'undefined') handlePlanChange('useFatTails', d.useFatTails as any);
+                                    if (typeof d.fatTailDf !== 'undefined') handlePlanChange('fatTailDf', d.fatTailDf as any);
+                                }
+                                showToast('Saved app defaults');
+                            }}
+                        plan={plan}
+                        setIsManualOpen={setIsManualOpen}
+                        setIsDisclaimerOpen={(open: boolean, requireAccept?: boolean) => {
+                            setIsDisclaimerRequireAccept(Boolean(requireAccept));
+                            setIsDisclaimerOpen(open);
                         }}
-                    plan={plan}
-                    setIsManualOpen={setIsManualOpen}
-                    setIsDisclaimerOpen={(open: boolean, requireAccept?: boolean) => {
-                        setIsDisclaimerRequireAccept(Boolean(requireAccept));
-                        setIsDisclaimerOpen(open);
-                    }}
-                />
+                    />
+                    )}
 
                 <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
-                    <div className="sticky top-16 z-10">
+                    <div className={`sticky z-10 ${isEmbedded ? 'top-0' : 'top-16'}`}>
                         <ScenariosBar
                             scenarios={scenarios}
                             activeScenarioId={activeScenarioId}
@@ -540,11 +676,21 @@ const App: React.FC = () => {
                             isMcLoading={isMcLoading}
                             monteCarloResults={monteCarloResults}
                             handleRunSimulation={handleRunSimulation}
+                            isPremium={isPremium || isAdmin}
+                            isEmbedded={isEmbedded}
                         />
                     </div>
                 </div>
                 
-                <UserManualModal isOpen={isManualOpen} onClose={() => setIsManualOpen(false)} />
+                <UserManualModal
+                    isOpen={isManualOpen}
+                    onClose={() => setIsManualOpen(false)}
+                    openDisclaimer={() => {
+                        // Open disclaimer above the manual and do not require accept
+                        setIsDisclaimerRequireAccept(false);
+                        setIsDisclaimerOpen(true);
+                    }}
+                />
                 <DisclaimerModal
                     isOpen={isDisclaimerOpen}
                     requireAccept={isDisclaimerRequireAccept}
@@ -555,6 +701,28 @@ const App: React.FC = () => {
                     }}
                     onClose={() => setIsDisclaimerOpen(false)}
                 />
+                
+                {isSettingsOpen && isEmbedded && (
+                    <div style={{ position: 'fixed', top: '70px', right: '20px', zIndex: 50 }}>
+                        <AppSettingsMenu 
+                            onSaveDefaults={(d) => {
+                                try { localStorage.setItem('assetAssumptionDefaults', JSON.stringify(d)); } catch (e) { /* ignore */ }
+                                if (d) {
+                                    if (typeof d.stockMean !== 'undefined') handlePlanChange('stockMean', d.stockMean as any);
+                                    if (typeof d.stockStd !== 'undefined') handlePlanChange('stockStd', d.stockStd as any);
+                                    if (typeof d.bondMean !== 'undefined') handlePlanChange('bondMean', d.bondMean as any);
+                                    if (typeof d.bondStd !== 'undefined') handlePlanChange('bondStd', d.bondStd as any);
+                                    if (typeof d.useFatTails !== 'undefined') handlePlanChange('useFatTails', d.useFatTails as any);
+                                    if (typeof d.fatTailDf !== 'undefined') handlePlanChange('fatTailDf', d.fatTailDf as any);
+                                }
+                                showToast('Saved app defaults');
+                                setIsSettingsOpen(false);
+                            }} 
+                            onClose={() => setIsSettingsOpen(false)} 
+                            plan={plan} 
+                        />
+                    </div>
+                )}
                 
                 <Toast message={toastMessage} />
                 <ScrollToTopButton />
