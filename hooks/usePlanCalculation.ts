@@ -53,12 +53,13 @@ export const useAIInsights = () => {
     const [aiInsights, setAiInsights] = useState<string>('');
 
     const getInsights = useCallback(async (plan: RetirementPlan, results: CalculationResult) => {
+        const AI_PROXY = (import.meta as any).env?.VITE_AI_PROXY_URL || 'http://localhost:3000';
         try {
             setIsAiLoading(true);
             setAiInsights('');
             // Send plan+results to the server-side AI proxy
             try {
-                const resp = await fetch('/api/insights', {
+                const resp = await fetch(`${AI_PROXY}/api/insights`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ plan, result: results }),
