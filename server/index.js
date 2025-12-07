@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 let GoogleGenAI;
 try {
   // optional dependency: @google/genai may not be published/available in some registries
@@ -11,6 +12,27 @@ require('dotenv').config();
 
 const app = express();
 app.use(bodyParser.json({ limit: '1mb' }));
+
+// Configure CORS: allow origins from env or sensible defaults for dev and production
+const allowedOrigins = process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',') : [
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'https://retirement-planner-ai.vercel.app',
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // Allow requests with no origin like mobile apps or server-to-server
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) !== -1 || allowedOrigins.indexOf('*') !== -1) {
+      return callback(null, true);
+    }
+    return callback(new Error('CORS policy: Origin not allowed'));
+  },
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+}));
 
 if (!process.env.API_KEY) {
   console.warn('Warning: API_KEY not set in server environment. AI proxy will return a fallback message.');
