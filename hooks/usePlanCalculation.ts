@@ -51,9 +51,11 @@ export const usePlanCalculation = (plan: RetirementPlan | undefined) => {
 export const useAIInsights = () => {
     const [isAiLoading, setIsAiLoading] = useState(false);
     const [aiInsights, setAiInsights] = useState<string>('');
+    const [aiProvider, setAiProvider] = useState<string | null>(null);
 
     const getInsights = useCallback(async (plan: RetirementPlan, results: CalculationResult) => {
-        const AI_PROXY = (import.meta as any).env?.VITE_AI_PROXY_URL || 'http://localhost:3000';
+        // Prefer explicit env var; default to the local proxy on port 4000 for dev
+        const AI_PROXY = (import.meta as any).env?.VITE_AI_PROXY_URL || 'http://localhost:4000';
         try {
             setIsAiLoading(true);
             setAiInsights('');
@@ -69,20 +71,34 @@ export const useAIInsights = () => {
                     throw new Error(text || `AI proxy error: ${resp.status}`);
                 }
                 const data = await resp.json();
+                // Read provider from response header (proxy sets `X-AI-Provider`)
+                const providerHeader = resp.headers.get('x-ai-provider');
+                if (providerHeader) setAiProvider(String(providerHeader));
                 setAiInsights(data.text || 'No insights returned.');
-                // Report AI query to portal
+                // Report AI query to portal: try proxy forwarding (avoids CORS), fall back to Firebase callable
                 try {
-                    const trackEvent = httpsCallable(functions, 'trackEvent');
-                    await trackEvent({
-                        eventType: 'query',
-                        application: 'retirement-planner',
-                        metadata: {
-                            timestamp: new Date().toISOString(),
-                        },
+                    const reportUrl = `${AI_PROXY.replace(/\/$/, '')}/api/report`;
+                    await fetch(reportUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            eventType: 'query',
+                            application: 'retirement-planner',
+                            metadata: { timestamp: new Date().toISOString() },
+                        }),
                     });
-                } catch (err) {
-                    // Non-blocking
-                    console.warn('Failed to report AI query to portal:', err);
+                } catch (proxyErr) {
+                    try {
+                        const trackEvent = httpsCallable(functions, 'trackEvent');
+                        await trackEvent({
+                            eventType: 'query',
+                            application: 'retirement-planner',
+                            metadata: { timestamp: new Date().toISOString() },
+                        });
+                    } catch (err) {
+                        // Non-blocking
+                        console.warn('Failed to report AI query to portal:', err, proxyErr);
+                    }
                 }
             } catch (err: any) {
                 console.error('AI proxy call failed:', err);
@@ -98,11 +114,13 @@ export const useAIInsights = () => {
 
     const clearInsights = useCallback(() => {
         setAiInsights('');
+        setAiProvider(null);
     }, []);
 
     return {
         isAiLoading,
         aiInsights,
+        aiProvider,
         getInsights,
         clearInsights,
     };

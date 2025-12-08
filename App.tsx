@@ -106,7 +106,7 @@ const App: React.FC = () => {
     const { results, isLoading, error, projectionData, calculatePlan, setResults, setError } = usePlanCalculation(plan);
     
     // AI insights management
-    const { isAiLoading, aiInsights, getInsights, clearInsights } = useAIInsights();
+    const { isAiLoading, aiInsights, aiProvider, getInsights, clearInsights } = useAIInsights();
     
     // Social Security auto-calculation
     useSocialSecurityCalculation(plan, updateActivePlan);
@@ -669,6 +669,7 @@ const App: React.FC = () => {
                             results={results}
                             isLoading={isLoading}
                             error={error}
+                            aiProvider={aiProvider}
                             isAiLoading={isAiLoading}
                             aiInsights={aiInsights}
                             handleGetInsights={handleGetInsights}

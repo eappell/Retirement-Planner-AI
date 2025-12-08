@@ -14,6 +14,7 @@ interface AnalysisSectionsProps {
     error: string | null;
     aiInsights: string;
     isAiLoading: boolean;
+    aiProvider?: string | null;
     handleGetInsights: () => void;
     projectionData: YearlyProjection[];
     monteCarloResults: MonteCarloResult | null;
@@ -98,6 +99,7 @@ export const AnalysisSections: React.FC<AnalysisSectionsProps> = ({
     handleRunSimulation,
     isPremium = false,
     isEmbedded = false,
+    aiProvider = null,
 }) => {
     
     const isCouple = plan.planType === PlanType.COUPLE;
@@ -143,8 +145,15 @@ export const AnalysisSections: React.FC<AnalysisSectionsProps> = ({
                     </button>
                     {aiInsights && (
                         <div className="mt-4 p-4 border rounded-md bg-purple-50">
-                    <div className="prose prose-sm max-w-none ai-insights" dangerouslySetInnerHTML={{__html: markdownToHtml(aiInsights)}}></div>
-                    </div>
+                            <div className="flex items-start justify-between">
+                                <div className="prose prose-sm max-w-none ai-insights" dangerouslySetInnerHTML={{__html: markdownToHtml(aiInsights)}}></div>
+                                {aiProvider && (
+                                    <div className="ml-4 flex-shrink-0">
+                                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 border">{aiProvider}</span>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                     )}
                 </PremiumGate>
                 </div>
