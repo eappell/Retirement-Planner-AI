@@ -54,55 +54,128 @@ export const useAIInsights = () => {
     const [aiProvider, setAiProvider] = useState<string | null>(null);
 
     const getInsights = useCallback(async (plan: RetirementPlan, results: CalculationResult) => {
-        // Prefer explicit env var; default to the local proxy on port 4000 for dev
-        const AI_PROXY = (import.meta as any).env?.VITE_AI_PROXY_URL || 'http://localhost:4000';
+        // Prefer explicit env var; default to the local proxy on port 3000 for dev
+        const configuredProxy = (import.meta as any).env?.VITE_AI_PROXY_URL || null;
+        const defaultProxy = 'http://localhost:3000';
+        // Prefer same-origin first so deployed apps that expose /api/insights
+        // via their platform (or reverse proxy) work without extra config.
+        const originApi = window.location.origin.replace(/\/$/, '') + '/api';
+        const candidates: string[] = [originApi];
+        if (configuredProxy) candidates.push(configuredProxy.replace(/\/$/, ''));
+        candidates.push(defaultProxy);
+
+        let lastError: Error | null = null;
+
+            // If embedded, prefer asking the parent portal to fetch insights via its secure proxy.
+            if (window.self !== window.top) {
+                try {
+                    const requestId = `insights_${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
+                    const payload = { type: 'REQUEST_INSIGHTS', requestId, plan, result };
+                    // Promise that resolves when parent replies with INSIGHTS_RESPONSE
+                    const responseFromParent = await new Promise<string | null>((resolve, reject) => {
+                        const timer = setTimeout(() => {
+                            window.removeEventListener('message', listener);
+                            resolve(null);
+                        }, 6000);
+
+                        const listener = (event: MessageEvent) => {
+                            try {
+                                const data = event.data || {};
+                                if (data && data.type === 'INSIGHTS_RESPONSE' && data.requestId === requestId) {
+                                    clearTimeout(timer);
+                                    window.removeEventListener('message', listener);
+                                    if (data.error) return resolve(null);
+                                    return resolve(data.text || null);
+                                }
+                            } catch (e) { /* ignore */ }
+                        };
+
+                        window.addEventListener('message', listener);
+                        // send request to parent portal
+                        try { window.parent.postMessage(payload, '*'); } catch (e) { window.removeEventListener('message', listener); clearTimeout(timer); return reject(e); }
+                    }).catch(() => null);
+
+                    if (responseFromParent) {
+                        setAiProvider('portal-proxy');
+                        setAiInsights(responseFromParent);
+                        setIsAiLoading(false);
+                        return;
+                    }
+                } catch (e) {
+                    console.warn('Portal proxy postMessage failed, falling back to local proxies', e);
+                }
+            }
         try {
             setIsAiLoading(true);
             setAiInsights('');
-            // Send plan+results to the server-side AI proxy
-            try {
-                const resp = await fetch(`${AI_PROXY}/api/insights`, {
+
+            const tryFetch = async (baseUrl: string) => {
+                const base = baseUrl.replace(/\/$/, '');
+                // Try /api/insights first (server uses this route), then /insights
+                const urlsToTry = [`${base}/api/insights`, `${base}/insights`];
+                let lastErr: any = null;
+                for (const url of urlsToTry) {
+                    try {
+                        const resp = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ plan, result: results }),
-                });
-                if (!resp.ok) {
-                    const text = await resp.text();
-                    throw new Error(text || `AI proxy error: ${resp.status}`);
-                }
-                const data = await resp.json();
-                // Read provider from response header (proxy sets `X-AI-Provider`)
-                const providerHeader = resp.headers.get('x-ai-provider');
-                if (providerHeader) setAiProvider(String(providerHeader));
-                setAiInsights(data.text || 'No insights returned.');
-                // Report AI query to portal: try proxy forwarding (avoids CORS), fall back to Firebase callable
-                try {
-                    const reportUrl = `${AI_PROXY.replace(/\/$/, '')}/api/report`;
-                    await fetch(reportUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            eventType: 'query',
-                            application: 'retirement-planner',
-                            metadata: { timestamp: new Date().toISOString() },
-                        }),
-                    });
-                } catch (proxyErr) {
-                    try {
-                        const trackEvent = httpsCallable(functions, 'trackEvent');
-                        await trackEvent({
-                            eventType: 'query',
-                            application: 'retirement-planner',
-                            metadata: { timestamp: new Date().toISOString() },
                         });
-                    } catch (err) {
-                        // Non-blocking
-                        console.warn('Failed to report AI query to portal:', err, proxyErr);
+                        if (!resp.ok) {
+                            const text = await resp.text().catch(() => null);
+                            throw new Error(text || `AI proxy error: ${resp.status}`);
+                        }
+                        const data = await resp.json();
+                        // Read provider header if present
+                        const providerHeader = resp.headers.get('x-ai-provider') || resp.headers.get('X-AI-Provider');
+                        if (providerHeader) setAiProvider(String(providerHeader));
+                        return data.text || 'No insights returned.';
+                    } catch (e) {
+                        lastErr = e;
+                        // try next url
                     }
                 }
-            } catch (err: any) {
-                console.error('AI proxy call failed:', err);
+                throw lastErr || new Error('All urls failed');
+            };
+
+            let resultText: string | null = null;
+            for (const base of candidates) {
+                try {
+                    // console.debug to help with diagnosing environment-specific failures
+                    console.debug('[getInsights] trying AI proxy at', base);
+                    resultText = await tryFetch(base);
+                    console.debug('[getInsights] success from', base);
+                    // Attempt to report the query; don't block the user on failures
+                    (async () => {
+                        try {
+                            const reportUrl = `${base.replace(/\/$/, '')}/report`;
+                            await fetch(reportUrl, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ eventType: 'query', application: 'retirement-planner', metadata: { timestamp: new Date().toISOString() } }),
+                            });
+                        } catch (proxyErr) {
+                            try {
+                                const trackEvent = httpsCallable(functions, 'trackEvent');
+                                await trackEvent({ eventType: 'query', application: 'retirement-planner', metadata: { timestamp: new Date().toISOString() } });
+                            } catch (err) {
+                                console.warn('Failed to report AI query to portal:', err, proxyErr);
+                            }
+                        }
+                    })();
+                    break;
+                } catch (err: any) {
+                    console.warn('[getInsights] proxy at', base, 'failed:', err && (err.message || err));
+                    lastError = err instanceof Error ? err : new Error(String(err));
+                    // continue to next candidate
+                }
+            }
+
+            if (!resultText) {
+                console.error('All AI proxy attempts failed.', lastError);
                 setAiInsights('AI Insights are currently unavailable. Please try again later.');
+            } else {
+                setAiInsights(resultText);
             }
         } catch (error) {
             console.error('Error getting AI insights:', error);

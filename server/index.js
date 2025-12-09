@@ -25,6 +25,17 @@ app.use(cors({
   origin: function (origin, callback) {
     // Allow requests with no origin like mobile apps or server-to-server
     if (!origin) return callback(null, true);
+
+    // Allow any localhost origin (useful during development when Vite picks
+    // a dynamic port such as 5174) while keeping stricter policies for other
+    // hosts.
+    try {
+      const u = new URL(origin);
+      if (u.hostname === 'localhost' || u.hostname === '127.0.0.1') return callback(null, true);
+    } catch (e) {
+      // ignore parse errors
+    }
+
     if (allowedOrigins.indexOf(origin) !== -1 || allowedOrigins.indexOf('*') !== -1) {
       return callback(null, true);
     }

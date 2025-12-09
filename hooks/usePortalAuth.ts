@@ -13,7 +13,6 @@ export const usePortalAuth = () => {
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
   const [isEmbedded, setIsEmbedded] = useState<boolean>(initialEmbedded);
-  const [allowAllWhenNoPortal, setAllowAllWhenNoPortal] = useState(false);
 
   useEffect(() => {
     // Update embedded state in case it changed
@@ -36,13 +35,7 @@ export const usePortalAuth = () => {
         const rawTier = (event.data.tier || '').toString().toLowerCase();
         let normalizedTier: UserData['tier'] = 'free';
         if (rawTier.startsWith('admin')) normalizedTier = 'admin';
-        else if (rawTier.startsWith('premium')) normalizedTier = 'premium';
-
-        console.log('[usePortalAuth] Received auth token:', {
-          userId: event.data.userId,
-          email: event.data.email,
-          tier: normalizedTier,
-        });
+        else if (rawTier.startsWith('premium') || rawTier.startsWith('paid')) normalizedTier = 'premium';
 
         setUserData({
           userId: event.data.userId,
@@ -56,13 +49,10 @@ export const usePortalAuth = () => {
 
     window.addEventListener('message', handleMessage);
 
-    // Set loading to false after a short timeout if no message received
-    // and allow all features when embedded but parent doesn't provide auth.
+    // Set loading to false after a short timeout if no message received.
+    // Important: when embedded, do NOT grant features by default — features
+    // should be gated unless the portal provides an authorized role.
     const timeout = setTimeout(() => {
-      if (!userData) {
-        // If embedded and parent didn't respond, allow all features
-        if (embeddedNow) setAllowAllWhenNoPortal(true);
-      }
       setLoading(false);
     }, 2000);
 
@@ -76,7 +66,7 @@ export const usePortalAuth = () => {
   // having full access so users see all features.
   const isStandalone = !isEmbedded;
 
-  const effectiveAllAccess = isStandalone || allowAllWhenNoPortal;
+  const effectiveAllAccess = isStandalone;
 
   return {
     userData,
@@ -84,8 +74,8 @@ export const usePortalAuth = () => {
     isEmbedded,
     isAuthenticated: !!userData,
     isFree: userData?.tier === 'free',
-    // If we have user data, honor it. Otherwise, if running standalone or
-    // parent didn't provide auth, expose premium features.
+    // If we have user data, honor it. Otherwise, only allow full access when
+    // running standalone (not embedded in a portal).
     isPremium: userData ? (userData.tier === 'premium' || userData.tier === 'admin') : effectiveAllAccess,
     isAdmin: userData?.tier === 'admin',
     hasAccess: (requiredTier: 'free' | 'premium' | 'admin') => {
