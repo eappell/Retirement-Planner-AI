@@ -59,10 +59,18 @@ export const useAIInsights = () => {
         const defaultProxy = 'http://localhost:3000';
         // Prefer same-origin first so deployed apps that expose /api/insights
         // via their platform (or reverse proxy) work without extra config.
-        const originApi = window.location.origin.replace(/\/$/, '') + '/api';
+        // NOTE: keep `originApi` as the origin (no trailing `/api`) because
+        // `tryFetch` appends `/api/insights` and `/insights` itself. Using
+        // origin + '/api' here caused duplicate `/api/api/insights` requests.
+        const originApi = window.location.origin.replace(/\/$/, '');
         const candidates: string[] = [originApi];
         if (configuredProxy) candidates.push(configuredProxy.replace(/\/$/, ''));
-        candidates.push(defaultProxy);
+        // Only include the localhost fallback when the frontend is running
+        // on localhost. Browsers will block deployed origins from reaching
+        // private address-space endpoints like localhost (Private Network Access).
+        if (['localhost', '127.0.0.1'].includes(window.location.hostname)) {
+            candidates.push(defaultProxy);
+        }
 
         let lastError: Error | null = null;
 
