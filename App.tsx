@@ -300,6 +300,7 @@ const App: React.FC = () => {
         addOneTimeExpense: (expense) => addToList('oneTimeExpenses', expense),
         scenarios: scenarios ? Object.values(scenarios).map(s => ({ id: s.id, name: s.name })) : [],
         activeScenarioId: activeScenarioId || null,
+        selectScenario: selectScenario,
     });
     
     // Show toast notification when healthcare data is received

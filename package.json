@@ -5,7 +5,6 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "start-server": "node server/index.js",
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run",
@@ -14,12 +13,7 @@
   "dependencies": {
     "@google/genai": "^1.29.1",
     "@heroicons/react": "^2.2.0",
-    "anthropic": "^0.0.0",
-    "body-parser": "^2.2.1",
-    "cors": "^2.8.5",
-    "dotenv": "^17.2.3",
-    "express": "^5.2.1",
-    "firebase": "^12.6.0",
+    "firebase-admin": "^13.6.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },
