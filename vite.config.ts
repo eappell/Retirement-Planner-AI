@@ -13,4 +13,16 @@ export default defineConfig({
   },
   resolve: {
   }
+  ,
+  server: {
+    // Forward client-side `/api` calls to the local AI proxy during development
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/api/, '/api')
+      }
+    }
+  }
 });
