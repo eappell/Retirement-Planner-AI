@@ -61,6 +61,16 @@ export const ThemeProvider: React.FC<React.PropsWithChildren<{}>> = ({ children 
     return () => window.removeEventListener('message', handleMessage);
   }, [isEmbedded]);
 
+  // If embedded, request the current portal theme on load so we immediately sync
+  useEffect(() => {
+    if (!isEmbedded) return;
+    try {
+      window.parent.postMessage({ type: 'REQUEST_THEME' }, '*');
+    } catch (e) {
+      // ignore cross-origin failures
+    }
+  }, [isEmbedded]);
+
   useEffect(() => {
     try {
       document.documentElement.classList.toggle('theme-dark', theme === 'dark');
