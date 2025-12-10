@@ -54,18 +54,12 @@ export default async (req, res) => {
     });
 
     const text = await resp.text();
-    if (!resp.ok) {
-      console.warn('Report forwarding failed','status=', resp.status, 'body=', text);
-      return res.status(resp.status).send(text);
-    }
-
     // Try to return JSON if possible
-    try {
-      const parsed = JSON.parse(text);
-      return res.status(200).json(parsed);
-    } catch (e) {
-      return res.status(200).send(text);
-    }
+    let parsed = null;
+    try { parsed = JSON.parse(text); } catch (e) { /* ignore */ }
+    // Always succeed to avoid causing a 4xx/5xx on caller that would treat reporting
+    // failures as hard errors. Instead surface diagnostic info in the response.
+    return res.status(200).json({ ok: true, forwarded: resp.ok, forwardedStatus: resp.status, forwardedBody: parsed || text });
   } catch (err) {
     console.error('Report handler error', err);
     const errMsg = (err && err.message) ? err.message : String(err);
