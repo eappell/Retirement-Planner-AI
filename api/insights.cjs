@@ -56,8 +56,18 @@ module.exports = async (req, res) => {
     } catch (err) {
       console.error('AI generation error', String(err));
       const fallback = `Overview:\nThis is a fallback response summarizing the plan.\n\nTips:\n1. Review asset allocation.\n2. Increase retirement savings by 1-3%.\n3. Revisit retirement age and Social Security timing.`;
-      res.setHeader('X-AI-Provider', providerLower);
-      return res.status(200).json({ text: fallback, _fallback: true });
+      // Include diagnostics to help identify why AI generation failed in production.
+      const fallbackReason = (err && err.message) ? String(err.message) : 'unknown error';
+      // Non-sensitive indicators about SDK/keys.
+      const diagnostics = {
+        provider: providerLower,
+        googleSdkInstalled: !!GoogleGenAI,
+        apiKeyPresent: !!process.env.API_KEY,
+        claudeKeyPresent: !!process.env.CLAUDE_API_KEY,
+      };
+      try { res.setHeader('X-AI-Provider', providerLower); } catch (e) { /* ignore */ }
+      // Return the fallback with a non-sensitive diagnostics field to aid debugging.
+      return res.status(200).json({ text: fallback, _fallback: true, _fallbackReason: fallbackReason, _diagnostics: diagnostics });
     }
 
     if (typeof text !== 'string') text = String(text);
