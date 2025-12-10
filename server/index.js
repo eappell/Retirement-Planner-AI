@@ -271,9 +271,30 @@ app.post('/api/insights', async (req, res) => {
         const claudePrompt = `Human: Please read the following retirement plan summary and provide a short Overview and three Actionable Tips in Markdown.\n\n${planSummary}\n\nAssistant:`;
         text = await generateWithClaude(claudePrompt);
       } else {
-        // default to google/gemini
+        // default to google/gemini with a safe fallback model if configured model is unsupported
         const googlePrompt = prompt;
-        text = await generateWithGoogle(googlePrompt);
+        const configuredModel = process.env.GOOGLE_MODEL || 'gemini-2.0-flash';
+        try {
+          text = await generateWithGoogle(googlePrompt);
+        } catch (err) {
+          console.warn('Google model generation with', configuredModel, 'failed, attempting fallback model. Error:', String(err));
+          // If the configured model is not found or not supported, try a conservative fallback
+          const fallbackModel = 'gemini-2.0-flash';
+          if (configuredModel !== fallbackModel) {
+            try {
+              // Temporarily override env for this call
+              const orig = process.env.GOOGLE_MODEL;
+              process.env.GOOGLE_MODEL = fallbackModel;
+              text = await generateWithGoogle(googlePrompt);
+              process.env.GOOGLE_MODEL = orig;
+            } catch (err2) {
+              console.error('Fallback google model also failed:', String(err2));
+              throw err2;
+            }
+          } else {
+            throw err;
+          }
+        }
       }
 
       // If the provider returned a JSON object or complex shape, stringify minimal text
