@@ -1,0 +1,60 @@
+// Vercel serverless function that forwards report events to the configured
+// `PORTAL_TRACK_URL`. Mirrors the behavior from the Express dev server so
+// production deployments (Vercel) can accept /api/report requests.
+
+/**
+ * Expected env:
+ * - PORTAL_TRACK_URL: the fully qualified URL to forward reports to (e.g., https://retirement-portal.vercel.app/api/report)
+ */
+
+const parseJsonBody = async (req) => {
+  if (req.body) return req.body;
+  return await new Promise((resolve, reject) => {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      try {
+        resolve(body ? JSON.parse(body) : {});
+      } catch (e) {
+        reject(e);
+      }
+    });
+    req.on('error', reject);
+  });
+};
+
+module.exports = async (req, res) => {
+  try {
+    const body = await parseJsonBody(req);
+    const trackUrl = process.env.PORTAL_TRACK_URL;
+    if (!trackUrl) {
+      // Keep parity with local dev: don't fail the client
+      const warning = 'PORTAL_TRACK_URL not configured; skipping portal forwarding';
+      console.warn(warning);
+      return res.status(200).json({ ok: true, warning, forwarded: false });
+    }
+
+    const resp = await fetch(trackUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+
+    const text = await resp.text();
+    if (!resp.ok) {
+      console.warn('Report forwarding failed','status=', resp.status, 'body=', text);
+      return res.status(resp.status).send(text);
+    }
+
+    // Try to return JSON if possible
+    try {
+      const parsed = JSON.parse(text);
+      return res.status(200).json(parsed);
+    } catch (e) {
+      return res.status(200).send(text);
+    }
+  } catch (err) {
+    console.error('Report handler error', err);
+    return res.status(500).json({ error: 'Report forwarding failed' });
+  }
+};
