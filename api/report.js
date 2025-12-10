@@ -26,6 +26,17 @@ const parseJsonBody = async (req) => {
 module.exports = async (req, res) => {
   try {
     const body = await parseJsonBody(req);
+    // Ensure we have a working fetch implementation
+    let fetchFn = globalThis.fetch;
+    if (!fetchFn) {
+      try {
+        const { default: nodeFetch } = await import('node-fetch');
+        fetchFn = nodeFetch;
+      } catch (e) {
+        console.error('No fetch available and failed to load node-fetch', e);
+        return res.status(500).json({ error: 'No fetch implementation available' });
+      }
+    }
     const trackUrl = process.env.PORTAL_TRACK_URL;
     if (!trackUrl) {
       // Keep parity with local dev: don't fail the client
@@ -34,7 +45,7 @@ module.exports = async (req, res) => {
       return res.status(200).json({ ok: true, warning, forwarded: false });
     }
 
-    const resp = await fetch(trackUrl, {
+    const resp = await fetchFn(trackUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
