@@ -12,6 +12,8 @@
   },
   "dependencies": {
     "@google/genai": "^1.29.1",
+    "@anthropic-ai/sdk": "^0.71.1",
+    "node-fetch": "^3.3.1",
     "@heroicons/react": "^2.2.0",
     "firebase-admin": "^13.6.0",
     "firebase": "^11.0.0",
@@ -19,6 +21,7 @@
     "react-dom": "^19.2.0"
   },
   "devDependencies": {
+    "express": "^4.19.4",
     "@types/node": "^22.14.0",
     "@types/react": "^19.2.4",
     "@types/react-dom": "^19.2.3",
