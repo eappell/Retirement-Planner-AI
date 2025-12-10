@@ -2,7 +2,5 @@
   "version": 2,
   "buildCommand": "npm run build",
   "framework": "vite",
-  "functions": {
-    "api/**/*.js": { "runtime": "nodejs20.x", "memory": 1024, "maxDuration": 60 }
-  }
+  
 }
