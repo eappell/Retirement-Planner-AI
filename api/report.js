@@ -23,7 +23,7 @@ const parseJsonBody = async (req) => {
   });
 };
 
-module.exports = async (req, res) => {
+export default async (req, res) => {
   try {
     const body = await parseJsonBody(req);
     // Ensure we have a working fetch implementation
