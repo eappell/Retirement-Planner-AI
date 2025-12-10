@@ -23,6 +23,8 @@ const parseJsonBody = async (req) => {
   });
 };
 
+console.log('api/report module loaded', { PORTAL_TRACK_URL: process.env.PORTAL_TRACK_URL, hasGlobalFetch: typeof globalThis.fetch !== 'undefined' });
+
 export default async (req, res) => {
   try {
     const body = await parseJsonBody(req);
@@ -66,6 +68,8 @@ export default async (req, res) => {
     }
   } catch (err) {
     console.error('Report handler error', err);
-    return res.status(500).json({ error: 'Report forwarding failed' });
+    const errMsg = (err && err.message) ? err.message : String(err);
+    console.error('Report forwarding failed', errMsg);
+    return res.status(500).json({ error: 'Report forwarding failed', details: errMsg });
   }
 };
