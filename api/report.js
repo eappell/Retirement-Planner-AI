@@ -47,11 +47,20 @@ export default async (req, res) => {
       return res.status(200).json({ ok: true, warning, forwarded: false });
     }
 
-    const resp = await fetchFn(trackUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
+    const outgoingHeaders = { 'Content-Type': 'application/json', 'X-Report-Source': 'retirement-planner' };
+    // Prevent loops: if the incoming request already had an X-Report-Source header
+    // (e.g., 'retire-portal' or 'retirement-planner'), do not forward.
+    const incomingSource = req.headers && (req.headers['x-report-source'] || req.headers['X-Report-Source']);
+    if (incomingSource) {
+      console.warn('Skipping forwarding to avoid loop: incoming X-Report-Source=', incomingSource);
+      return res.status(200).json({ ok: true, forwarded: false, reason: 'loop detected', incomingSource });
+    }
+
+    const resp = await fetchFn(trackUrl, { method: 'POST', headers: outgoingHeaders, body: JSON.stringify(body) });
+    // Avoid forwarding loops by including a label of where this forward originated.
+    // Recipients should not forward again if they see this header.
+    // We included header on the outgoing request above; but ensure our handler won't re-forward requests
+    // where the incoming request already included X-Report-Source.
 
     const text = await resp.text();
     // Try to return JSON if possible
