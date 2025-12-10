@@ -1,6 +1,9 @@
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-const handler = require('../api/report');
+let handler;
+// Import ESM export from api/report
+const loadHandler = async () => {
+  const m = await import('../api/report.js');
+  handler = m.default || m;
+};
 
 // Mock request (IncomingMessage) and response
 const makeMockReq = (body) => {
@@ -33,6 +36,7 @@ const makeMockRes = () => {
 };
 
 (async () => {
+  await loadHandler();
   const req = makeMockReq({ eventType: 'test', application: 'retirement-planner', metadata: { timestamp: new Date().toISOString() } });
   const res = makeMockRes();
   // Set a backend to forward to for testing (httpbin returns JSON)
