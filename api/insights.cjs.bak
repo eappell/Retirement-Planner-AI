@@ -1,0 +1,2 @@
+// Archived duplicate - do not deploy. See api/insights.js wrapper -> ../lib/insights.cjs
+module.exports = require('../lib/insights.cjs');
