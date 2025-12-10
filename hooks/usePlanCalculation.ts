@@ -161,7 +161,9 @@ export const useAIInsights = () => {
                     // Attempt to report the query; don't block the user on failures
                     (async () => {
                         try {
-                            const reportUrl = `${base.replace(/\/$/, '')}/report`;
+                            // Report to the proxy's server-side reporting endpoint. Prefer the
+                            // canonical /api/report path (used by both Portal and Planner).
+                            const reportUrl = `${base.replace(/\/$/, '')}/api/report`;
                             await fetch(reportUrl, {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
