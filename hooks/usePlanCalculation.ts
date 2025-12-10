@@ -93,6 +93,11 @@ export const useAIInsights = () => {
                                     clearTimeout(timer);
                                     window.removeEventListener('message', listener);
                                     if (data.error) return resolve(null);
+                                    // surface any upstream fallback reason via the portal proxy so frontend can show diagnostics
+                                    if (data.upstreamFallbackReason) {
+                                        console.warn('[useAIInsights] upstream fallback reason from portal:', data.upstreamFallbackReason);
+                                    }
+                                    if (data.provider) setAiProvider(String(data.provider));
                                     return resolve(data.text || null);
                                 }
                             } catch (e) { /* ignore */ }
