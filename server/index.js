@@ -83,9 +83,9 @@ async function generateWithClaude(prompt) {
   // style isn't detected.
   let AnthropicSDK = null;
   try {
-    AnthropicSDK = require('anthropic');
+    AnthropicSDK = require('@anthropic-ai/sdk');
   } catch (e) {
-    AnthropicSDK = null;
+    try { AnthropicSDK = require('anthropic'); } catch (e2) { AnthropicSDK = null; }
   }
 
   // Helper to try various SDK shapes and extract text safely
