@@ -23,7 +23,6 @@ import {
     usePortalIntegration,
     usePortalAuth 
 } from './hooks';
-import { useHealthcareIntegration } from './hooks/useHealthcareIntegration';
 import { buildExport, parseUpload } from './utils/exportImport';
 import useTheme from './hooks/useTheme';
 
@@ -147,8 +146,20 @@ const App: React.FC = () => {
             if (event.data?.type === 'HEALTHCARE_DATA_RESPONSE' && !hasImported) {
                 console.log('[App] Received healthcare data from portal:', event.data.data);
                 const transfer = event.data.data;
-                
+
+                // If the hook already processed the same transfer, skip duplicate import
+                if (receivedData && transfer && receivedData.data?.metadata?.generatedAt && transfer.data?.metadata?.generatedAt && receivedData.data.metadata.generatedAt === transfer.data.metadata.generatedAt) {
+                    console.log('[App] Duplicate healthcare transfer detected; skipping import (already processed by integration hook).');
+                    hasImported = true;
+                    return;
+                }
+
                 if (transfer && transfer.data && plan) {
+                    // If the data appears to be a full scenarios backup, ignore it to avoid replacing user's data
+                    if ((transfer as any).data && ((transfer as any).data.scenarios || (transfer as any).data.scenariosState)) {
+                        console.warn("[App] Received transfer looks like full scenarios data - ignoring to avoid overwrite", transfer);
+                        return;
+                    }
                     console.log('[App] Importing healthcare data...');
                     hasImported = true;
                     
@@ -294,21 +305,10 @@ const App: React.FC = () => {
         });
     };
     
-    // --- Healthcare Cost Integration ---
-    const { receivedData } = useHealthcareIntegration({
-        addExpensePeriod: (period) => addToList('expensePeriods', period),
-        addOneTimeExpense: (expense) => addToList('oneTimeExpenses', expense),
-        scenarios: scenarios ? Object.values(scenarios).map(s => ({ id: s.id, name: s.name })) : [],
-        activeScenarioId: activeScenarioId || null,
-        selectScenario: selectScenario,
-    });
-    
-    // Show toast notification when healthcare data is received
-    useEffect(() => {
-        if (receivedData) {
-            showToast('Healthcare costs added to your retirement plan!', 3000);
-        }
-    }, [receivedData]);
+    // --- Healthcare Cost Integration Disabled ---
+    // The integration with external Healthcare Cost app has been disabled due to stability
+    // concerns that could overwrite user scenarios. If re-enabled in future, use a safe,
+    // authenticated channel and ensure imports append to existing plans.
 
     // --- Scenario Management Handlers (using hooks) ---
     const clearCalculationResults = useCallback(() => {

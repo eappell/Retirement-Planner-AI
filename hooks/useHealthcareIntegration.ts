@@ -86,15 +86,34 @@ export function useHealthcareIntegration({
   // Handle incoming healthcare data
   const handleHealthcareData = useCallback((transfer: HealthcareDataTransfer) => {
     console.log('[Healthcare Integration] Received healthcare data:', transfer);
-    
+
     try {
+      // Ensure this transfer is for healthcare only (reject if it looks like a full scenarios upload)
+      if ((transfer as any).data && ((transfer as any).data.scenarios || (transfer as any).data.scenariosState)) {
+        console.warn('[Healthcare Integration] Ignoring transfer: seems to contain full scenarios state');
+        return;
+      }
+
+      // Avoid re-applying the same transfer more than once (simple dedupe using generatedAt)
+      const lastGen = receivedData?.data?.metadata?.generatedAt;
+      const incomingGen = transfer?.data?.metadata?.generatedAt;
+      if (lastGen && incomingGen && lastGen === incomingGen) {
+        console.log('[Healthcare Integration] Duplicate transfer ignored (same generatedAt)');
+        return;
+      }
+
       // Generate unique IDs for the new entries
       const expensePeriodId = `healthcare-${Date.now()}`;
       const oneTimeExpenseId = `healthcare-ltc-${Date.now()}`;
-      // If we don't have an active plan, attempt to select a target scenario
-      // provided by the transfer or fall back to the first available scenario.
-      const ensureAndApply = () => {
-        if (transfer && transfer.data && (typeof addExpensePeriod === 'function')) {
+
+      const applyTransfer = () => {
+        if (!(transfer && transfer.data && typeof addExpensePeriod === 'function')) {
+          console.log('[Healthcare Integration] Cannot import: data structure invalid or plan not ready');
+          return;
+        }
+
+        // Build the new expense period object and append it
+        if (transfer.data.expensePeriod) {
           const newExpensePeriod = {
             id: expensePeriodId,
             name: transfer.data.expensePeriod.name,
@@ -104,101 +123,56 @@ export function useHealthcareIntegration({
             endAge: transfer.data.expensePeriod.endAge,
             endAgeRef: transfer.data.expensePeriod.endAgeRef,
           };
-
           addExpensePeriod(newExpensePeriod);
           console.log('[Healthcare Integration] Added expense period:', newExpensePeriod);
-
-          if (transfer.data.oneTimeExpense) {
-            const newOneTimeExpense = {
-              id: oneTimeExpenseId,
-              owner: transfer.data.oneTimeExpense.owner,
-              age: transfer.data.oneTimeExpense.age,
-              amount: transfer.data.oneTimeExpense.amount,
-              description: transfer.data.oneTimeExpense.description,
-            };
-            addOneTimeExpense(newOneTimeExpense);
-            console.log('[Healthcare Integration] Added one-time expense:', newOneTimeExpense);
-          }
-
-          setReceivedData(transfer);
-
-          window.parent.postMessage(
-            {
-              type: 'APP_DATA_TRANSFER_RESPONSE',
-              success: true,
-              sourceApp: 'healthcare-cost',
-              targetApp: 'retirement-planner',
-              dataType: 'HEALTHCARE_COSTS',
-              message: 'Healthcare costs successfully added to retirement plan',
-            },
-            '*'
-          );
-        } else {
-          console.log('[Healthcare Integration] Cannot import: data structure invalid or plan not ready');
         }
+
+        // Append a one-time LTC expense if present
+        if (transfer.data.oneTimeExpense) {
+          const newOneTimeExpense = {
+            id: oneTimeExpenseId,
+            owner: transfer.data.oneTimeExpense.owner,
+            age: transfer.data.oneTimeExpense.age,
+            amount: transfer.data.oneTimeExpense.amount,
+            description: transfer.data.oneTimeExpense.description,
+          };
+          addOneTimeExpense(newOneTimeExpense);
+          console.log('[Healthcare Integration] Added one-time expense:', newOneTimeExpense);
+        }
+
+        // Store received data for potential UI feedback
+        setReceivedData(transfer);
+
+        // Reply to portal with success
+        window.parent.postMessage(
+          {
+            type: 'APP_DATA_TRANSFER_RESPONSE',
+            success: true,
+            sourceApp: 'healthcare-cost',
+            targetApp: 'retirement-planner',
+            dataType: 'HEALTHCARE_COSTS',
+            message: 'Healthcare costs successfully added to retirement plan',
+          },
+          '*'
+        );
       };
 
       // If no active scenario, choose one based on transfer.targetScenario or fallback to first available
       if (!activeScenarioId) {
-        const targetCandidate = (transfer && (transfer as any).targetScenario) || (scenarios && scenarios.length > 0 ? scenarios[0].id : null);
+        const targetCandidate = (transfer as any).targetScenario || (scenarios && scenarios.length > 0 ? scenarios[0].id : null);
         if (targetCandidate && selectScenario) {
           console.log('[Healthcare Integration] No active scenario; selecting target scenario:', targetCandidate);
           selectScenario(targetCandidate);
           // Give React a tick to apply the selected scenario, then apply data
-          setTimeout(() => ensureAndApply(), 60);
+          setTimeout(() => applyTransfer(), 60);
           return;
         }
       }
 
-      // If we have an active scenario already, apply immediately
-      ensureAndApply();
-
-      // Add the expense period
-      const newExpensePeriod = {
-        id: expensePeriodId,
-        name: transfer.data.expensePeriod.name,
-        monthlyAmount: transfer.data.expensePeriod.monthlyAmount,
-        startAge: transfer.data.expensePeriod.startAge,
-        startAgeRef: transfer.data.expensePeriod.startAgeRef,
-        endAge: transfer.data.expensePeriod.endAge,
-        endAgeRef: transfer.data.expensePeriod.endAgeRef,
-      };
-
-      addExpensePeriod(newExpensePeriod);
-      console.log('[Healthcare Integration] Added expense period:', newExpensePeriod);
-
-      // Add one-time LTC expense if present
-      if (transfer.data.oneTimeExpense) {
-        const newOneTimeExpense = {
-          id: oneTimeExpenseId,
-          owner: transfer.data.oneTimeExpense.owner,
-          age: transfer.data.oneTimeExpense.age,
-          amount: transfer.data.oneTimeExpense.amount,
-          description: transfer.data.oneTimeExpense.description,
-        };
-
-        addOneTimeExpense(newOneTimeExpense);
-        console.log('[Healthcare Integration] Added one-time expense:', newOneTimeExpense);
-      }
-
-      // Store received data for potential UI feedback
-      setReceivedData(transfer);
-
-      // Send success response
-      window.parent.postMessage(
-        {
-          type: 'APP_DATA_TRANSFER_RESPONSE',
-          success: true,
-          sourceApp: 'healthcare-cost',
-          targetApp: 'retirement-planner',
-          dataType: 'HEALTHCARE_COSTS',
-          message: 'Healthcare costs successfully added to retirement plan',
-        },
-        '*'
-      );
+      // Apply directly when active scenario exists
+      applyTransfer();
     } catch (error) {
       console.error('[Healthcare Integration] Error processing healthcare data:', error);
-      
       // Send error response
       window.parent.postMessage(
         {
@@ -212,7 +186,7 @@ export function useHealthcareIntegration({
         '*'
       );
     }
-  }, [addExpensePeriod, addOneTimeExpense]);
+  }, [addExpensePeriod, addOneTimeExpense, receivedData, activeScenarioId, scenarios, selectScenario]);
 
   // Message listener
   useEffect(() => {
