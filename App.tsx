@@ -624,7 +624,7 @@ const App: React.FC = () => {
                     />
                     )}
 
-                <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+                <div className="max-w-[1400px] mx-auto p-4 sm:p-6 lg:p-8">
                     <div className={`sticky z-10 ${isEmbedded ? 'top-0' : 'top-16'}`}>
                         <ScenariosBar
                             scenarios={scenarios}
