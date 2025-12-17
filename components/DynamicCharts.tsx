@@ -117,10 +117,10 @@ const NetWorthScenarioChart: React.FC<{ scenarioData: ScenarioData[]; giftsByYea
 
     if (scenarioData.length < 2) return null;
 
-    // Compact chart sizing for a tighter layout
-    const width = 420;
-    const height = 180;
-    const padding = { top: 16, right: 12, bottom: 26, left: 50 };
+    // Uniform chart sizing
+    const width = 600;
+    const height = 220;
+    const padding = { top: 20, right: 16, bottom: 30, left: 55 };
 
     const maxNetWorth = Math.max(...scenarioData.map(d => d.optimistic));
     const minYear = scenarioData[0].year;
@@ -232,13 +232,221 @@ const NetWorthScenarioChart: React.FC<{ scenarioData: ScenarioData[]; giftsByYea
     );
 };
 
-// --- Compact Average Area Chart (lightweight, no external deps) ---
+// --- Income vs Expenses Chart ---
+const IncomeExpensesChart: React.FC<{ projectionData: YearlyProjection[] }> = ({ projectionData }) => {
+    const [tooltip, setTooltip] = useState<{ x: number; y: number; data: YearlyProjection } | null>(null);
+
+    if (projectionData.length < 2) return null;
+
+    const w = 600;
+    const h = 220;
+    const pad = { top: 20, right: 16, bottom: 30, left: 55 };
+
+    const maxVal = Math.max(...projectionData.map(d => Math.max(d.grossIncome, d.expenses)));
+    const minYear = projectionData[0].year;
+    const maxYear = projectionData[projectionData.length - 1].year;
+
+    const x = (year: number) => pad.left + (year - minYear) / (maxYear - minYear) * (w - pad.left - pad.right);
+    const y = (val: number) => h - pad.bottom - (val / maxVal) * (h - pad.top - pad.bottom);
+
+    const incomePath = projectionData.map((d, i) => `${i === 0 ? 'M' : 'L'} ${x(d.year)} ${y(d.grossIncome)}`).join(' ');
+    const expensesPath = projectionData.map((d, i) => `${i === 0 ? 'M' : 'L'} ${x(d.year)} ${y(d.expenses)}`).join(' ');
+
+    const handleMouseMove = (e: React.MouseEvent<SVGRectElement>) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        if (!rect.width) return;
+        const svgX = (e.clientX - rect.left) * (w / rect.width);
+        const chartAreaWidth = w - pad.left - pad.right;
+        const positionInChart = svgX - pad.left;
+        const ratio = Math.max(0, Math.min(1, positionInChart / chartAreaWidth));
+        const yearIndex = Math.round(ratio * (projectionData.length - 1));
+        const dataPoint = projectionData[yearIndex];
+        if (dataPoint) {
+            setTooltip({ x: (e.clientX - rect.left), y: (e.clientY - rect.top), data: dataPoint });
+        }
+    };
+
+    return (
+        <div className="relative">
+            <h4 className="font-semibold text-center mb-2 text-sm">Income vs Expenses</h4>
+            <svg viewBox={`0 0 ${w} ${h}`} className="w-full networth-chart">
+                {/* Y Axis */}
+                <g className="text-xs text-gray-500">
+                    {[0, 0.25, 0.5, 0.75, 1].map(tick => {
+                        const value = maxVal * tick;
+                        const yPos = y(value);
+                        return (
+                            <g key={tick}>
+                                <line x1={pad.left} x2={w - pad.right} y1={yPos} y2={yPos} stroke="#e5e7eb" />
+                                <text x={pad.left - 8} y={yPos + 4} textAnchor="end">{formatCurrencyShort(value)}</text>
+                            </g>
+                        );
+                    })}
+                </g>
+                {/* X Axis */}
+                <g className="text-xs text-gray-500">
+                    {projectionData.filter((_, i) => i % Math.ceil(projectionData.length / 5) === 0).map(d => (
+                        <text key={d.year} x={x(d.year)} y={h - pad.bottom + 15} textAnchor="middle">{d.year}</text>
+                    ))}
+                </g>
+
+                {/* Lines */}
+                <path d={incomePath} fill="none" stroke="#22c55e" strokeWidth="2" />
+                <path d={expensesPath} fill="none" stroke="#ef4444" strokeWidth="2" />
+
+                {/* Interactive overlay */}
+                <rect 
+                    x={pad.left}
+                    y={pad.top}
+                    width={w - pad.left - pad.right}
+                    height={h - pad.top - pad.bottom}
+                    fill="transparent"
+                    onMouseMove={handleMouseMove}
+                    onMouseLeave={() => setTooltip(null)}
+                />
+
+                {/* Marker */}
+                {tooltip && (
+                    <g transform={`translate(${x(tooltip.data.year)}, 0)`}>
+                        <line y1={pad.top} y2={h - pad.bottom} stroke="#9ca3af" strokeDasharray="4" />
+                        <circle cx={0} cy={y(tooltip.data.grossIncome)} r={3} fill="#22c55e" />
+                        <circle cx={0} cy={y(tooltip.data.expenses)} r={3} fill="#ef4444" />
+                    </g>
+                )}
+            </svg>
+
+            {/* Legend */}
+            <div className="flex justify-center gap-4 text-xs mt-1">
+                <span className="flex items-center"><div className="w-3 h-1 bg-green-500 mr-1"></div>Income</span>
+                <span className="flex items-center"><div className="w-3 h-1 bg-red-500 mr-1"></div>Expenses</span>
+            </div>
+
+            {tooltip && (
+                <div
+                    className="tooltip-popup chart-tooltip"
+                    style={{ left: `${tooltip.x + 10}px`, top: `${tooltip.y - 50}px` }}
+                >
+                    <p className="font-bold mb-1">{tooltip.data.year}</p>
+                    <p className="text-green-600">Income: {formatCurrencyShort(tooltip.data.grossIncome)}</p>
+                    <p className="text-red-500">Expenses: {formatCurrencyShort(tooltip.data.expenses)}</p>
+                </div>
+            )}
+        </div>
+    );
+};
+
+// --- Tax Burden Chart ---
+const TaxBurdenChart: React.FC<{ projectionData: YearlyProjection[] }> = ({ projectionData }) => {
+    const [tooltip, setTooltip] = useState<{ x: number; y: number; data: YearlyProjection } | null>(null);
+
+    if (projectionData.length < 2) return null;
+
+    const w = 600;
+    const h = 220;
+    const pad = { top: 20, right: 16, bottom: 30, left: 55 };
+
+    const maxTax = Math.max(...projectionData.map(d => d.federalTax + d.stateTax));
+    const minYear = projectionData[0].year;
+    const maxYear = projectionData[projectionData.length - 1].year;
+
+    const x = (year: number) => pad.left + (year - minYear) / (maxYear - minYear) * (w - pad.left - pad.right);
+    const y = (val: number) => maxTax > 0 ? h - pad.bottom - (val / maxTax) * (h - pad.top - pad.bottom) : h - pad.bottom;
+
+    // Line paths
+    const federalPath = projectionData.map((d, i) => `${i === 0 ? 'M' : 'L'} ${x(d.year)} ${y(d.federalTax)}`).join(' ');
+    const totalTaxPath = projectionData.map((d, i) => `${i === 0 ? 'M' : 'L'} ${x(d.year)} ${y(d.federalTax + d.stateTax)}`).join(' ');
+
+    const handleMouseMove = (e: React.MouseEvent<SVGRectElement>) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        if (!rect.width) return;
+        const svgX = (e.clientX - rect.left) * (w / rect.width);
+        const chartAreaWidth = w - pad.left - pad.right;
+        const positionInChart = svgX - pad.left;
+        const ratio = Math.max(0, Math.min(1, positionInChart / chartAreaWidth));
+        const yearIndex = Math.round(ratio * (projectionData.length - 1));
+        const dataPoint = projectionData[yearIndex];
+        if (dataPoint) {
+            setTooltip({ x: (e.clientX - rect.left), y: (e.clientY - rect.top), data: dataPoint });
+        }
+    };
+
+    return (
+        <div className="relative">
+            <h4 className="font-semibold text-center mb-2 text-sm">Tax Burden Over Time</h4>
+            <svg viewBox={`0 0 ${w} ${h}`} className="w-full networth-chart">
+                {/* Y Axis */}
+                <g className="text-xs text-gray-500">
+                    {[0, 0.25, 0.5, 0.75, 1].map(tick => {
+                        const value = maxTax * tick;
+                        const yPos = y(value);
+                        return (
+                            <g key={tick}>
+                                <line x1={pad.left} x2={w - pad.right} y1={yPos} y2={yPos} stroke="#e5e7eb" />
+                                <text x={pad.left - 8} y={yPos + 4} textAnchor="end">{formatCurrencyShort(value)}</text>
+                            </g>
+                        );
+                    })}
+                </g>
+                {/* X Axis */}
+                <g className="text-xs text-gray-500">
+                    {projectionData.filter((_, i) => i % Math.ceil(projectionData.length / 5) === 0).map(d => (
+                        <text key={d.year} x={x(d.year)} y={h - pad.bottom + 15} textAnchor="middle">{d.year}</text>
+                    ))}
+                </g>
+
+                {/* Lines */}
+                <path d={totalTaxPath} fill="none" stroke="#f59e0b" strokeWidth="2" />
+                <path d={federalPath} fill="none" stroke="#6366f1" strokeWidth="2" />
+
+                {/* Interactive overlay */}
+                <rect 
+                    x={pad.left}
+                    y={pad.top}
+                    width={w - pad.left - pad.right}
+                    height={h - pad.top - pad.bottom}
+                    fill="transparent"
+                    onMouseMove={handleMouseMove}
+                    onMouseLeave={() => setTooltip(null)}
+                />
+
+                {/* Marker */}
+                {tooltip && (
+                    <g transform={`translate(${x(tooltip.data.year)}, 0)`}>
+                        <line y1={pad.top} y2={h - pad.bottom} stroke="#9ca3af" strokeDasharray="4" />
+                        <circle cx={0} cy={y(tooltip.data.federalTax)} r={3} fill="#6366f1" />
+                        <circle cx={0} cy={y(tooltip.data.federalTax + tooltip.data.stateTax)} r={3} fill="#f59e0b" />
+                    </g>
+                )}
+            </svg>
+
+            {/* Legend */}
+            <div className="flex justify-center gap-4 text-xs mt-1">
+                <span className="flex items-center"><div className="w-3 h-1 bg-indigo-500 mr-1"></div>Federal</span>
+                <span className="flex items-center"><div className="w-3 h-1 bg-amber-500 mr-1"></div>Total (Fed + State)</span>
+            </div>
+
+            {tooltip && (
+                <div
+                    className="tooltip-popup chart-tooltip"
+                    style={{ left: `${tooltip.x + 10}px`, top: `${tooltip.y - 50}px` }}
+                >
+                    <p className="font-bold mb-1">{tooltip.data.year}</p>
+                    <p className="text-indigo-600">Federal: {formatCurrencyShort(tooltip.data.federalTax)}</p>
+                    <p className="text-amber-600">State: {formatCurrencyShort(tooltip.data.stateTax)}</p>
+                    <p className="font-medium">Total: {formatCurrencyShort(tooltip.data.federalTax + tooltip.data.stateTax)}</p>
+                </div>
+            )}
+        </div>
+    );
+};
+
+// --- Average Area Chart ---
 const AverageAreaChart: React.FC<{ scenarioData: ScenarioData[] }> = ({ scenarioData }) => {
     if (!scenarioData || scenarioData.length < 2) return null;
 
-    const w = 420;
-    const h = 120;
-    const pad = { top: 8, right: 8, bottom: 20, left: 36 };
+    const w = 600;
+    const h = 220;
+    const pad = { top: 20, right: 16, bottom: 30, left: 55 };
 
     const maxVal = Math.max(...scenarioData.map(d => d.average));
     const minYear = scenarioData[0].year;
@@ -269,7 +477,7 @@ const AverageAreaChart: React.FC<{ scenarioData: ScenarioData[] }> = ({ scenario
     return (
         <div className="relative">
             <h4 className="font-semibold text-center mb-2 text-sm">Avg Net Worth Trend (Area)</h4>
-            <svg viewBox={`0 0 ${w} ${h}`} className="w-full small-area-chart">
+            <svg viewBox={`0 0 ${w} ${h}`} className="w-full networth-chart">
                 <defs>
                     <linearGradient id="avgGrad" x1="0" x2="0" y1="0" y2="1">
                         <stop offset="0%" stopColor="#6366f1" stopOpacity={0.18} />
@@ -387,6 +595,12 @@ export const DynamicCharts: React.FC<DynamicChartsProps> = ({ projectionData, pl
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div className="col-span-1">
                 <NetWorthScenarioChart scenarioData={scenarioData} giftsByYear={giftsByYear} />
+            </div>
+            <div className="col-span-1">
+                <IncomeExpensesChart projectionData={retirementProjections} />
+            </div>
+            <div className="col-span-1">
+                <TaxBurdenChart projectionData={retirementProjections} />
             </div>
             <div className="col-span-1">
                 <AverageAreaChart scenarioData={scenarioData} />
