@@ -17,9 +17,11 @@ export const InputSection: React.FC<InputSectionProps> = ({ title, subtitle, tit
   const isAnnual = typeof title === 'string' && title.toLowerCase().includes('annual');
   const effectiveTitleClass = theme === 'dark' && isAnnual ? 'text-white' : titleColorClass;
 
+  const headerBorderClass = !(isAnnual && theme === 'light') ? 'border-b border-gray-200 pb-3 mb-4' : 'pb-3 mb-4';
+
   return (
     <div className="bg-brand-surface p-6 rounded-lg shadow-sm mb-6">
-      <div className="flex justify-between items-start border-b border-gray-200 pb-3 mb-4">
+      <div className={`flex justify-between items-start ${headerBorderClass}`}>
         <div>
             <h3 className={`text-xl font-bold ${effectiveTitleClass} flex items-center`}><SectionIcon title={title} titleColorClass={titleColorClass} /><span>{title}</span></h3>
             {subtitle && <p className="text-sm text-brand-text-secondary mt-1">{subtitle}</p>}

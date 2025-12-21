@@ -164,6 +164,90 @@ table tr.bg-gray-50 {
   color: #e5e7eb !important;
 }
 
+/* Remove thin separator that can appear between the header and the first row.
+   This clears any border on the header's bottom or the first row's top. */
+table thead th {
+  border-bottom: none !important;
+}
+table tbody tr:first-child td {
+  border-top: none !important;
+}
+.theme-dark table thead th {
+  border-bottom: none !important;
+}
+.theme-dark table tbody tr:first-child td {
+  border-top: none !important;
+}
+
+/* Additional resets to cover borders/shadows applied to the thead or tr itself */
+table thead, table thead tr, table thead th {
+  border-bottom: none !important;
+  box-shadow: none !important;
+}
+table tbody tr:first-child, table tbody tr:first-child td {
+  border-top: none !important;
+  box-shadow: none !important;
+}
+.theme-dark table thead, .theme-dark table thead tr, .theme-dark table thead th {
+  border-bottom: none !important;
+  box-shadow: none !important;
+}
+.theme-dark table tbody tr:first-child, .theme-dark table tbody tr:first-child td {
+  border-top: none !important;
+  box-shadow: none !important;
+}
+
+/* Target the projection table specifically to remove any internal border that may remain */
+.projection-table {
+  border: none !important;
+  border-collapse: separate !important; /* separate prevents collapsed borders showing through */
+}
+.projection-table thead th,
+.projection-table thead,
+.projection-table thead tr {
+  border-bottom: 0 !important;
+  box-shadow: none !important;
+}
+.projection-table tbody tr:first-child td,
+.projection-table tbody tr:first-child {
+  border-top: 0 !important;
+  box-shadow: none !important;
+}
+.theme-dark .projection-table thead th,
+.theme-dark .projection-table thead,
+.theme-dark .projection-table thead tr {
+  border-bottom: 0 !important;
+}
+.theme-dark .projection-table tbody tr:first-child td,
+.theme-dark .projection-table tbody tr:first-child {
+  border-top: 0 !important;
+}
+
+/* Ensure hover highlights work even when the base rule uses !important.
+   Light mode: hover -> bg-gray-100. Dark mode: hover -> gray-700. */
+table tr.bg-gray-50:hover {
+  background-color: #e5e7eb !important; /* tailwind bg-gray-200 - slightly darker */
+}
+.theme-dark table tr.bg-gray-50:hover {
+  background-color: #111827 !important; /* tailwind gray-900 - noticeably darker in dark mode */
+}
+
+/* In dark theme, use a darker popover background with lighter text for contrast.
+   This keeps the popover visually distinct while improving readability. */
+.theme-dark .projection-popover {
+  background-color: #0b1220 !important; /* dark navy */
+  color: #f8fafc !important; /* very light text */
+  border-color: rgba(255,255,255,0.06) !important;
+}
+.theme-dark .projection-popover button {
+  color: #f8fafc !important;
+}
+.theme-dark .projection-popover .text-gray-400,
+.theme-dark .projection-popover .text-gray-500,
+.theme-dark .projection-popover .text-gray-600 {
+  color: #e5e7eb !important; /* muted but light labels */
+}
+
 /* Projection table colored columns - override the generic bg-*-50 rules */
 .projection-col-gifts {
   background-color: #fef9c3 !important;
@@ -198,6 +282,46 @@ table tr.bg-gray-50 {
 }
 .theme-dark .projection-col-netincome {
   background-color: #14532d !important;
+  color: #bbf7d0 !important;
+}
+
+/* Smooth background transition for colored projection cells */
+.projection-col-gifts,
+.projection-col-income,
+.projection-col-tax,
+.projection-col-netincome {
+  transition: background-color 120ms ease;
+}
+
+/* Darken colored cells when the row is hovered (light mode) */
+table tr.bg-gray-50:hover td.projection-col-gifts {
+  background-color: #fef08a !important; /* slightly darker yellow */
+}
+table tr.bg-gray-50:hover td.projection-col-income {
+  background-color: #bfdbfe !important; /* slightly darker blue */
+}
+table tr.bg-gray-50:hover td.projection-col-tax {
+  background-color: #fecaca !important; /* slightly darker red */
+}
+table tr.bg-gray-50:hover td.projection-col-netincome {
+  background-color: #bbf7d0 !important; /* slightly darker green */
+}
+
+/* Dark mode: use deeper/darker shades for hover so contrast remains clear */
+.theme-dark table tr.bg-gray-50:hover td.projection-col-gifts {
+  background-color: #5c2f0e !important;
+  color: #fde047 !important;
+}
+.theme-dark table tr.bg-gray-50:hover td.projection-col-income {
+  background-color: #0f2a5a !important;
+  color: #bfdbfe !important;
+}
+.theme-dark table tr.bg-gray-50:hover td.projection-col-tax {
+  background-color: #5a1212 !important;
+  color: #fecaca !important;
+}
+.theme-dark table tr.bg-gray-50:hover td.projection-col-netincome {
+  background-color: #0f3921 !important;
   color: #bbf7d0 !important;
 }
 
