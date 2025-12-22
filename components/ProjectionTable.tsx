@@ -59,21 +59,14 @@ export const ProjectionTable: React.FC<ProjectionTableProps> = React.memo(({ dat
         const p1Dead = row.age1 > person1.lifeExpectancy;
         const p2Dead = isCouple && row.age2 && row.age2 > person2.lifeExpectancy;
 
-        const handleClick = (e: React.MouseEvent<HTMLTableRowElement>) => {
+        const handleMouseEnter = (e: React.MouseEvent<HTMLTableRowElement>) => {
+            const rowRect = e.currentTarget.getBoundingClientRect();
             const containerRect = containerRef.current?.getBoundingClientRect();
-            const clickX = e.clientX;
-            const clickY = e.clientY;
             if (containerRect) {
-                // Position the popover near the mouse cursor with a small offset
+                // Position the tooltip below the row, centered
                 const popWidth = 300;
-                const leftRaw = clickX - containerRect.left + 12; // 12px to offset from cursor
-                const maxLeft = Math.max(8, (containerRect.width || 0) - popWidth - 8);
-                let left = Math.min(Math.max(8, leftRaw), maxLeft);
-
-                // Position the popover slightly below the cursor; clamp vertically inside container
-                const topRaw = clickY - containerRect.top + 12;
-                const maxTop = Math.max(8, (containerRect.height || 0) - 200 - 8);
-                let top = Math.min(Math.max(8, topRaw), maxTop);
+                const left = Math.max(8, Math.min(rowRect.left - containerRect.left + (rowRect.width / 2) - (popWidth / 2), containerRect.width - popWidth - 8));
+                const top = rowRect.bottom - containerRect.top + 8; // 8px below the row
 
                 setPopoverStyle({ top, left });
             } else {
@@ -82,10 +75,16 @@ export const ProjectionTable: React.FC<ProjectionTableProps> = React.memo(({ dat
             setSelectedRow(row);
         };
 
+        const handleMouseLeave = () => {
+            setSelectedRow(null);
+            setPopoverStyle(null);
+        };
+
         return (
             <tr
                 key={row.year}
-                onClick={handleClick}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
                 className={`bg-gray-50 dark:bg-gray-800 text-base text-gray-800 dark:text-gray-200 dark:border-b dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer ${selectedRow?.year === row.year ? 'bg-gray-100 dark:bg-gray-700' : ''}`}
             >
                 <td className="p-2 text-left">{row.year}</td>
