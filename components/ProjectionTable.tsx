@@ -32,6 +32,8 @@ export const ProjectionTable: React.FC<ProjectionTableProps> = React.memo(({ dat
     const hasGifts = !!(plan.gifts && plan.gifts.length > 0);
     const containerRef = useRef<HTMLDivElement | null>(null);
     const popoverRef = useRef<HTMLDivElement | null>(null);
+    // store last mouse position so we can reposition the tooltip during scroll/resize
+    const mousePosRef = useRef<{ x: number; y: number } | null>(null);
     const [selectedRow, setSelectedRow] = useState<YearlyProjection | null>(null);
     const [popoverStyle, setPopoverStyle] = useState<{ top: number; left: number } | null>(null);
 
@@ -60,22 +62,55 @@ export const ProjectionTable: React.FC<ProjectionTableProps> = React.memo(({ dat
         const p2Dead = isCouple && row.age2 && row.age2 > person2.lifeExpectancy;
 
         const handleMouseEnter = (e: React.MouseEvent<HTMLTableRowElement>) => {
-            const rowRect = e.currentTarget.getBoundingClientRect();
-            const containerRect = containerRef.current?.getBoundingClientRect();
-            if (containerRect) {
-                // Position the tooltip below the row, centered
-                const popWidth = 300;
-                const left = Math.max(8, Math.min(rowRect.left - containerRect.left + (rowRect.width / 2) - (popWidth / 2), containerRect.width - popWidth - 8));
-                const top = rowRect.bottom - containerRect.top + 8; // 8px below the row
+            // Show the popover for this row; position will be updated by mouse move so tooltip follows cursor
+            setSelectedRow(row);
 
+            // seed initial position so it appears immediately and centered vertically near cursor
+            const containerRect = containerRef.current?.getBoundingClientRect();
+            if (containerRect && containerRef.current) {
+                const popWidth = 300;
+                const popHeight = popoverRef.current?.offsetHeight || 180;
+                const scrollTop = containerRef.current.scrollTop || 0;
+                const scrollLeft = containerRef.current.scrollLeft || 0;
+
+                const rawLeft = e.clientX - containerRect.left + scrollLeft + 12; // right of cursor, include horizontal scroll
+                const left = Math.max(8, Math.min(rawLeft, containerRect.width - popWidth - 8));
+
+                const rawTop = e.clientY - containerRect.top + scrollTop - (popHeight / 2); // center vertically on cursor (include scroll)
+                const top = Math.min(Math.max(rawTop, 8), containerRect.height - popHeight - 8 + scrollTop);
                 setPopoverStyle({ top, left });
             } else {
                 setPopoverStyle(null);
             }
-            setSelectedRow(row);
         };
 
-        const handleMouseLeave = () => {
+        const handleMouseMove = (e: React.MouseEvent<HTMLTableRowElement>) => {
+            // record the last mouse position (viewport coordinates)
+            mousePosRef.current = { x: e.clientX, y: e.clientY };
+
+            const containerRect = containerRef.current?.getBoundingClientRect();
+            if (!containerRect || !containerRef.current) return;
+
+            const popWidth = 300;
+            const popHeight = popoverRef.current?.offsetHeight || 180;
+            const scrollTop = containerRef.current.scrollTop || 0;
+            const scrollLeft = containerRef.current.scrollLeft || 0;
+
+            // position tooltip next to cursor and center vertically relative to cursor
+            const rawLeft = e.clientX - containerRect.left + scrollLeft + 12; // include horizontal scroll
+            const left = Math.max(8, Math.min(rawLeft, containerRect.width - popWidth - 8 + scrollLeft));
+
+            const rawTop = e.clientY - containerRect.top + scrollTop - (popHeight / 2); // include vertical scroll
+            const top = Math.min(Math.max(rawTop, 8), containerRect.height - popHeight - 8 + scrollTop);
+
+            setPopoverStyle({ top, left });
+        };
+
+        const handleMouseLeave = (e?: React.MouseEvent) => {
+            // If moving into the popover, keep it open
+            if (e && e.relatedTarget && popoverRef.current && popoverRef.current.contains(e.relatedTarget as Node)) {
+                return;
+            }
             setSelectedRow(null);
             setPopoverStyle(null);
         };
@@ -84,6 +119,7 @@ export const ProjectionTable: React.FC<ProjectionTableProps> = React.memo(({ dat
             <tr
                 key={row.year}
                 onMouseEnter={handleMouseEnter}
+                onMouseMove={handleMouseMove}
                 onMouseLeave={handleMouseLeave}
                 className={`bg-gray-50 dark:bg-gray-800 text-base text-gray-800 dark:text-gray-200 dark:border-b dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer ${selectedRow?.year === row.year ? 'bg-gray-100 dark:bg-gray-700' : ''}`}
             >
@@ -128,6 +164,40 @@ export const ProjectionTable: React.FC<ProjectionTableProps> = React.memo(({ dat
         return () => document.removeEventListener('mousedown', handler);
     }, []);
 
+    // Reposition popover on container scroll / window scroll / resize so it follows content
+    useEffect(() => {
+        const reposition = () => {
+            if (!selectedRow || !mousePosRef.current) return;
+            const containerRect = containerRef.current?.getBoundingClientRect();
+            if (!containerRect) return;
+
+            const popWidth = 300;
+            const popHeight = popoverRef.current?.offsetHeight || 180;
+
+            const scrollTop = containerRef.current?.scrollTop || 0;
+            const scrollLeft = containerRef.current?.scrollLeft || 0;
+
+            const rawLeft = mousePosRef.current.x - containerRect.left + scrollLeft + 12;
+            const left = Math.max(8, Math.min(rawLeft, containerRect.width - popWidth - 8 + scrollLeft));
+
+            const rawTop = mousePosRef.current.y - containerRect.top + scrollTop - (popHeight / 2);
+            const top = Math.min(Math.max(rawTop, 8), containerRect.height - popHeight - 8 + scrollTop);
+
+            setPopoverStyle({ top, left });
+        };
+
+        const cont = containerRef.current;
+        cont?.addEventListener('scroll', reposition, { passive: true });
+        window.addEventListener('scroll', reposition, { passive: true });
+        window.addEventListener('resize', reposition);
+
+        return () => {
+            cont?.removeEventListener('scroll', reposition);
+            window.removeEventListener('scroll', reposition);
+            window.removeEventListener('resize', reposition);
+        };
+    }, [selectedRow]);
+
     return (
         <div ref={containerRef} className="w-full overflow-x-auto max-h-[600px] relative rounded-lg border">
             <table className="w-full border-collapse projection-table">
@@ -140,8 +210,10 @@ export const ProjectionTable: React.FC<ProjectionTableProps> = React.memo(({ dat
             {selectedRow && popoverStyle && (
                 <div
                     ref={popoverRef}
-                    style={{ top: popoverStyle.top, left: popoverStyle.left }}
-                    className="projection-popover absolute z-20 w-72 bg-white dark:bg-gray-800 shadow-lg rounded-md p-3 text-sm text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700"
+                    onMouseEnter={() => { /* keep open when mouse moves into popover */ }}
+                    onMouseLeave={(e) => handleMouseLeave(e)}
+                    style={{ ['--tp-x' as any]: `${popoverStyle.left}px`, ['--tp-y' as any]: `${popoverStyle.top}px` }}
+                    className="projection-popover absolute z-20 w-72 shadow-lg rounded-md p-3 text-sm border border-gray-200 dark:border-gray-700"
                 >
                     <div className="flex justify-between items-start">
                         <div>
@@ -152,16 +224,36 @@ export const ProjectionTable: React.FC<ProjectionTableProps> = React.memo(({ dat
                                     : `Age ${selectedRow.age1}`}
                             </div>
                         </div>
-                        <button className="text-gray-500 hover:text-gray-700" onClick={() => setSelectedRow(null)}>✕</button>
                     </div>
-                    <div className="mt-2">
-                        <div className="flex justify-between"><span className="text-gray-400 dark:text-gray-300">Net Worth</span><span className="font-medium">{formatCurrency(selectedRow.netWorth)}</span></div>
-                        <div className="flex justify-between"><span className="text-gray-400 dark:text-gray-300">Gross Income</span><span className="font-medium">{formatCurrency(selectedRow.grossIncome / 12)}</span></div>
-                        <div className="flex justify-between"><span className="text-gray-400 dark:text-gray-300">Net Income</span><span className="font-medium">{formatCurrency(selectedRow.netIncome / 12)}</span></div>
-                        <div className="flex justify-between"><span className="text-gray-400 dark:text-gray-300">Fed Taxes</span><span className="font-medium">{formatCurrency(selectedRow.federalTax / 12)}</span></div>
-                        <div className="flex justify-between"><span className="text-gray-400 dark:text-gray-300">State Taxes</span><span className="font-medium">{formatCurrency(selectedRow.stateTax / 12)}</span></div>
-                        <div className="flex justify-between"><span className="text-gray-400 dark:text-gray-300">Expenses</span><span className="font-medium">{formatCurrency(selectedRow.expenses / 12)}</span></div>
-                        <div className="flex justify-between"><span className="text-gray-400 dark:text-gray-300">Surplus</span><span className={`font-medium ${selectedRow.surplus >= 0 ? 'text-green-700 dark:text-green-200' : 'text-red-600 dark:text-red-400'}`}>{formatCurrency(selectedRow.surplus / 12)}</span></div>
+                    <div className="mt-2 space-y-2">
+                        <div className="flex justify-between items-center">
+                          <span className="flex items-center projection-popover-label"><span className="inline-block swatch swatch-indigo mr-2"></span>Net Worth</span>
+                          <span className="font-medium">{formatCurrency(selectedRow.netWorth)}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="flex items-center projection-popover-label"><span className="inline-block swatch swatch-green mr-2"></span>Gross Income</span>
+                          <span className="font-medium">{formatCurrency(selectedRow.grossIncome / 12)}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="flex items-center projection-popover-label"><span className="inline-block swatch swatch-indigo-light mr-2"></span>Net Income</span>
+                          <span className="font-medium">{formatCurrency(selectedRow.netIncome / 12)}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="flex items-center projection-popover-label"><span className="inline-block swatch swatch-red mr-2"></span>Fed Taxes</span>
+                          <span className="font-medium">{formatCurrency(selectedRow.federalTax / 12)}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="flex items-center projection-popover-label"><span className="inline-block swatch swatch-amber mr-2"></span>State Taxes</span>
+                          <span className="font-medium">{formatCurrency(selectedRow.stateTax / 12)}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="flex items-center projection-popover-label"><span className="inline-block swatch swatch-red-dark mr-2"></span>Expenses</span>
+                          <span className="font-medium">{formatCurrency(selectedRow.expenses / 12)}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="flex items-center projection-popover-label"><span className="inline-block swatch swatch-green-dark mr-2"></span>Surplus</span>
+                          <span className={`font-medium ${selectedRow.surplus >= 0 ? 'text-green-700 dark:text-green-200' : 'text-red-600 dark:text-red-400'}`}>{formatCurrency(selectedRow.surplus / 12)}</span>
+                        </div>
                     </div>
                 </div>
             )}

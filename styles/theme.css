@@ -232,20 +232,85 @@ table tr.bg-gray-50:hover {
   background-color: #111827 !important; /* tailwind gray-900 - noticeably darker in dark mode */
 }
 
-/* In dark theme, use a darker popover background with lighter text for contrast.
-   This keeps the popover visually distinct while improving readability. */
-.theme-dark .projection-popover {
-  background-color: #0b1220 !important; /* dark navy */
-  color: #f8fafc !important; /* very light text */
-  border-color: rgba(255,255,255,0.06) !important;
+/* Base projection popover positioning uses CSS variables so the tooltip can be positioned
+   relative to the cursor without writing left/top inline values that may trigger linter rules. */
+.projection-popover {
+  position: absolute;
+  left: 0;
+  top: 0;
+  pointer-events: auto; /* allow clicking inside popover (close button) */
+  transform: translate(var(--tp-x, 0), var(--tp-y, 0));
+  will-change: transform;
 }
-.theme-dark .projection-popover button {
-  color: #f8fafc !important;
+
+/* In dark theme, prefer a lighter tooltip background with dark text for legibility. Also support the .dark class variant. */
+.theme-dark .projection-popover,
+.dark .projection-popover {
+  background-color: #f8fafc !important; /* light surface */
+  color: #0f172a !important; /* dark text */
+  border-color: rgba(15,23,42,0.06) !important;
+}
+.theme-dark .projection-popover button,
+.dark .projection-popover button {
+  color: #0f172a !important;
 }
 .theme-dark .projection-popover .text-gray-400,
 .theme-dark .projection-popover .text-gray-500,
-.theme-dark .projection-popover .text-gray-600 {
-  color: #e5e7eb !important; /* muted but light labels */
+.theme-dark .projection-popover .text-gray-600,
+.dark .projection-popover .text-gray-400,
+.dark .projection-popover .text-gray-500,
+.dark .projection-popover .text-gray-600 {
+  color: #475569 !important; /* slate-600 for muted labels */
+}
+
+/* Swatches inside the projection popover: explicit colors so they're visible in both themes */
+/* Default (app in light mode): make the popover dark with light text (inverted behavior) */
+.projection-popover {
+  background-color: #0b1220 !important; /* dark navy */
+  color: #e6eef8 !important; /* light text */
+  border-color: rgba(255,255,255,0.06) !important;
+}
+.projection-popover .swatch {
+  width: 0.75rem;
+  height: 0.75rem;
+  display: inline-block;
+  border-radius: 0.125rem;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.05) inset;
+}
+.projection-popover .swatch-indigo { background-color: #6366f1 !important; }
+.projection-popover .swatch-green { background-color: #22c55e !important; }
+.projection-popover .swatch-indigo-light { background-color: #818cf8 !important; }
+.projection-popover .swatch-red { background-color: #ef4444 !important; }
+.projection-popover .swatch-amber { background-color: #f59e0b !important; }
+.projection-popover .swatch-red-dark { background-color: #dc2626 !important; }
+.projection-popover .swatch-green-dark { background-color: #16a34a !important; }
+
+/* Ensure popover text values use light color by default (for dark popover) */
+.projection-popover .font-medium { color: #e6eef8 !important; }
+
+/* Label color: light labels by default (app light mode with dark popover), but muted in .theme-dark*/
+.projection-popover .projection-popover-label { color: #e6eef8 !important; }
+.theme-dark .projection-popover .projection-popover-label,
+.dark .projection-popover .projection-popover-label { color: #475569 !important; }
+
+/* When the app is in dark mode, invert the popover to a light background with dark text */
+.theme-dark .projection-popover,
+.dark .projection-popover {
+  background-color: #f8fafc !important; /* light surface */
+  color: #0f172a !important; /* dark text */
+  border-color: rgba(15,23,42,0.06) !important;
+}
+.theme-dark .projection-popover .font-medium,
+.dark .projection-popover .font-medium {
+  color: #0f172a !important;
+}
+.theme-dark .projection-popover .text-gray-400,
+.theme-dark .projection-popover .text-gray-500,
+.theme-dark .projection-popover .text-gray-600,
+.dark .projection-popover .text-gray-400,
+.dark .projection-popover .text-gray-500,
+.dark .projection-popover .text-gray-600 {
+  color: #475569 !important; /* slate-600 for muted labels */
 }
 
 /* Projection table colored columns - override the generic bg-*-50 rules */
