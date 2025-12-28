@@ -256,7 +256,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                         ))}
                     </div>
 
-                    <div className="col-span-4 grid grid-cols-4 gap-4 items-center">
+                    <div className="col-span-4 grid grid-cols-4 gap-4 items-start">
                         <div className="flex items-center space-x-2">
                             <label htmlFor="stateInput" className="w-28 text-sm font-medium">State</label>
                             <input id="stateInput" type="text" value={plan.state} onChange={e => handlePlanChange('state', e.target.value)} className="w-32 px-2 py-1.5 border rounded-md text-sm" />
