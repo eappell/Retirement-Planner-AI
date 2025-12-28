@@ -53,9 +53,14 @@ const AppSettingsMenu: React.FC<Props> = ({ onSaveDefaults, onClose, plan = null
         <NumberInput label="Bonds: Expected Return" suffix="%" value={bondMean} onChange={e => setBondMean(Number(e.target.value))} />
         <NumberInput label="Bonds: Volatility (std dev)" suffix="%" value={bondStd} onChange={e => setBondStd(Number(e.target.value))} />
 
-        <div className="flex items-center space-x-3">
-          <input id="menu-use-fat" type="checkbox" checked={useFatTails} onChange={e => setUseFatTails(e.target.checked)} className="h-4 w-4 rounded text-brand-primary focus:ring-brand-primary" />
-          <label htmlFor="menu-use-fat" className="text-sm font-medium">Default: Use fat-tailed returns</label>
+        <div className="flex items-start space-x-3">
+          <div className="flex-shrink-0">
+            <input id="menu-use-fat" type="checkbox" checked={useFatTails} onChange={e => setUseFatTails(e.target.checked)} className="h-4 w-4 rounded text-brand-primary focus:ring-brand-primary mt-1" />
+          </div>
+          <div className="flex-1">
+            <label htmlFor="menu-use-fat" className="text-sm font-medium">Default: Use fat-tailed returns</label>
+            <p className="text-xs text-gray-500 mt-1">When enabled, returns are sampled from a fat‑tailed distribution, so projections will include a small randomized variation each time you run them.</p>
+          </div>
         </div>
         <NumberInput label="Default fat-tail df" value={fatTailDf} onChange={e => setFatTailDf(Number(e.target.value))} />
 
