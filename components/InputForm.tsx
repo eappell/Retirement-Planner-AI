@@ -262,7 +262,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 col-span-full">
 
 
-                    <div className="col-span-full grid grid-cols-2 sm:grid-cols-4 gap-4 items-start md:col-span-4">
+                    <div className="col-span-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 items-start md:col-span-4">
                         <div className="flex flex-col">
                             <label htmlFor="stateInput" className="mb-1 text-sm font-medium">State</label>
                             <select
@@ -295,12 +295,12 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                             <label htmlFor="plan-use-fat" className="text-sm font-medium">Use fat-tailed returns for this scenario</label>
                         </div>
 
-                        <div className="sm:col-start-2 md:col-start-2">
+                        <div className="col-span-1 sm:col-span-1 md:col-span-1">
                             <NumberInput label="Tail degrees of freedom (df)" value={plan.fatTailDf ?? 4} onChange={e => handlePlanChange('fatTailDf', Number(e.target.value))} disabled={!plan.useFatTails} />
                         </div>
 
                         {isCouple && (
-                            <div className="mt-3 sm:col-start-3 md:col-start-3 sm:col-span-2 md:col-span-2 flex items-center">
+                            <div className="mt-3 md:col-start-3 md:col-span-2 sm:col-span-2 flex items-center">
                                 <input
                                     id="useBalancesForSurvivorIncome"
                                     type="checkbox"
