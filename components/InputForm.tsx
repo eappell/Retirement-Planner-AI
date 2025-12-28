@@ -306,7 +306,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                                     type="checkbox"
                                     checked={!!plan.useBalancesForSurvivorIncome}
                                     onChange={e => handlePlanChange('useBalancesForSurvivorIncome', e.target.checked)}
-                                    className="h-5 w-5 rounded text-brand-primary focus:ring-brand-primary"
+                                    className="h-4 w-4 rounded text-brand-primary focus:ring-brand-primary"
                                 />
                                 <label htmlFor="useBalancesForSurvivorIncome" className="ml-2 text-sm font-medium">Allow survivor to use deceased balances</label>
                             </div>
