@@ -283,7 +283,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                         <NumberInput label="Withdrawal Rate" id="withdrawalInput" suffix="%" value={plan.annualWithdrawalRate} onChange={e => handlePlanChange('annualWithdrawalRate', Number(e.target.value))} disabled={plan.dieWithZero} />
 
                         {isCouple && (
-                            <div className="flex items-center mt-2 md:mt-0">
+                            <div className="flex items-center self-center mt-2 md:mt-0">
                                 <input
                                     id="useBalancesForSurvivorIncome"
                                     type="checkbox"
