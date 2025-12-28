@@ -613,7 +613,7 @@ const App: React.FC = () => {
                                     if (typeof d.useFatTails !== 'undefined') handlePlanChange('useFatTails', d.useFatTails as any);
                                     if (typeof d.fatTailDf !== 'undefined') handlePlanChange('fatTailDf', d.fatTailDf as any);
                                 }
-                                showToast('Saved app defaults');
+                                showToast('Saved Advanced Market Assumptions');
                             }}
                             onApplyDefaults={(d) => {
                                 try { localStorage.setItem('assetAssumptionDefaults', JSON.stringify(d)); } catch (e) { /* ignore */ }
@@ -729,7 +729,7 @@ const App: React.FC = () => {
                                     if (typeof d.useFatTails !== 'undefined') handlePlanChange('useFatTails', d.useFatTails as any);
                                     if (typeof d.fatTailDf !== 'undefined') handlePlanChange('fatTailDf', d.fatTailDf as any);
                                 }
-                                showToast('Saved app defaults');
+                                showToast('Saved Advanced Market Assumptions');
                                 setIsSettingsOpen(false);
                             }} 
                             onApplyDefaults={(d) => {
