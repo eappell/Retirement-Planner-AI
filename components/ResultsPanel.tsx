@@ -80,6 +80,5 @@ export const ResultsPanel: React.FC<ResultsPanelProps> = React.memo(({ results, 
                 <p className="text-xs text-gray-500">Note: Fat-tailed sampling is enabled — amounts may be randomized slightly each time projections are computed.</p>
             </div>
         )}
-        <hr className="my-4" />
     </>);
 });
