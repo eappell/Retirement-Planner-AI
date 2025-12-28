@@ -237,7 +237,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                 }
             >
                     {/* Advanced Market Assumptions moved below person fields for better flow */}
-                    <div className="grid grid-cols-1 md:grid-cols-5 lg:grid-cols-5 gap-4 col-span-full">
+                    <div className="grid grid-cols-1 sm:grid-cols-5 gap-4 col-span-full">
                     <div className="flex flex-col space-y-2 h-full col-span-1">
                         {(Object.values(PlanType) as PlanType[]).map(type => (
                             
@@ -256,10 +256,12 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                         ))}
                     </div>
 
-                    <div className="col-span-4 grid grid-cols-4 gap-4 items-start">
+                    <div className="col-span-4 sm:col-span-4 grid grid-cols-4 gap-4 items-start">
                         <div className="flex items-center space-x-2">
                             <label htmlFor="stateInput" className="w-28 text-sm font-medium">State</label>
-                            <input id="stateInput" type="text" value={plan.state} onChange={e => handlePlanChange('state', e.target.value)} className="w-32 px-2 py-1.5 border rounded-md text-sm" />
+                            <SelectInput id="stateInput" value={plan.state} onChange={e => handlePlanChange('state', e.target.value)} className="w-32 text-sm">
+                                {Object.entries(STATES).map(([abbr, name]) => <option key={abbr} value={abbr}>{name}</option>)}
+                            </SelectInput>
                         </div>
 
                         <div className="flex items-center space-x-2">
