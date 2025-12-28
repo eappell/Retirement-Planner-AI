@@ -45,16 +45,23 @@ export const ResultsPanel: React.FC<ResultsPanelProps> = React.memo(({ results, 
                 colorClass="bg-indigo-500"
             />
                 <IndicatorCard
-                title="Avg Annual Gross Income"
+                title="Avg Annual Income"
                 value={results && !isLoading ? (results.yearlyProjections && results.yearlyProjections.length > 0 ? formatCurrency(Math.round(results.yearlyProjections.reduce((a,b) => a + b.grossIncome, 0) / results.yearlyProjections.length)) : '---') : '---'}
                 subValue={results && !isLoading ? (results.yearlyProjections && results.yearlyProjections.length > 0 ? `(avg over ${results.yearlyProjections.length} years)` : '') : ''}
                 icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.002 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.002 0M18 7l3 9m-3-9l-6-2" /></svg>}
                 colorClass="bg-red-500"
             />
-                <IndicatorCard 
-                title="State Tax Rate" 
-                value={results && !isLoading ? `${results.stateTaxRate.toFixed(1)}%` : '---'}
-                icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>}
+                <IndicatorCard
+                title="Taxes"
+                value={
+                    results && !isLoading ? (
+                        <div className="flex flex-col text-sm">
+                            <div>Federal: <span className="font-bold">{results.federalTaxRate.toFixed(1)}%</span></div>
+                            <div>State: <span className="font-bold">{results.stateTaxRate.toFixed(1)}%</span></div>
+                        </div>
+                    ) : '---'
+                }
+                icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v8M8 12h8"/></svg>}
                 colorClass="bg-yellow-500"
             />
         </div>
