@@ -15,6 +15,7 @@ const AppSettingsMenu: React.FC<Props> = ({ onSaveDefaults, onClose, plan = null
   const [bondStd, setBondStd] = useState<number>(6);
   const [useFatTails, setUseFatTails] = useState<boolean>(true);
   const [fatTailDf, setFatTailDf] = useState<number>(4);
+  const [fatTooltipOpen, setFatTooltipOpen] = useState(false);
 
   useEffect(() => {
     try {
@@ -45,7 +46,7 @@ const AppSettingsMenu: React.FC<Props> = ({ onSaveDefaults, onClose, plan = null
   return (
     <div className="origin-top-right absolute right-0 mt-2 w-80 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-30 p-4">
       <div className="space-y-3">
-        <h3 className="text-lg font-semibold text-brand-text-primary">App Settings</h3>
+        <h3 className="text-lg font-semibold text-brand-text-primary">Advanced Market Assumptions</h3>
         <p className="text-sm text-gray-600">Edit application defaults for asset-class assumptions.</p>
 
         <NumberInput label="Stocks: Expected Return" suffix="%" value={stockMean} onChange={e => setStockMean(Number(e.target.value))} />
@@ -53,15 +54,27 @@ const AppSettingsMenu: React.FC<Props> = ({ onSaveDefaults, onClose, plan = null
         <NumberInput label="Bonds: Expected Return" suffix="%" value={bondMean} onChange={e => setBondMean(Number(e.target.value))} />
         <NumberInput label="Bonds: Volatility (std dev)" suffix="%" value={bondStd} onChange={e => setBondStd(Number(e.target.value))} />
 
-        <div className="flex items-start space-x-3">
-          <div className="flex-shrink-0">
-            <input id="menu-use-fat" type="checkbox" checked={useFatTails} onChange={e => setUseFatTails(e.target.checked)} className="h-4 w-4 rounded text-brand-primary focus:ring-brand-primary mt-1" />
-          </div>
-          <div className="flex-1">
-            <label htmlFor="menu-use-fat" className="text-sm font-medium">Default: Use fat-tailed returns</label>
-            <p className="text-xs text-gray-500 mt-1">When enabled, returns are sampled from a fat‑tailed distribution, so projections will include a small randomized variation each time you run them.</p>
-          </div>
+        <div className="flex items-center space-x-3">
+          <input id="menu-use-fat" type="checkbox" checked={useFatTails} onChange={e => setUseFatTails(e.target.checked)} className="h-4 w-4 rounded text-brand-primary focus:ring-brand-primary" />
+          <label htmlFor="menu-use-fat" className="text-sm font-medium">Default: Use fat-tailed returns</label>
+          <span
+            className="relative inline-flex ml-2"
+            onMouseEnter={() => setFatTooltipOpen(true)}
+            onMouseLeave={() => setFatTooltipOpen(false)}
+            onFocus={() => setFatTooltipOpen(true)}
+            onBlur={() => setFatTooltipOpen(false)}
+            tabIndex={-1}
+          >
+            <span className="text-gray-400 hover:text-gray-600 focus:text-gray-700" aria-hidden="true" tabIndex={0}>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
+            </span>
+            <div role="tooltip" className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-72 bg-gray-100 text-gray-900 text-[0.95rem] p-2.5 rounded shadow border border-gray-200 ${fatTooltipOpen ? 'block' : 'hidden'} z-10`}>
+              <div className="font-medium">Fat-Tailed Returns</div>
+              <div className="mt-1 text-sm">When enabled, returns are sampled from a fat‑tailed distribution, so projections will include rarer, larger market moves ("fat tails"). Lower "Tail degrees of freedom" makes extreme gains or losses more likely. Note: enabling fat‑tailed sampling introduces a small randomized variation in projections — results may differ slightly each time you run them.</div>
+            </div>
+          </span>
         </div>
+
         <NumberInput label="Default fat-tail df" value={fatTailDf} onChange={e => setFatTailDf(Number(e.target.value))} />
 
         <div className="mt-2 flex items-center justify-end space-x-2">

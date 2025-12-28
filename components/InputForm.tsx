@@ -274,64 +274,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                         <label htmlFor="useBalancesForSurvivorIncome" className="ml-2 text-sm font-medium">Allow survivor to use deceased balances</label>
                     </div>
                 )}
-                <details className="mt-3 col-span-full">
-                    <summary className="cursor-pointer text-sm font-medium text-brand-text-primary">Advanced Market Assumptions</summary>
-                    <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 mt-3">
-                        <NumberInput label="Stocks: Expected Return" suffix="%" value={(plan.stockMean ?? 8)} onChange={e => handlePlanChange('stockMean', Number(e.target.value))} />
-                        <NumberInput label="Stocks: Volatility (std dev)" suffix="%" value={(plan.stockStd ?? 15)} onChange={e => handlePlanChange('stockStd', Number(e.target.value))} />
-                        <NumberInput label="Bonds: Expected Return" suffix="%" value={(plan.bondMean ?? 3)} onChange={e => handlePlanChange('bondMean', Number(e.target.value))} />
-                        <NumberInput label="Bonds: Volatility (std dev)" suffix="%" value={(plan.bondStd ?? 6)} onChange={e => handlePlanChange('bondStd', Number(e.target.value))} />
-
-                        <div className="sm:col-start-1 flex items-center">
-                            <input id="useFatTails" type="checkbox" checked={!!plan.useFatTails} onChange={e => handlePlanChange('useFatTails', e.target.checked as any)} className="h-4 w-4 rounded text-brand-primary focus:ring-brand-primary" />
-                            <label htmlFor="useFatTails" className="ml-2 text-sm font-medium">Use fat-tailed returns</label>
-                        </div>
-                        <div className="sm:col-start-2">
-                            <NumberInput label="Tail degrees of freedom (df)" value={plan.fatTailDf ?? 4} onChange={e => handlePlanChange('fatTailDf', Number(e.target.value))} />
-                        </div>
-                    </div>
-
-                    <p className="text-xs text-gray-500 mt-2">When <strong>Use fat-tailed returns</strong> is enabled, returns include rarer, larger market moves ("fat tails"). Lower "Tail degrees of freedom" makes extreme gains or losses more likely. Adjust these settings to change the expected returns and volatility used in projections.</p>
-
-                    <p className="text-xs text-gray-500 mt-2">Note: enabling fat-tailed sampling introduces a small randomized variation in projections — results may differ slightly each time you run them.</p>
-
-                    {(() => {
-                        const sd = Number(plan.stockStd ?? 15);
-                        const bd = Number(plan.bondStd ?? 6);
-                        const sm = Number(plan.stockMean ?? 8);
-                        const bm = Number(plan.bondMean ?? 3);
-                        const issues = validateAssetDefaults({ stockMean: sm, bondMean: bm, stockStd: sd, bondStd: bd });
-                        if (issues.length === 0) return null;
-                        return (
-                            <div className="mt-2">
-                                <p className="text-sm text-red-600 font-medium">Market assumptions warnings:</p>
-                                <ul className="text-sm text-red-600 list-disc list-inside">
-                                    {issues.map((x, i) => <li key={i}>{x}</li>)}
-                                </ul>
-                            </div>
-                        );
-                    })()}
-
-                    <div className="flex justify-end mt-3">
-                        <button type="button" className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-md text-sm" onClick={() => {
-                            try {
-                                const payload = {
-                                    stockMean: plan.stockMean,
-                                    stockStd: plan.stockStd,
-                                    bondMean: plan.bondMean,
-                                    bondStd: plan.bondStd,
-                                    useFatTails: plan.useFatTails,
-                                    fatTailDf: plan.fatTailDf
-                                };
-                                window.dispatchEvent(new CustomEvent('app:saveMarketDefaults', { detail: payload }));
-                                window.dispatchEvent(new CustomEvent('app:toast', { detail: { message: 'Saved market assumptions' } }));
-                            } catch (e) {
-                                console.error(e);
-                                window.dispatchEvent(new CustomEvent('app:toast', { detail: { message: 'Failed to save app defaults' } }));
-                            }
-                        }}>Save as App Defaults</button>
-                    </div>
-                </details>
+                <p className="text-xs text-gray-500 mt-2">Advanced Market Assumptions have moved to the <strong>Advanced Market Assumptions</strong> menu in the top-right app menu.</p>
                 {/* Fat-tail demo removed per user request */}
 
                 {/* header action moved into InputSection.actions */}
