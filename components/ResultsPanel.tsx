@@ -1,6 +1,7 @@
 import React, { useMemo, useContext } from 'react';
 import { CalculationResult } from '../types';
 import { IndicatorCard } from './IndicatorCard';
+import { BanknotesIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
 import { ThemeContext } from '../contexts/ThemeContext';
 
 interface ResultsPanelProps {
@@ -48,7 +49,7 @@ export const ResultsPanel: React.FC<ResultsPanelProps> = React.memo(({ results, 
                 title="Avg Annual Income"
                 value={results && !isLoading ? (results.yearlyProjections && results.yearlyProjections.length > 0 ? formatCurrency(Math.round(results.yearlyProjections.reduce((a,b) => a + b.grossIncome, 0) / results.yearlyProjections.length)) : '---') : '---'}
                 subValue={results && !isLoading ? (results.yearlyProjections && results.yearlyProjections.length > 0 ? `(avg over ${results.yearlyProjections.length} years)` : '') : ''}
-                icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.002 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.002 0M18 7l3 9m-3-9l-6-2" /></svg>}
+                icon={<BanknotesIcon className="h-6 w-6 text-white" />}
                 colorClass="bg-red-500"
             />
                 <IndicatorCard
@@ -61,7 +62,7 @@ export const ResultsPanel: React.FC<ResultsPanelProps> = React.memo(({ results, 
                         </div>
                     ) : '---'
                 }
-                icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v8M8 12h8"/></svg>}
+                icon={<DocumentTextIcon className="h-6 w-6 text-white" />}
                 colorClass="bg-yellow-500"
             />
         </div>
