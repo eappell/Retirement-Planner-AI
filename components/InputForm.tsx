@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
+import { ThemeContext } from '../contexts/ThemeContext';
 import AddButton from './AddButton';
 import ActionIcons from './ActionIcons';
 import { RetirementPlan, Person, PlanType, RetirementAccount, InvestmentAccount, Pension, OtherIncome, Annuity, ExpensePeriod, Gift, LegacyDisbursement, OneTimeExpense } from '../types';
@@ -264,7 +265,13 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                     <div className="col-span-full grid grid-cols-2 sm:grid-cols-4 gap-4 items-start md:col-span-4">
                         <div className="flex flex-col">
                             <label htmlFor="stateInput" className="mb-1 text-sm font-medium">State</label>
-                            <select id="stateInput" value={plan.state} onChange={e => handlePlanChange('state', e.target.value)} className="w-full px-2 py-1.5 border rounded-md text-sm bg-white text-gray-900 dark:bg-gray-700 dark:text-white border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-1 focus:ring-brand-primary">
+                            <select
+                                id="stateInput"
+                                value={plan.state}
+                                onChange={e => handlePlanChange('state', e.target.value)}
+                                className="w-full px-2 py-1.5 border rounded-md text-sm bg-white text-gray-900 dark:bg-gray-700 dark:text-white border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-1 focus:ring-brand-primary"
+                                style={{ backgroundColor: (useContext(ThemeContext)?.theme === 'dark') ? undefined : '#ffffff', color: (useContext(ThemeContext)?.theme === 'dark') ? undefined : '#111827' }}
+                            >
                                 {Object.entries(STATES).map(([abbr, name]) => <option key={abbr} value={abbr}>{name}</option>)}
                             </select>
                         </div>
