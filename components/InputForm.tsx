@@ -237,8 +237,8 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                 }
             >
                     {/* Advanced Market Assumptions moved below person fields for better flow */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 col-span-full">
-                    <div className="flex flex-col space-y-2 h-full">
+                    <div className="grid grid-cols-1 md:grid-cols-5 lg:grid-cols-5 gap-4 col-span-full">
+                    <div className="flex flex-col space-y-2 h-full col-span-1">
                         {(Object.values(PlanType) as PlanType[]).map(type => (
                             
                             <button
@@ -281,7 +281,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                         </div>
                     </div>
 
-                <div className="col-span-full">
+                <div className="col-span-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                         <NumberInput label="Stocks: Expected Return" suffix="%" value={(plan as any).stockMean ?? 8} onChange={e => handlePlanChange('stockMean', Number(e.target.value))} />
                         <NumberInput label="Stocks: Volatility (std dev)" suffix="%" value={(plan as any).stockStd ?? 15} onChange={e => handlePlanChange('stockStd', Number(e.target.value))} />
@@ -298,7 +298,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                     </div>
                 </div>
                 {isCouple && (
-                    <div className="mt-3 col-span-full flex items-center">
+                    <div className="mt-3 col-span-4 flex items-center">
                         <input
                             id="useBalancesForSurvivorIncome"
                             type="checkbox"
