@@ -234,7 +234,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                 actions={
                     <div className="flex items-center space-x-2">
                         {scenariosCount && scenariosCount > 1 ? (
-                            <button type="button" className="text-sm px-2 py-1 bg-gray-100 rounded transition-colors hover:bg-[#5b8dde] hover:text-white" onClick={() => doUpdateAll({ planType: plan.planType, state: plan.state, inflationRate: plan.inflationRate, avgReturn: plan.avgReturn, annualWithdrawalRate: plan.annualWithdrawalRate, useFatTails: plan.useFatTails, fatTailDf: plan.fatTailDf, stockMean: (plan as any).stockMean, stockStd: (plan as any).stockStd, bondMean: (plan as any).bondMean, bondStd: (plan as any).bondStd, dieWithZero: plan.dieWithZero, legacyAmount: plan.legacyAmount }, 'Plan Information')}>Update All Scenarios</button>
+                            <button type="button" className="text-sm px-2 py-1 bg-gray-100 rounded transition-colors hover:bg-[#5b8dde] hover:text-white" onClick={() => doUpdateAll({ planType: plan.planType, state: plan.state, inflationRate: plan.inflationRate, avgReturn: plan.avgReturn, avgReturnOverride: plan.avgReturnOverride, annualWithdrawalRate: plan.annualWithdrawalRate, useFatTails: plan.useFatTails, fatTailDf: plan.fatTailDf, stockMean: (plan as any).stockMean, stockStd: (plan as any).stockStd, bondMean: (plan as any).bondMean, bondStd: (plan as any).bondStd, dieWithZero: plan.dieWithZero, legacyAmount: plan.legacyAmount }, 'Plan Information')}>Update All Scenarios</button>
                         ) : null}
 
                         <div className="inline-flex items-center rounded-md bg-gray-100 p-1">
@@ -278,7 +278,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
 
                         <NumberInput label="Inflation" id="inflationInput" suffix="%" value={plan.inflationRate} onChange={e => handlePlanChange('inflationRate', Number(e.target.value))} />
 
-                        <NumberInput label="Avg. Return" id="avgReturnInput" suffix="%" value={plan.avgReturn} onChange={e => handlePlanChange('avgReturn', Number(e.target.value))} />
+
 
                         <NumberInput label="Withdrawal Rate" id="withdrawalInput" suffix="%" value={plan.annualWithdrawalRate} onChange={e => handlePlanChange('annualWithdrawalRate', Number(e.target.value))} disabled={plan.dieWithZero} />
                     </div>
@@ -289,6 +289,36 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                         <NumberInput label="Stocks: Volatility (std dev)" suffix="%" value={(plan as any).stockStd ?? 15} onChange={e => handlePlanChange('stockStd', Number(e.target.value))} />
                         <NumberInput label="Bonds: Expected Return" suffix="%" value={(plan as any).bondMean ?? 3} onChange={e => handlePlanChange('bondMean', Number(e.target.value))} />
                         <NumberInput label="Bonds: Volatility (std dev)" suffix="%" value={(plan as any).bondStd ?? 6} onChange={e => handlePlanChange('bondStd', Number(e.target.value))} />
+
+                        <div className="col-span-1 sm:col-span-1 md:col-span-1">
+                            {/* Computed portfolio average derived from account allocations and asset-class means */}
+                            <NumberInput label="Computed Avg. Return" suffix="%" value={(() => {
+                                // compute portfolio stocks % (balance-weighted or percentStocks avg fallback)
+                                const totalInvBal = (plan.investmentAccounts || []).reduce((s, a) => s + (a.balance || 0), 0);
+                                let portfolioStocksPct = 0;
+                                if (totalInvBal > 0) {
+                                    const stocksWeight = (plan.investmentAccounts || []).reduce((s, a) => s + ((a.balance || 0) * ((a.percentStocks ?? 60) / 100)), 0);
+                                    portfolioStocksPct = stocksWeight / totalInvBal;
+                                } else {
+                                    const n = (plan.investmentAccounts || []).length || 1;
+                                    portfolioStocksPct = ((plan.investmentAccounts || []).reduce((s, a) => s + (a.percentStocks ?? 60), 0) / n) / 100;
+                                }
+                                const baseStock = ((plan as any).stockMean !== undefined ? (plan as any).stockMean / 100 : 0.08);
+                                const baseBond = ((plan as any).bondMean !== undefined ? (plan as any).bondMean / 100 : 0.03);
+                                const portfolioBaseAvg = (portfolioStocksPct * baseStock + (1 - portfolioStocksPct) * baseBond) * 100;
+                                return Number(portfolioBaseAvg.toFixed(2));
+                            })()} disabled />
+                        </div>
+
+                        <div className="col-span-1 sm:col-span-2 md:col-span-1 flex items-center space-x-3">
+                            <input id="avg-override" type="checkbox" checked={!!plan.avgReturnOverride} onChange={e => handlePlanChange('avgReturnOverride', e.target.checked)} className="h-4 w-4 rounded text-brand-primary focus:ring-brand-primary" />
+                            <label htmlFor="avg-override" className="text-sm font-medium">Override Avg Return</label>
+                            {plan.avgReturnOverride && (
+                                <div className="w-28">
+                                    <NumberInput label="Avg. Return" suffix="%" value={plan.avgReturn} onChange={e => handlePlanChange('avgReturn', Number(e.target.value))} />
+                                </div>
+                            )}
+                        </div>
 
                         <div className="flex items-center space-x-3 col-span-1">
                             <input id="plan-use-fat" type="checkbox" checked={!!plan.useFatTails} onChange={e => handlePlanChange('useFatTails', e.target.checked)} className="h-4 w-4 rounded text-brand-primary focus:ring-brand-primary" />

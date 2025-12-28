@@ -136,6 +136,8 @@ export interface RetirementPlan {
   state: string;
   inflationRate: number;
   avgReturn: number;
+  // Allow overriding the computed portfolio average. If undefined (legacy plans), simulation defaults to true (preserve existing behavior).
+  avgReturnOverride?: boolean;
   // Asset-class assumptions (percent values, e.g., 8 = 8%)
   stockMean?: number;
   stockStd?: number;

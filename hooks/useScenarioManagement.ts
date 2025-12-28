@@ -22,6 +22,8 @@ const initialPlanState: RetirementPlan = {
   state: 'CA',
   inflationRate: 2.5,
   avgReturn: 7,
+  // Default for new plans: do not override (computed avg shown). Existing plans without the flag will behave as before.
+  avgReturnOverride: false,
   annualWithdrawalRate: 4,
   dieWithZero: false,
     useBalancesForSurvivorIncome: false,

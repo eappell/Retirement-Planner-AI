@@ -69,7 +69,9 @@ const generateScenarioData = (plan: RetirementPlan): ScenarioData[] => {
             const baseStock = (plan.stockMean !== undefined ? plan.stockMean / 100 : STOCK_MEAN_DEFAULT);
             const baseBond = (plan.bondMean !== undefined ? plan.bondMean / 100 : BOND_MEAN_DEFAULT);
             const portfolioBaseAvg = portfolioStocksPct * baseStock + (1 - portfolioStocksPct) * baseBond;
-            const desiredAvg = plan.avgReturn / 100;
+            // Preserve legacy behavior: default to override true when undefined
+            const overrideFlag = (typeof plan.avgReturnOverride === 'undefined') ? true : !!plan.avgReturnOverride;
+            const desiredAvg = overrideFlag ? (plan.avgReturn / 100) : portfolioBaseAvg;
             const delta = desiredAvg - portfolioBaseAvg;
             const stockReturn = baseStock + delta + adjustment;
             const bondReturn = baseBond + delta + adjustment;

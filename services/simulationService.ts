@@ -186,10 +186,12 @@ export const runSimulation = (plan: RetirementPlan, volatility?: number): Calcul
                 portfolioStocksPct = (investmentAccounts.reduce((s, a) => s + (a.percentStocks ?? 60), 0) / n) / 100;
             }
 
-            const desiredAvg = plan.avgReturn / 100;
             const baseStock = (plan.stockMean !== undefined ? plan.stockMean / 100 : STOCK_MEAN_DEFAULT);
             const baseBond = (plan.bondMean !== undefined ? plan.bondMean / 100 : BOND_MEAN_DEFAULT);
             const portfolioBaseAvg = portfolioStocksPct * baseStock + (1 - portfolioStocksPct) * baseBond;
+            // Preserve legacy behavior: if avgReturnOverride is undefined (older saved plans), default to true so nothing changes.
+            const overrideFlag = (typeof plan.avgReturnOverride === 'undefined') ? true : !!plan.avgReturnOverride;
+            const desiredAvg = overrideFlag ? (plan.avgReturn / 100) : portfolioBaseAvg;
             const delta = desiredAvg - portfolioBaseAvg;
             const stockMean = baseStock + delta;
             const bondMean = baseBond + delta;
