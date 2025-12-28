@@ -641,7 +641,7 @@ const App: React.FC = () => {
                                 handleUploadScenarios(fakeEvent);
                             }}
                         />
-                        <ResultsPanel results={results} isLoading={isLoading} />
+                        <ResultsPanel results={results} isLoading={isLoading} plan={plan} />
                     </div>
 
                     <div className="mt-4 space-y-6">

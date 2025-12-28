@@ -1,5 +1,5 @@
 import React, { useMemo, useContext } from 'react';
-import { CalculationResult } from '../types';
+import { CalculationResult, RetirementPlan } from '../types';
 import { IndicatorCard } from './IndicatorCard';
 import { BanknotesIcon, CurrencyDollarIcon } from '@heroicons/react/24/outline';
 import { ThemeContext } from '../contexts/ThemeContext';
@@ -7,9 +7,10 @@ import { ThemeContext } from '../contexts/ThemeContext';
 interface ResultsPanelProps {
     results: CalculationResult | null;
     isLoading: boolean;
+    plan?: RetirementPlan | null;
 }
 
-export const ResultsPanel: React.FC<ResultsPanelProps> = React.memo(({ results, isLoading }) => {
+export const ResultsPanel: React.FC<ResultsPanelProps> = React.memo(({ results, isLoading, plan }) => {
     const themeCtx = useContext(ThemeContext);
     const theme = themeCtx?.theme ?? 'light';
     const surplusColorClass = theme === 'dark' ? 'bg-indigo-500' : 'bg-teal-500';
@@ -74,5 +75,10 @@ export const ResultsPanel: React.FC<ResultsPanelProps> = React.memo(({ results, 
                 colorClass="bg-red-500"
             />
         </div>
+        {plan?.useFatTails && (
+            <div className="mt-2 px-4 sm:px-6 lg:px-8">
+                <p className="text-xs text-gray-500">Note: Fat-tailed sampling is enabled — amounts may be randomized slightly each time projections are computed.</p>
+            </div>
+        )}
     );
 });
