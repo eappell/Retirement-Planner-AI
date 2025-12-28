@@ -615,18 +615,7 @@ const App: React.FC = () => {
                                 }
                                 showToast('Saved Advanced Market Assumptions');
                             }}
-                            onApplyDefaults={(d) => {
-                                try { localStorage.setItem('assetAssumptionDefaults', JSON.stringify(d)); } catch (e) { /* ignore */ }
-                                // apply immediately but do not show toast or close the menu
-                                if (d) {
-                                    if (typeof d.stockMean !== 'undefined') handlePlanChange('stockMean', d.stockMean as any);
-                                    if (typeof d.stockStd !== 'undefined') handlePlanChange('stockStd', d.stockStd as any);
-                                    if (typeof d.bondMean !== 'undefined') handlePlanChange('bondMean', d.bondMean as any);
-                                    if (typeof d.bondStd !== 'undefined') handlePlanChange('bondStd', d.bondStd as any);
-                                    if (typeof d.useFatTails !== 'undefined') handlePlanChange('useFatTails', d.useFatTails as any);
-                                    if (typeof d.fatTailDf !== 'undefined') handlePlanChange('fatTailDf', d.fatTailDf as any);
-                                }
-                            }}
+
                         plan={plan}
                         setIsManualOpen={setIsManualOpen}
                         setIsDisclaimerOpen={(open: boolean, requireAccept?: boolean) => {

@@ -262,6 +262,25 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                     <NumberInput label="Avg. Return" suffix="%" value={plan.avgReturn} onChange={e => handlePlanChange('avgReturn', Number(e.target.value))}/>
                     <NumberInput label="Withdrawal Rate" suffix="%" value={plan.annualWithdrawalRate} onChange={e => handlePlanChange('annualWithdrawalRate', Number(e.target.value))} disabled={plan.dieWithZero}/>
                 </div>
+
+                {/* Advanced Market Assumptions moved into Plan Information */}
+                <div className="col-span-full mt-3">
+                    <h4 className="text-sm font-semibold mb-2">Advanced Market Assumptions</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                        <NumberInput label="Stocks: Expected Return" suffix="%" value={(plan as any).stockMean ?? 8} onChange={e => handlePlanChange('stockMean', Number(e.target.value))} />
+                        <NumberInput label="Stocks: Volatility (std dev)" suffix="%" value={(plan as any).stockStd ?? 15} onChange={e => handlePlanChange('stockStd', Number(e.target.value))} />
+                        <NumberInput label="Bonds: Expected Return" suffix="%" value={(plan as any).bondMean ?? 3} onChange={e => handlePlanChange('bondMean', Number(e.target.value))} />
+                        <NumberInput label="Bonds: Volatility (std dev)" suffix="%" value={(plan as any).bondStd ?? 6} onChange={e => handlePlanChange('bondStd', Number(e.target.value))} />
+
+                        <div className="flex items-center space-x-3 col-span-2">
+                            <input id="plan-use-fat" type="checkbox" checked={!!plan.useFatTails} onChange={e => handlePlanChange('useFatTails', e.target.checked)} className="h-4 w-4 rounded text-brand-primary focus:ring-brand-primary" />
+                            <label htmlFor="plan-use-fat" className="text-sm font-medium">Use fat-tailed returns for this scenario</label>
+                        </div>
+
+                        <NumberInput label="Tail degrees of freedom (df)" value={plan.fatTailDf ?? 4} onChange={e => handlePlanChange('fatTailDf', Number(e.target.value))} />
+                        <div />
+                    </div>
+                </div>
                 {isCouple && (
                     <div className="mt-3 col-span-full flex items-center">
                         <input
