@@ -3,8 +3,8 @@ import React from 'react';
 
 interface IndicatorCardProps {
   title: string;
-  value: string;
-  subValue?: string;
+  value?: string | React.ReactNode;
+  subValue?: string | React.ReactNode;
   icon: React.ReactNode;
   colorClass: string;
 }
@@ -17,8 +17,8 @@ export const IndicatorCard: React.FC<IndicatorCardProps> = React.memo(({ title, 
       </div>
       <div>
         <p className="text-sm text-brand-text-secondary">{title}</p>
-        <p className="text-xl font-bold text-brand-text-primary">{value}</p>
-        {subValue && <p className="text-xs text-brand-text-secondary mt-1">{subValue}</p>}
+        {value && <p className="text-xl font-bold text-brand-text-primary">{value}</p>}
+        {subValue && <div className="text-xs text-brand-text-secondary mt-1">{subValue}</div>}
       </div>
     </div>
   );
