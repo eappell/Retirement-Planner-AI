@@ -261,31 +261,16 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 col-span-full">
 
 
-                    <div className="col-span-full grid grid-cols-4 gap-4 items-start md:col-span-4">
-                        <div className="flex items-center space-x-2">
-                            <label htmlFor="stateInput" className="w-28 text-sm font-medium">State</label>
-                            <SelectInput id="stateInput" value={plan.state} onChange={e => handlePlanChange('state', e.target.value)} className="w-32 text-sm">
-                                {Object.entries(STATES).map(([abbr, name]) => <option key={abbr} value={abbr}>{name}</option>)}
-                            </SelectInput>
-                        </div>
+                    <div className="col-span-full grid grid-cols-2 sm:grid-cols-4 gap-4 items-start md:col-span-4">
+                        <SelectInput label="State" id="stateInput" value={plan.state} onChange={e => handlePlanChange('state', e.target.value)} className="text-sm w-full">
+                            {Object.entries(STATES).map(([abbr, name]) => <option key={abbr} value={abbr}>{name}</option>)}
+                        </SelectInput>
 
-                        <div className="flex items-center space-x-2">
-                            <label htmlFor="inflationInput" className="w-28 text-sm font-medium">Inflation</label>
-                            <input id="inflationInput" type="number" value={plan.inflationRate} onChange={e => handlePlanChange('inflationRate', Number(e.target.value))} className="w-20 px-2 py-1.5 border rounded-md text-sm" />
-                            <span className="text-sm">%</span>
-                        </div>
+                        <NumberInput label="Inflation" id="inflationInput" suffix="%" value={plan.inflationRate} onChange={e => handlePlanChange('inflationRate', Number(e.target.value))} />
 
-                        <div className="flex items-center space-x-2">
-                            <label htmlFor="avgReturnInput" className="w-28 text-sm font-medium">Avg. Return</label>
-                            <input id="avgReturnInput" type="number" value={plan.avgReturn} onChange={e => handlePlanChange('avgReturn', Number(e.target.value))} className="w-20 px-2 py-1.5 border rounded-md text-sm" />
-                            <span className="text-sm">%</span>
-                        </div>
+                        <NumberInput label="Avg. Return" id="avgReturnInput" suffix="%" value={plan.avgReturn} onChange={e => handlePlanChange('avgReturn', Number(e.target.value))} />
 
-                        <div className="flex items-center space-x-2">
-                            <label htmlFor="withdrawalInput" className="w-28 text-sm font-medium">Withdrawal Rate</label>
-                            <input id="withdrawalInput" type="number" value={plan.annualWithdrawalRate} onChange={e => handlePlanChange('annualWithdrawalRate', Number(e.target.value))} disabled={plan.dieWithZero} className={`w-20 px-2 py-1.5 border rounded-md text-sm ${plan.dieWithZero ? 'opacity-60 cursor-not-allowed' : ''}`} />
-                            <span className="text-sm">%</span>
-                        </div>
+                        <NumberInput label="Withdrawal Rate" id="withdrawalInput" suffix="%" value={plan.annualWithdrawalRate} onChange={e => handlePlanChange('annualWithdrawalRate', Number(e.target.value))} disabled={plan.dieWithZero} />
                     </div>
 
                 <div className="col-span-full md:col-span-4">
