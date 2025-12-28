@@ -229,7 +229,27 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
             
             
             <InputSection
-                title="Plan Information & Assumptions"
+                title={<>
+                    <span>Plan Information & Assumptions</span>
+                    <div className="ml-4 inline-flex items-center rounded-md bg-gray-100 p-1">
+                        <button
+                            type="button"
+                            aria-pressed={plan.planType === PlanType.INDIVIDUAL}
+                            onClick={() => handlePlanChange('planType', PlanType.INDIVIDUAL)}
+                            className={`px-3 py-1.5 text-sm rounded ${plan.planType === PlanType.INDIVIDUAL ? 'bg-brand-primary text-white' : 'bg-transparent'}`}
+                        >
+                            Individual
+                        </button>
+                        <button
+                            type="button"
+                            aria-pressed={plan.planType === PlanType.COUPLE}
+                            onClick={() => handlePlanChange('planType', PlanType.COUPLE)}
+                            className={`px-3 py-1.5 text-sm rounded ${plan.planType === PlanType.COUPLE ? 'bg-brand-primary text-white' : 'bg-transparent'}`}
+                        >
+                            Couple
+                        </button>
+                    </div>
+                </>} 
                 subtitle="Set the high-level assumptions for your retirement plan."
                 actions={
                     <div className="flex items-center space-x-2">
@@ -237,24 +257,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                             <button type="button" className="text-sm px-2 py-1 bg-gray-100 rounded transition-colors hover:bg-[#5b8dde] hover:text-white" onClick={() => doUpdateAll({ planType: plan.planType, state: plan.state, inflationRate: plan.inflationRate, avgReturn: plan.avgReturn, avgReturnOverride: plan.avgReturnOverride, annualWithdrawalRate: plan.annualWithdrawalRate, useFatTails: plan.useFatTails, fatTailDf: plan.fatTailDf, stockMean: (plan as any).stockMean, stockStd: (plan as any).stockStd, bondMean: (plan as any).bondMean, bondStd: (plan as any).bondStd, dieWithZero: plan.dieWithZero, legacyAmount: plan.legacyAmount }, 'Plan Information')}>Update All Scenarios</button>
                         ) : null}
 
-                        <div className="inline-flex items-center rounded-md bg-gray-100 p-1">
-                            <button
-                                type="button"
-                                aria-pressed={plan.planType === PlanType.INDIVIDUAL}
-                                onClick={() => handlePlanChange('planType', PlanType.INDIVIDUAL)}
-                                className={`px-3 py-1.5 text-sm rounded ${plan.planType === PlanType.INDIVIDUAL ? 'bg-brand-primary text-white' : 'bg-transparent'}`}
-                            >
-                                Individual
-                            </button>
-                            <button
-                                type="button"
-                                aria-pressed={plan.planType === PlanType.COUPLE}
-                                onClick={() => handlePlanChange('planType', PlanType.COUPLE)}
-                                className={`px-3 py-1.5 text-sm rounded ${plan.planType === PlanType.COUPLE ? 'bg-brand-primary text-white' : 'bg-transparent'}`}
-                            >
-                                Couple
-                            </button>
-                        </div>
+
                     </div>
                 }
             >
