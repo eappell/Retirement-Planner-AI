@@ -11,36 +11,10 @@ interface Props {
 const AppSettingsMenu: React.FC<Props> = ({ onSaveDefaults, onClose, plan = null }) => {
   const [fatTooltipOpen, setFatTooltipOpen] = useState(false);
 
-  // Populate initial values from plan when opening for clarity (menu is now informational)
-
-
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem('assetAssumptionDefaults');
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        setStockMean(parsed.stockMean ?? (plan?.stockMean ?? 8));
-        setStockStd(parsed.stockStd ?? (plan?.stockStd ?? 15));
-        setBondMean(parsed.bondMean ?? (plan?.bondMean ?? 3));
-        setBondStd(parsed.bondStd ?? (plan?.bondStd ?? 6));
-        setUseFatTails(parsed.useFatTails ?? (plan?.useFatTails ?? true));
-        setFatTailDf(parsed.fatTailDf ?? (plan?.fatTailDf ?? 4));
-        return;
-      }
-      if (plan) {
-        setStockMean(plan.stockMean ?? 8);
-        setStockStd(plan.stockStd ?? 15);
-        setBondMean(plan.bondMean ?? 3);
-        setBondStd(plan.bondStd ?? 6);
-        setUseFatTails(plan.useFatTails ?? true);
-        setFatTailDf(plan.fatTailDf ?? 4);
-      }
-    } catch (e) {
-      // ignore
-    }
-  }, [plan]);
+  // Menu is informational now; values are read from the provided `plan` prop (no internal editable state)
 
   return (
+    <>
     <div className="origin-top-right absolute right-0 mt-2 w-80 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-30 p-4">
       <div className="space-y-3">
         <h3 className="text-lg font-semibold text-brand-text-primary">Advanced Market Assumptions</h3>
@@ -50,7 +24,8 @@ const AppSettingsMenu: React.FC<Props> = ({ onSaveDefaults, onClose, plan = null
           <div><strong>Stocks:</strong> {typeof plan?.stockMean !== 'undefined' ? `${plan?.stockMean}% (vol ${plan?.stockStd ?? '—'}%)` : '—'}</div>
           <div className="mt-1"><strong>Bonds:</strong> {typeof plan?.bondMean !== 'undefined' ? `${plan?.bondMean}% (vol ${plan?.bondStd ?? '—'}%)` : '—'}</div>
           <div className="mt-1"><strong>Fat-tailed returns:</strong> {typeof plan?.useFatTails !== 'undefined' ? (plan?.useFatTails ? `Enabled (df ${plan?.fatTailDf ?? '—'})` : 'Disabled') : '—'}</div>
-        </div>          <span
+
+          <span
             className="relative inline-flex ml-2"
             onMouseEnter={() => setFatTooltipOpen(true)}
             onMouseLeave={() => setFatTooltipOpen(false)}
@@ -68,7 +43,7 @@ const AppSettingsMenu: React.FC<Props> = ({ onSaveDefaults, onClose, plan = null
           </span>
         </div>
 
-        <NumberInput label="Default fat-tail df" value={fatTailDf} onChange={e => setFatTailDf(Number(e.target.value))} />
+        <NumberInput label="Default fat-tail df" value={plan?.fatTailDf ?? 4} />
 
         <div className="mt-2 flex items-center justify-end space-x-2">
           <button type="button" className="px-3 py-1.5 rounded-md bg-gray-100 hover:bg-gray-200" onClick={() => {
@@ -85,6 +60,7 @@ const AppSettingsMenu: React.FC<Props> = ({ onSaveDefaults, onClose, plan = null
         </div>
       </div>
     </div>
+    </>
   );
 };
 
