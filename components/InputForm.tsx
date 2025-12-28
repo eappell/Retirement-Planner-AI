@@ -255,13 +255,30 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                             </button>
                         ))}
                     </div>
-                    <SelectInput label="State" value={plan.state} onChange={e => handlePlanChange('state', e.target.value)}>
-                            {Object.entries(STATES).map(([abbr, name]) => <option key={abbr} value={abbr}>{name}</option>)}
-                    </SelectInput>
-                    <NumberInput label="Inflation" suffix="%" value={plan.inflationRate} onChange={e => handlePlanChange('inflationRate', Number(e.target.value))}/>
-                    <NumberInput label="Avg. Return" suffix="%" value={plan.avgReturn} onChange={e => handlePlanChange('avgReturn', Number(e.target.value))}/>
-                    <NumberInput label="Withdrawal Rate" suffix="%" value={plan.annualWithdrawalRate} onChange={e => handlePlanChange('annualWithdrawalRate', Number(e.target.value))} disabled={plan.dieWithZero}/>
-                </div>
+
+                    <div className="col-span-4 grid grid-cols-4 gap-4 items-center">
+                        <div className="flex items-center space-x-2">
+                            <label className="w-28 text-sm font-medium">State</label>
+                            <SelectInput value={plan.state} onChange={e => handlePlanChange('state', e.target.value)} className="w-32">
+                                {Object.entries(STATES).map(([abbr, name]) => <option key={abbr} value={abbr}>{name}</option>)}
+                            </SelectInput>
+                        </div>
+
+                        <div className="flex items-center space-x-2">
+                            <label className="w-28 text-sm font-medium">Inflation</label>
+                            <NumberInput label={undefined} className="w-20" suffix="%" value={plan.inflationRate} onChange={e => handlePlanChange('inflationRate', Number(e.target.value))} />
+                        </div>
+
+                        <div className="flex items-center space-x-2">
+                            <label className="w-28 text-sm font-medium">Avg. Return</label>
+                            <NumberInput label={undefined} className="w-20" suffix="%" value={plan.avgReturn} onChange={e => handlePlanChange('avgReturn', Number(e.target.value))} />
+                        </div>
+
+                        <div className="flex items-center space-x-2">
+                            <label className="w-28 text-sm font-medium">Withdrawal Rate</label>
+                            <NumberInput label={undefined} className="w-20" suffix="%" value={plan.annualWithdrawalRate} onChange={e => handlePlanChange('annualWithdrawalRate', Number(e.target.value))} disabled={plan.dieWithZero} />
+                        </div>
+                    </div>
 
                 {/* Advanced Market Assumptions moved into Plan Information */}
                 <div className="col-span-full mt-3">
