@@ -62,7 +62,15 @@ export const ResultsPanel: React.FC<ResultsPanelProps> = React.memo(({ results, 
                         </div>
                     ) : '---'
                 }
-                icon={<CurrencyDollarIcon className="h-6 w-6 text-white" />}
+                icon={
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <ellipse cx="12" cy="4.5" rx="6" ry="2" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M6 4.5v2.5c0 1.1 2.7 2 6 2s6-.9 6-2V4.5" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+                        <ellipse cx="12" cy="9.5" rx="6" ry="2" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M6 9.5v2.5c0 1.1 2.7 2 6 2s6-.9 6-2V9.5" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+                        <ellipse cx="12" cy="14.5" rx="6" ry="2" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                }
                 colorClass="bg-red-500"
             />
         </div>
