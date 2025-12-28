@@ -256,7 +256,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                         ))}
                     </div>
 
-                    <div className="col-span-4 sm:col-span-4 grid grid-cols-4 gap-4 items-start">
+                    <div className="sm:col-start-2 sm:col-span-4 grid grid-cols-4 gap-4 items-start">
                         <div className="flex items-center space-x-2">
                             <label htmlFor="stateInput" className="w-28 text-sm font-medium">State</label>
                             <SelectInput id="stateInput" value={plan.state} onChange={e => handlePlanChange('state', e.target.value)} className="w-32 text-sm">
@@ -283,7 +283,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                         </div>
                     </div>
 
-                <div className="col-span-4">
+                <div className="sm:col-start-2 sm:col-span-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                         <NumberInput label="Stocks: Expected Return" suffix="%" value={(plan as any).stockMean ?? 8} onChange={e => handlePlanChange('stockMean', Number(e.target.value))} />
                         <NumberInput label="Stocks: Volatility (std dev)" suffix="%" value={(plan as any).stockStd ?? 15} onChange={e => handlePlanChange('stockStd', Number(e.target.value))} />
@@ -300,7 +300,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                     </div>
                 </div>
                 {isCouple && (
-                    <div className="mt-3 col-span-4 flex items-center">
+                    <div className="mt-3 sm:col-start-2 sm:col-span-4 flex items-center">
                         <input
                             id="useBalancesForSurvivorIncome"
                             type="checkbox"
