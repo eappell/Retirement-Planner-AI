@@ -281,6 +281,19 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
 
 
                         <NumberInput label="Withdrawal Rate" id="withdrawalInput" suffix="%" value={plan.annualWithdrawalRate} onChange={e => handlePlanChange('annualWithdrawalRate', Number(e.target.value))} disabled={plan.dieWithZero} />
+
+                        {isCouple && (
+                            <div className="flex items-center mt-2 md:mt-0">
+                                <input
+                                    id="useBalancesForSurvivorIncome"
+                                    type="checkbox"
+                                    checked={!!plan.useBalancesForSurvivorIncome}
+                                    onChange={e => handlePlanChange('useBalancesForSurvivorIncome', e.target.checked)}
+                                    className="h-4 w-4 rounded text-brand-primary focus:ring-brand-primary"
+                                />
+                                <label htmlFor="useBalancesForSurvivorIncome" className="ml-2 text-sm font-medium">Allow survivor to use deceased balances</label>
+                            </div>
+                        )}
                     </div>
 
                 <div className="col-span-full md:col-span-4">
@@ -329,18 +342,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                             <NumberInput label="Tail degrees of freedom (df)" value={plan.fatTailDf ?? 4} onChange={e => handlePlanChange('fatTailDf', Number(e.target.value))} disabled={!plan.useFatTails} />
                         </div>
 
-                        {isCouple && (
-                            <div className="mt-3 md:col-start-3 md:col-span-2 sm:col-span-2 flex items-center">
-                                <input
-                                    id="useBalancesForSurvivorIncome"
-                                    type="checkbox"
-                                    checked={!!plan.useBalancesForSurvivorIncome}
-                                    onChange={e => handlePlanChange('useBalancesForSurvivorIncome', e.target.checked)}
-                                    className="h-4 w-4 rounded text-brand-primary focus:ring-brand-primary"
-                                />
-                                <label htmlFor="useBalancesForSurvivorIncome" className="ml-2 text-sm font-medium">Allow survivor to use deceased balances</label>
-                            </div>
-                        )}
+
 
                         <div />
                     </div>
