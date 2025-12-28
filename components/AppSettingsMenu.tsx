@@ -17,6 +17,15 @@ const AppSettingsMenu: React.FC<Props> = ({ onSaveDefaults, onClose, plan = null
   const [fatTailDf, setFatTailDf] = useState<number>(4);
   const [fatTooltipOpen, setFatTooltipOpen] = useState(false);
 
+  // Apply useFatTails immediately to the active plan when toggled so UI (e.g., stat notes) updates instantly
+  React.useEffect(() => {
+    try {
+      onSaveDefaults({ useFatTails });
+    } catch (e) {
+      // ignore
+    }
+  }, [useFatTails]);
+
   useEffect(() => {
     try {
       const raw = localStorage.getItem('assetAssumptionDefaults');
