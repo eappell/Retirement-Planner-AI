@@ -315,6 +315,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
 
                 {/* header action moved into InputSection.actions */}
 
+                <div className="col-span-full">
                 <div className="bg-brand-surface p-3 rounded-lg shadow-sm flex items-center space-x-4">
                     <div className="flex items-center space-x-2 flex-shrink-0 group">
                     <input
@@ -380,8 +381,8 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                 </p>
             </div>
 
+            </div>
             
-            </InputSection>
 
             <div className={`grid grid-cols-1 ${isCouple ? 'md:grid-cols-2' : ''} gap-6`}>
                 <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
