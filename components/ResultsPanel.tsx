@@ -50,7 +50,7 @@ export const ResultsPanel: React.FC<ResultsPanelProps> = React.memo(({ results, 
                 value={results && !isLoading ? (results.yearlyProjections && results.yearlyProjections.length > 0 ? formatCurrency(Math.round(results.yearlyProjections.reduce((a,b) => a + b.grossIncome, 0) / results.yearlyProjections.length)) : '---') : '---'}
                 subValue={results && !isLoading ? (results.yearlyProjections && results.yearlyProjections.length > 0 ? `(avg over ${results.yearlyProjections.length} years)` : '') : ''}
                 icon={<BanknotesIcon className="h-6 w-6 text-white" />}
-                colorClass="bg-red-500"
+                colorClass="bg-yellow-500"
             />
                 <IndicatorCard
                 title="Taxes"
@@ -63,7 +63,7 @@ export const ResultsPanel: React.FC<ResultsPanelProps> = React.memo(({ results, 
                     ) : '---'
                 }
                 icon={<DocumentTextIcon className="h-6 w-6 text-white" />}
-                colorClass="bg-yellow-500"
+                colorClass="bg-red-500"
             />
         </div>
     );
