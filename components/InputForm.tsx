@@ -231,32 +231,37 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                 title="Plan Information & Assumptions"
                 subtitle="Set the high-level assumptions for your retirement plan."
                 actions={
-                    scenariosCount && scenariosCount > 1 ? (
-                        <button type="button" className="text-sm px-2 py-1 bg-gray-100 rounded transition-colors hover:bg-[#5b8dde] hover:text-white" onClick={() => doUpdateAll({ planType: plan.planType, state: plan.state, inflationRate: plan.inflationRate, avgReturn: plan.avgReturn, annualWithdrawalRate: plan.annualWithdrawalRate, useFatTails: plan.useFatTails, fatTailDf: plan.fatTailDf, stockMean: (plan as any).stockMean, stockStd: (plan as any).stockStd, bondMean: (plan as any).bondMean, bondStd: (plan as any).bondStd, dieWithZero: plan.dieWithZero, legacyAmount: plan.legacyAmount }, 'Plan Information')}>Update All Scenarios</button>
-                    ) : undefined
+                    <div className="flex items-center space-x-2">
+                        {scenariosCount && scenariosCount > 1 ? (
+                            <button type="button" className="text-sm px-2 py-1 bg-gray-100 rounded transition-colors hover:bg-[#5b8dde] hover:text-white" onClick={() => doUpdateAll({ planType: plan.planType, state: plan.state, inflationRate: plan.inflationRate, avgReturn: plan.avgReturn, annualWithdrawalRate: plan.annualWithdrawalRate, useFatTails: plan.useFatTails, fatTailDf: plan.fatTailDf, stockMean: (plan as any).stockMean, stockStd: (plan as any).stockStd, bondMean: (plan as any).bondMean, bondStd: (plan as any).bondStd, dieWithZero: plan.dieWithZero, legacyAmount: plan.legacyAmount }, 'Plan Information')}>Update All Scenarios</button>
+                        ) : null}
+
+                        <div className="inline-flex items-center rounded-md bg-gray-100 p-1">
+                            <button
+                                type="button"
+                                aria-pressed={plan.planType === PlanType.INDIVIDUAL}
+                                onClick={() => handlePlanChange('planType', PlanType.INDIVIDUAL)}
+                                className={`px-3 py-1.5 text-sm rounded ${plan.planType === PlanType.INDIVIDUAL ? 'bg-brand-primary text-white' : 'bg-transparent'}`}
+                            >
+                                Individual
+                            </button>
+                            <button
+                                type="button"
+                                aria-pressed={plan.planType === PlanType.COUPLE}
+                                onClick={() => handlePlanChange('planType', PlanType.COUPLE)}
+                                className={`px-3 py-1.5 text-sm rounded ${plan.planType === PlanType.COUPLE ? 'bg-brand-primary text-white' : 'bg-transparent'}`}
+                            >
+                                Couple
+                            </button>
+                        </div>
+                    </div>
                 }
             >
                     {/* Advanced Market Assumptions moved below person fields for better flow */}
-                    <div className="grid grid-cols-1 sm:grid-cols-5 gap-4 col-span-full">
-                    <div className="flex flex-col space-y-2 h-full col-span-1">
-                        {(Object.values(PlanType) as PlanType[]).map(type => (
-                            
-                            <button
-                                key={type}
-                                onClick={() => {
-                                    handlePlanChange('planType', type);
-                                    // focus appropriate field after switching plan type
-                                    if (type === PlanType.COUPLE) setFocusTargetId('person2-name');
-                                    else setFocusTargetId('person1-name');
-                                }}
-                                className={`px-3 py-1.5 text-sm rounded-md w-full flex-1 ${plan.planType === type ? 'bg-brand-primary text-white' : 'bg-gray-200 text-gray-700'}`}
-                            >
-                                {type}
-                            </button>
-                        ))}
-                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 col-span-full">
 
-                    <div className="sm:col-start-2 sm:col-span-4 grid grid-cols-4 gap-4 items-start">
+
+                    <div className="col-span-full grid grid-cols-4 gap-4 items-start md:col-span-4">
                         <div className="flex items-center space-x-2">
                             <label htmlFor="stateInput" className="w-28 text-sm font-medium">State</label>
                             <SelectInput id="stateInput" value={plan.state} onChange={e => handlePlanChange('state', e.target.value)} className="w-32 text-sm">
@@ -283,7 +288,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                         </div>
                     </div>
 
-                <div className="sm:col-start-2 sm:col-span-4">
+                <div className="col-span-full md:col-span-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                         <NumberInput label="Stocks: Expected Return" suffix="%" value={(plan as any).stockMean ?? 8} onChange={e => handlePlanChange('stockMean', Number(e.target.value))} />
                         <NumberInput label="Stocks: Volatility (std dev)" suffix="%" value={(plan as any).stockStd ?? 15} onChange={e => handlePlanChange('stockStd', Number(e.target.value))} />
@@ -300,7 +305,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                     </div>
                 </div>
                 {isCouple && (
-                    <div className="mt-3 sm:col-start-2 sm:col-span-4 flex items-center">
+                    <div className="mt-3 col-span-full md:col-span-4 flex items-center">
                         <input
                             id="useBalancesForSurvivorIncome"
                             type="checkbox"
