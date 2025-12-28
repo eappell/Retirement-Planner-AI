@@ -613,8 +613,9 @@ const App: React.FC = () => {
                                     if (typeof d.useFatTails !== 'undefined') handlePlanChange('useFatTails', d.useFatTails as any);
                                     if (typeof d.fatTailDf !== 'undefined') handlePlanChange('fatTailDf', d.fatTailDf as any);
                                 }
-                                showToast('Saved app defaults');
+                                showToast('Saved Advanced Market Assumptions');
                             }}
+
                         plan={plan}
                         setIsManualOpen={setIsManualOpen}
                         setIsDisclaimerOpen={(open: boolean, requireAccept?: boolean) => {
@@ -641,7 +642,7 @@ const App: React.FC = () => {
                                 handleUploadScenarios(fakeEvent);
                             }}
                         />
-                        <ResultsPanel results={results} isLoading={isLoading} />
+                        <ResultsPanel results={results} isLoading={isLoading} plan={plan} />
                     </div>
 
                     <div className="mt-4 space-y-6">
@@ -717,9 +718,20 @@ const App: React.FC = () => {
                                     if (typeof d.useFatTails !== 'undefined') handlePlanChange('useFatTails', d.useFatTails as any);
                                     if (typeof d.fatTailDf !== 'undefined') handlePlanChange('fatTailDf', d.fatTailDf as any);
                                 }
-                                showToast('Saved app defaults');
+                                showToast('Saved Advanced Market Assumptions');
                                 setIsSettingsOpen(false);
                             }} 
+                            onApplyDefaults={(d) => {
+                                try { localStorage.setItem('assetAssumptionDefaults', JSON.stringify(d)); } catch (e) { /* ignore */ }
+                                if (d) {
+                                    if (typeof d.stockMean !== 'undefined') handlePlanChange('stockMean', d.stockMean as any);
+                                    if (typeof d.stockStd !== 'undefined') handlePlanChange('stockStd', d.stockStd as any);
+                                    if (typeof d.bondMean !== 'undefined') handlePlanChange('bondMean', d.bondMean as any);
+                                    if (typeof d.bondStd !== 'undefined') handlePlanChange('bondStd', d.bondStd as any);
+                                    if (typeof d.useFatTails !== 'undefined') handlePlanChange('useFatTails', d.useFatTails as any);
+                                    if (typeof d.fatTailDf !== 'undefined') handlePlanChange('fatTailDf', d.fatTailDf as any);
+                                }
+                            }}
                             onClose={() => setIsSettingsOpen(false)} 
                             plan={plan} 
                         />

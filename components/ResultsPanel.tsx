@@ -1,5 +1,5 @@
 import React, { useMemo, useContext } from 'react';
-import { CalculationResult } from '../types';
+import { CalculationResult, RetirementPlan } from '../types';
 import { IndicatorCard } from './IndicatorCard';
 import { BanknotesIcon, CurrencyDollarIcon } from '@heroicons/react/24/outline';
 import { ThemeContext } from '../contexts/ThemeContext';
@@ -7,9 +7,10 @@ import { ThemeContext } from '../contexts/ThemeContext';
 interface ResultsPanelProps {
     results: CalculationResult | null;
     isLoading: boolean;
+    plan?: RetirementPlan | null;
 }
 
-export const ResultsPanel: React.FC<ResultsPanelProps> = React.memo(({ results, isLoading }) => {
+export const ResultsPanel: React.FC<ResultsPanelProps> = React.memo(({ results, isLoading, plan }) => {
     const themeCtx = useContext(ThemeContext);
     const theme = themeCtx?.theme ?? 'light';
     const surplusColorClass = theme === 'dark' ? 'bg-indigo-500' : 'bg-teal-500';
@@ -18,7 +19,7 @@ export const ResultsPanel: React.FC<ResultsPanelProps> = React.memo(({ results, 
         []
     );
     
-    return (
+    return (<>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6 bg-brand-background py-4 shadow-sm -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8">
             <IndicatorCard 
                 title="Avg. Monthly Net Income" 
@@ -37,13 +38,6 @@ export const ResultsPanel: React.FC<ResultsPanelProps> = React.memo(({ results, 
                     </svg>
                 }
                 colorClass={surplusColorClass}
-            />
-                <IndicatorCard 
-                title="Final Net Worth" 
-                value={results && !isLoading ? formatCurrency(results.netWorthAtEndFuture) : '---'}
-                subValue={results && !isLoading ? `(${formatCurrency(results.netWorthAtEnd)} today's $)` : ''}
-                icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>}
-                colorClass="bg-indigo-500"
             />
                 <IndicatorCard
                 title="Avg Annual Income"
@@ -73,6 +67,14 @@ export const ResultsPanel: React.FC<ResultsPanelProps> = React.memo(({ results, 
                 }
                 colorClass="bg-red-500"
             />
+                <IndicatorCard 
+                title="Final Net Worth" 
+                value={results && !isLoading ? formatCurrency(results.netWorthAtEndFuture) : '---'}
+                subValue={results && !isLoading ? `(${formatCurrency(results.netWorthAtEnd)} today's $)` : ''}
+                icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>}
+                colorClass="bg-indigo-500"
+            />
         </div>
-    );
+
+    </>);
 });

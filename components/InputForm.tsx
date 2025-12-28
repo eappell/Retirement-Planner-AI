@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
+import { ThemeContext } from '../contexts/ThemeContext';
 import AddButton from './AddButton';
 import ActionIcons from './ActionIcons';
 import { RetirementPlan, Person, PlanType, RetirementAccount, InvestmentAccount, Pension, OtherIncome, Annuity, ExpensePeriod, Gift, LegacyDisbursement, OneTimeExpense } from '../types';
@@ -228,114 +229,100 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
             
             
             <InputSection
-                title="Plan Information"
+                title="Plan Information & Assumptions"
                 subtitle="Set the high-level assumptions for your retirement plan."
                 actions={
-                    scenariosCount && scenariosCount > 1 ? (
-                        <button type="button" className="text-sm px-2 py-1 bg-gray-100 rounded transition-colors hover:bg-[#5b8dde] hover:text-white" onClick={() => doUpdateAll({ planType: plan.planType, state: plan.state, inflationRate: plan.inflationRate, avgReturn: plan.avgReturn, annualWithdrawalRate: plan.annualWithdrawalRate, useFatTails: plan.useFatTails, fatTailDf: plan.fatTailDf, stockMean: (plan as any).stockMean, stockStd: (plan as any).stockStd, bondMean: (plan as any).bondMean, bondStd: (plan as any).bondStd, dieWithZero: plan.dieWithZero, legacyAmount: plan.legacyAmount }, 'Plan Information')}>Update All Scenarios</button>
-                    ) : undefined
+                    <div className="flex items-center space-x-2">
+                        {scenariosCount && scenariosCount > 1 ? (
+                            <button type="button" className="text-sm px-2 py-1 bg-gray-100 rounded transition-colors hover:bg-[#5b8dde] hover:text-white" onClick={() => doUpdateAll({ planType: plan.planType, state: plan.state, inflationRate: plan.inflationRate, avgReturn: plan.avgReturn, annualWithdrawalRate: plan.annualWithdrawalRate, useFatTails: plan.useFatTails, fatTailDf: plan.fatTailDf, stockMean: (plan as any).stockMean, stockStd: (plan as any).stockStd, bondMean: (plan as any).bondMean, bondStd: (plan as any).bondStd, dieWithZero: plan.dieWithZero, legacyAmount: plan.legacyAmount }, 'Plan Information')}>Update All Scenarios</button>
+                        ) : null}
+
+                        <div className="inline-flex items-center rounded-md bg-gray-100 p-1">
+                            <button
+                                type="button"
+                                aria-pressed={plan.planType === PlanType.INDIVIDUAL}
+                                onClick={() => handlePlanChange('planType', PlanType.INDIVIDUAL)}
+                                className={`px-3 py-1.5 text-sm rounded ${plan.planType === PlanType.INDIVIDUAL ? 'bg-brand-primary text-white' : 'bg-transparent'}`}
+                            >
+                                Individual
+                            </button>
+                            <button
+                                type="button"
+                                aria-pressed={plan.planType === PlanType.COUPLE}
+                                onClick={() => handlePlanChange('planType', PlanType.COUPLE)}
+                                className={`px-3 py-1.5 text-sm rounded ${plan.planType === PlanType.COUPLE ? 'bg-brand-primary text-white' : 'bg-transparent'}`}
+                            >
+                                Couple
+                            </button>
+                        </div>
+                    </div>
                 }
             >
                     {/* Advanced Market Assumptions moved below person fields for better flow */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 col-span-full">
-                    <div className="flex flex-col space-y-2 h-full">
-                        {(Object.values(PlanType) as PlanType[]).map(type => (
-                            
-                            <button
-                                key={type}
-                                onClick={() => {
-                                    handlePlanChange('planType', type);
-                                    // focus appropriate field after switching plan type
-                                    if (type === PlanType.COUPLE) setFocusTargetId('person2-name');
-                                    else setFocusTargetId('person1-name');
-                                }}
-                                className={`px-3 py-1.5 text-sm rounded-md w-full flex-1 ${plan.planType === type ? 'bg-brand-primary text-white' : 'bg-gray-200 text-gray-700'}`}
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 col-span-full">
+
+
+                    <div className="col-span-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 items-start md:col-span-4">
+                        <div className="flex flex-col">
+                            <label htmlFor="stateInput" className="mb-1 text-sm font-medium">State</label>
+                            <select
+                                id="stateInput"
+                                value={plan.state}
+                                onChange={e => handlePlanChange('state', e.target.value)}
+                                className="w-full px-2 py-1.5 border rounded-md text-sm bg-white text-gray-900 dark:bg-gray-700 dark:text-white border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-1 focus:ring-brand-primary"
+                                style={{ backgroundColor: (useContext(ThemeContext)?.theme === 'dark') ? undefined : '#ffffff', color: (useContext(ThemeContext)?.theme === 'dark') ? undefined : '#111827' }}
                             >
-                                {type}
-                            </button>
-                        ))}
-                    </div>
-                    <SelectInput label="State" value={plan.state} onChange={e => handlePlanChange('state', e.target.value)}>
-                            {Object.entries(STATES).map(([abbr, name]) => <option key={abbr} value={abbr}>{name}</option>)}
-                    </SelectInput>
-                    <NumberInput label="Inflation" suffix="%" value={plan.inflationRate} onChange={e => handlePlanChange('inflationRate', Number(e.target.value))}/>
-                    <NumberInput label="Avg. Return" suffix="%" value={plan.avgReturn} onChange={e => handlePlanChange('avgReturn', Number(e.target.value))}/>
-                    <NumberInput label="Withdrawal Rate" suffix="%" value={plan.annualWithdrawalRate} onChange={e => handlePlanChange('annualWithdrawalRate', Number(e.target.value))} disabled={plan.dieWithZero}/>
-                </div>
-                {isCouple && (
-                    <div className="mt-3 col-span-full flex items-center">
-                        <input
-                            id="useBalancesForSurvivorIncome"
-                            type="checkbox"
-                            checked={!!plan.useBalancesForSurvivorIncome}
-                            onChange={e => handlePlanChange('useBalancesForSurvivorIncome', e.target.checked)}
-                            className="h-5 w-5 rounded text-brand-primary focus:ring-brand-primary"
-                        />
-                        <label htmlFor="useBalancesForSurvivorIncome" className="ml-2 text-sm font-medium">Allow survivor to use deceased balances</label>
-                    </div>
-                )}
-                <details className="mt-3 col-span-full">
-                    <summary className="cursor-pointer text-sm font-medium text-brand-text-primary">Advanced Market Assumptions</summary>
-                    <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 mt-3">
-                        <NumberInput label="Stocks: Expected Return" suffix="%" value={(plan.stockMean ?? 8)} onChange={e => handlePlanChange('stockMean', Number(e.target.value))} />
-                        <NumberInput label="Stocks: Volatility (std dev)" suffix="%" value={(plan.stockStd ?? 15)} onChange={e => handlePlanChange('stockStd', Number(e.target.value))} />
-                        <NumberInput label="Bonds: Expected Return" suffix="%" value={(plan.bondMean ?? 3)} onChange={e => handlePlanChange('bondMean', Number(e.target.value))} />
-                        <NumberInput label="Bonds: Volatility (std dev)" suffix="%" value={(plan.bondStd ?? 6)} onChange={e => handlePlanChange('bondStd', Number(e.target.value))} />
-
-                        <div className="sm:col-start-1 flex items-center">
-                            <input id="useFatTails" type="checkbox" checked={!!plan.useFatTails} onChange={e => handlePlanChange('useFatTails', e.target.checked as any)} className="h-4 w-4 rounded text-brand-primary focus:ring-brand-primary" />
-                            <label htmlFor="useFatTails" className="ml-2 text-sm font-medium">Use fat-tailed returns</label>
+                                {Object.entries(STATES).map(([abbr, name]) => <option key={abbr} value={abbr}>{name}</option>)}
+                            </select>
                         </div>
-                        <div className="sm:col-start-2">
-                            <NumberInput label="Tail degrees of freedom (df)" value={plan.fatTailDf ?? 4} onChange={e => handlePlanChange('fatTailDf', Number(e.target.value))} />
-                        </div>
+
+                        <NumberInput label="Inflation" id="inflationInput" suffix="%" value={plan.inflationRate} onChange={e => handlePlanChange('inflationRate', Number(e.target.value))} />
+
+                        <NumberInput label="Avg. Return" id="avgReturnInput" suffix="%" value={plan.avgReturn} onChange={e => handlePlanChange('avgReturn', Number(e.target.value))} />
+
+                        <NumberInput label="Withdrawal Rate" id="withdrawalInput" suffix="%" value={plan.annualWithdrawalRate} onChange={e => handlePlanChange('annualWithdrawalRate', Number(e.target.value))} disabled={plan.dieWithZero} />
                     </div>
 
-                    <p className="text-xs text-gray-500 mt-2">When <strong>Use fat-tailed returns</strong> is enabled, returns include rarer, larger market moves ("fat tails"). Lower "Tail degrees of freedom" makes extreme gains or losses more likely. Adjust these settings to change the expected returns and volatility used in projections.</p>
+                <div className="col-span-full md:col-span-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                        <NumberInput label="Stocks: Expected Return" suffix="%" value={(plan as any).stockMean ?? 8} onChange={e => handlePlanChange('stockMean', Number(e.target.value))} />
+                        <NumberInput label="Stocks: Volatility (std dev)" suffix="%" value={(plan as any).stockStd ?? 15} onChange={e => handlePlanChange('stockStd', Number(e.target.value))} />
+                        <NumberInput label="Bonds: Expected Return" suffix="%" value={(plan as any).bondMean ?? 3} onChange={e => handlePlanChange('bondMean', Number(e.target.value))} />
+                        <NumberInput label="Bonds: Volatility (std dev)" suffix="%" value={(plan as any).bondStd ?? 6} onChange={e => handlePlanChange('bondStd', Number(e.target.value))} />
 
-                    {(() => {
-                        const sd = Number(plan.stockStd ?? 15);
-                        const bd = Number(plan.bondStd ?? 6);
-                        const sm = Number(plan.stockMean ?? 8);
-                        const bm = Number(plan.bondMean ?? 3);
-                        const issues = validateAssetDefaults({ stockMean: sm, bondMean: bm, stockStd: sd, bondStd: bd });
-                        if (issues.length === 0) return null;
-                        return (
-                            <div className="mt-2">
-                                <p className="text-sm text-red-600 font-medium">Market assumptions warnings:</p>
-                                <ul className="text-sm text-red-600 list-disc list-inside">
-                                    {issues.map((x, i) => <li key={i}>{x}</li>)}
-                                </ul>
+                        <div className="flex items-center space-x-3 col-span-1">
+                            <input id="plan-use-fat" type="checkbox" checked={!!plan.useFatTails} onChange={e => handlePlanChange('useFatTails', e.target.checked)} className="h-4 w-4 rounded text-brand-primary focus:ring-brand-primary" />
+                            <label htmlFor="plan-use-fat" className="text-sm font-medium">Use fat-tailed returns for this scenario</label>
+                        </div>
+
+                        <div className="col-span-1 sm:col-span-1 md:col-span-1">
+                            <NumberInput label="Tail degrees of freedom (df)" value={plan.fatTailDf ?? 4} onChange={e => handlePlanChange('fatTailDf', Number(e.target.value))} disabled={!plan.useFatTails} />
+                        </div>
+
+                        {isCouple && (
+                            <div className="mt-3 md:col-start-3 md:col-span-2 sm:col-span-2 flex items-center">
+                                <input
+                                    id="useBalancesForSurvivorIncome"
+                                    type="checkbox"
+                                    checked={!!plan.useBalancesForSurvivorIncome}
+                                    onChange={e => handlePlanChange('useBalancesForSurvivorIncome', e.target.checked)}
+                                    className="h-4 w-4 rounded text-brand-primary focus:ring-brand-primary"
+                                />
+                                <label htmlFor="useBalancesForSurvivorIncome" className="ml-2 text-sm font-medium">Allow survivor to use deceased balances</label>
                             </div>
-                        );
-                    })()}
+                        )}
 
-                    <div className="flex justify-end mt-3">
-                        <button type="button" className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-md text-sm" onClick={() => {
-                            try {
-                                const payload = {
-                                    stockMean: plan.stockMean,
-                                    stockStd: plan.stockStd,
-                                    bondMean: plan.bondMean,
-                                    bondStd: plan.bondStd,
-                                    useFatTails: plan.useFatTails,
-                                    fatTailDf: plan.fatTailDf
-                                };
-                                window.dispatchEvent(new CustomEvent('app:saveMarketDefaults', { detail: payload }));
-                                window.dispatchEvent(new CustomEvent('app:toast', { detail: { message: 'Saved market assumptions' } }));
-                            } catch (e) {
-                                console.error(e);
-                                window.dispatchEvent(new CustomEvent('app:toast', { detail: { message: 'Failed to save app defaults' } }));
-                            }
-                        }}>Save as App Defaults</button>
+                        <div />
                     </div>
-                </details>
+                </div>
+
                 {/* Fat-tail demo removed per user request */}
 
                 {/* header action moved into InputSection.actions */}
-
+                </div>
             </InputSection>
 
+                <div className="col-span-full">
                 <div className="bg-brand-surface p-3 rounded-lg shadow-sm flex items-center space-x-4">
                     <div className="flex items-center space-x-2 flex-shrink-0 group">
                     <input
@@ -401,7 +388,9 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                 </p>
             </div>
 
+            </div>
             
+
             <div className={`grid grid-cols-1 ${isCouple ? 'md:grid-cols-2' : ''} gap-6`}>
                 <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
                     <h3 className="font-semibold text-blue-800 flex items-center mb-3">
