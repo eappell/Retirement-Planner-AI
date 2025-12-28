@@ -19,7 +19,7 @@ export const ResultsPanel: React.FC<ResultsPanelProps> = React.memo(({ results, 
         []
     );
     
-    return (
+    return (<>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6 bg-brand-background py-4 shadow-sm -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8">
             <IndicatorCard 
                 title="Avg. Monthly Net Income" 
@@ -80,5 +80,5 @@ export const ResultsPanel: React.FC<ResultsPanelProps> = React.memo(({ results, 
                 <p className="text-xs text-gray-500">Note: Fat-tailed sampling is enabled — amounts may be randomized slightly each time projections are computed.</p>
             </div>
         )}
-    );
+    </>);
 });
