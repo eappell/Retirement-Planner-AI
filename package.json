@@ -8,7 +8,9 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "deploy-ui": "bash scripts/deploy-ui.sh",
+    "deploy-api": "bash scripts/deploy-api.sh"
   },
   "dependencies": {
     "@google/genai": "^1.29.1",
