@@ -1,7 +1,7 @@
 import React, { useMemo, useContext } from 'react';
 import { CalculationResult } from '../types';
 import { IndicatorCard } from './IndicatorCard';
-import { BanknotesIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
+import { BanknotesIcon, CurrencyDollarIcon } from '@heroicons/react/24/outline';
 import { ThemeContext } from '../contexts/ThemeContext';
 
 interface ResultsPanelProps {
@@ -62,7 +62,7 @@ export const ResultsPanel: React.FC<ResultsPanelProps> = React.memo(({ results, 
                         </div>
                     ) : '---'
                 }
-                icon={<DocumentTextIcon className="h-6 w-6 text-white" />}
+                icon={<CurrencyDollarIcon className="h-6 w-6 text-white" />}
                 colorClass="bg-red-500"
             />
         </div>
