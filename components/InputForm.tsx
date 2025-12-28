@@ -314,6 +314,8 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                 {/* Fat-tail demo removed per user request */}
 
                 {/* header action moved into InputSection.actions */}
+                </div>
+            </InputSection>
 
                 <div className="col-span-full">
                 <div className="bg-brand-surface p-3 rounded-lg shadow-sm flex items-center space-x-4">
