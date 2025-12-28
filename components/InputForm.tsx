@@ -290,12 +290,14 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                         <NumberInput label="Bonds: Expected Return" suffix="%" value={(plan as any).bondMean ?? 3} onChange={e => handlePlanChange('bondMean', Number(e.target.value))} />
                         <NumberInput label="Bonds: Volatility (std dev)" suffix="%" value={(plan as any).bondStd ?? 6} onChange={e => handlePlanChange('bondStd', Number(e.target.value))} />
 
-                        <div className="flex items-center space-x-3 col-span-2">
+                        <div className="flex items-center space-x-3 col-span-1">
                             <input id="plan-use-fat" type="checkbox" checked={!!plan.useFatTails} onChange={e => handlePlanChange('useFatTails', e.target.checked)} className="h-4 w-4 rounded text-brand-primary focus:ring-brand-primary" />
                             <label htmlFor="plan-use-fat" className="text-sm font-medium">Use fat-tailed returns for this scenario</label>
                         </div>
 
-                        <NumberInput label="Tail degrees of freedom (df)" value={plan.fatTailDf ?? 4} onChange={e => handlePlanChange('fatTailDf', Number(e.target.value))} />
+                        <div className="sm:col-start-2 md:col-start-2">
+                            <NumberInput label="Tail degrees of freedom (df)" value={plan.fatTailDf ?? 4} onChange={e => handlePlanChange('fatTailDf', Number(e.target.value))} />
+                        </div>
                         <div />
                     </div>
                 </div>
