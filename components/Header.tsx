@@ -35,6 +35,7 @@ interface HeaderProps {
   setIsManualOpen: (isOpen: boolean) => void;
   setIsDisclaimerOpen: (isOpen: boolean, requireAccept?: boolean) => void;
   onSaveDefaults: (d: { stockMean: number; stockStd: number; bondMean: number; bondStd: number; useFatTails?: boolean; fatTailDf?: number }) => void;
+  onApplyDefaults?: (d: { useFatTails?: boolean }) => void;
   plan?: any;
 }
 
@@ -179,7 +180,7 @@ const Header: React.FC<HeaderProps> = ({
             <span className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 whitespace-nowrap z-40 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-none">Advanced Market Assumptions</span>
           </button>
           {isSettingsOpen && (
-            <AppSettingsMenu onSaveDefaults={(d) => { onSaveDefaults(d); setIsSettingsOpen(false); }} onClose={() => setIsSettingsOpen(false)} plan={plan} />
+            <AppSettingsMenu onSaveDefaults={(d) => { onSaveDefaults(d); setIsSettingsOpen(false); }} onApplyDefaults={(d) => { if (typeof onApplyDefaults === 'function') onApplyDefaults(d); }} onClose={() => setIsSettingsOpen(false)} plan={plan} />
           )}
         </div>
 

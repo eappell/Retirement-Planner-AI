@@ -4,11 +4,12 @@ import { RetirementPlan } from '../types';
 
 interface Props {
   onSaveDefaults: (d: { stockMean: number; stockStd: number; bondMean: number; bondStd: number; useFatTails?: boolean; fatTailDf?: number }) => void;
+  onApplyDefaults?: (d: { useFatTails?: boolean }) => void;
   onClose: () => void;
   plan?: RetirementPlan | null;
 }
 
-const AppSettingsMenu: React.FC<Props> = ({ onSaveDefaults, onClose, plan = null }) => {
+const AppSettingsMenu: React.FC<Props> = ({ onSaveDefaults, onApplyDefaults, onClose, plan = null }) => {
   const [stockMean, setStockMean] = useState<number>(8);
   const [stockStd, setStockStd] = useState<number>(15);
   const [bondMean, setBondMean] = useState<number>(3);
@@ -17,14 +18,9 @@ const AppSettingsMenu: React.FC<Props> = ({ onSaveDefaults, onClose, plan = null
   const [fatTailDf, setFatTailDf] = useState<number>(4);
   const [fatTooltipOpen, setFatTooltipOpen] = useState(false);
 
-  // Apply useFatTails immediately to the active plan when toggled so UI (e.g., stat notes) updates instantly
-  React.useEffect(() => {
-    try {
-      onSaveDefaults({ useFatTails });
-    } catch (e) {
-      // ignore
-    }
-  }, [useFatTails]);
+  // When the user toggles the fat-tail checkbox, notify parent via onApplyDefaults (no toast/close)
+  // This replaces the previous auto-save on mount which closed the menu unexpectedly.
+
 
   useEffect(() => {
     try {
@@ -64,7 +60,11 @@ const AppSettingsMenu: React.FC<Props> = ({ onSaveDefaults, onClose, plan = null
         <NumberInput label="Bonds: Volatility (std dev)" suffix="%" value={bondStd} onChange={e => setBondStd(Number(e.target.value))} />
 
         <div className="flex items-center space-x-3">
-          <input id="menu-use-fat" type="checkbox" checked={useFatTails} onChange={e => setUseFatTails(e.target.checked)} className="h-4 w-4 rounded text-brand-primary focus:ring-brand-primary" />
+          <input id="menu-use-fat" type="checkbox" checked={useFatTails} onChange={e => {
+            const v = e.target.checked;
+            setUseFatTails(v);
+            try { if (typeof onApplyDefaults === 'function') onApplyDefaults({ useFatTails: v }); } catch (e) { /* ignore */ }
+          }} className="h-4 w-4 rounded text-brand-primary focus:ring-brand-primary" />
           <label htmlFor="menu-use-fat" className="text-sm font-medium">Default: Use fat-tailed returns</label>
           <span
             className="relative inline-flex ml-2"

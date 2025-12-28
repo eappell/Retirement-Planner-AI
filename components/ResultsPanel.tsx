@@ -75,10 +75,6 @@ export const ResultsPanel: React.FC<ResultsPanelProps> = React.memo(({ results, 
                 colorClass="bg-red-500"
             />
         </div>
-        {plan?.useFatTails && (
-            <div className="mt-2 px-4 sm:px-6 lg:px-8">
-                <p className="text-xs text-gray-500">Note: Fat-tailed sampling is enabled — amounts may be randomized slightly each time projections are computed.</p>
-            </div>
-        )}
+
     </>);
 });
