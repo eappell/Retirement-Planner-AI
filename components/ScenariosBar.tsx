@@ -266,6 +266,7 @@ const ScenariosBar: React.FC<ScenariosBarProps> = ({ scenarios = [], activeScena
                         aria-label="Delete scenario"
                         disabled={list.length <= 1}
                         className="relative group py-2 px-3 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center font-semibold text-base"
+                        style={{ backgroundColor: computedTheme === 'dark' ? '#dc2626' : undefined }}
                     >
                         <TrashIcon className="h-4 w-4 text-white" />
                         <span className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-gray-800 dark:bg-gray-700 text-white dark:text-white text-xs rounded py-1 px-2 whitespace-nowrap z-40 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-none">Delete the current scenario</span>
