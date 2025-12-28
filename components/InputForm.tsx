@@ -274,7 +274,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                         <label htmlFor="useBalancesForSurvivorIncome" className="ml-2 text-sm font-medium">Allow survivor to use deceased balances</label>
                     </div>
                 )}
-                <p className="text-xs text-gray-500 mt-2">Advanced Market Assumptions have moved to the <strong>Advanced Market Assumptions</strong> menu in the top-right app menu.</p>
+
                 {/* Fat-tail demo removed per user request */}
 
                 {/* header action moved into InputSection.actions */}
