@@ -228,7 +228,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
             
             
             <InputSection
-                title="Plan Information"
+                title="Plan Information & Assumptions"
                 subtitle="Set the high-level assumptions for your retirement plan."
                 actions={
                     scenariosCount && scenariosCount > 1 ? (
@@ -281,9 +281,7 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                         </div>
                     </div>
 
-                {/* Advanced Market Assumptions moved into Plan Information */}
-                <div className="col-span-full mt-3">
-                    <h4 className="text-sm font-semibold mb-2">Advanced Market Assumptions</h4>
+                <div className="col-span-full">
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                         <NumberInput label="Stocks: Expected Return" suffix="%" value={(plan as any).stockMean ?? 8} onChange={e => handlePlanChange('stockMean', Number(e.target.value))} />
                         <NumberInput label="Stocks: Volatility (std dev)" suffix="%" value={(plan as any).stockStd ?? 15} onChange={e => handlePlanChange('stockStd', Number(e.target.value))} />
