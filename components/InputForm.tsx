@@ -293,6 +293,8 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
 
                     <p className="text-xs text-gray-500 mt-2">When <strong>Use fat-tailed returns</strong> is enabled, returns include rarer, larger market moves ("fat tails"). Lower "Tail degrees of freedom" makes extreme gains or losses more likely. Adjust these settings to change the expected returns and volatility used in projections.</p>
 
+                    <p className="text-xs text-gray-500 mt-2">Note: enabling fat-tailed sampling introduces a small randomized variation in projections — results may differ slightly each time you run them.</p>
+
                     {(() => {
                         const sd = Number(plan.stockStd ?? 15);
                         const bd = Number(plan.bondStd ?? 6);
