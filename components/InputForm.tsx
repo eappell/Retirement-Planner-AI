@@ -296,23 +296,25 @@ const InputForm: React.FC<InputFormProps> = ({ plan, handlePlanChange, handlePer
                         </div>
 
                         <div className="sm:col-start-2 md:col-start-2">
-                            <NumberInput label="Tail degrees of freedom (df)" value={plan.fatTailDf ?? 4} onChange={e => handlePlanChange('fatTailDf', Number(e.target.value))} />
+                            <NumberInput label="Tail degrees of freedom (df)" value={plan.fatTailDf ?? 4} onChange={e => handlePlanChange('fatTailDf', Number(e.target.value))} disabled={!plan.useFatTails} />
                         </div>
+
+                        {isCouple && (
+                            <div className="mt-3 sm:col-start-3 md:col-start-3 sm:col-span-2 md:col-span-2 flex items-center">
+                                <input
+                                    id="useBalancesForSurvivorIncome"
+                                    type="checkbox"
+                                    checked={!!plan.useBalancesForSurvivorIncome}
+                                    onChange={e => handlePlanChange('useBalancesForSurvivorIncome', e.target.checked)}
+                                    className="h-5 w-5 rounded text-brand-primary focus:ring-brand-primary"
+                                />
+                                <label htmlFor="useBalancesForSurvivorIncome" className="ml-2 text-sm font-medium">Allow survivor to use deceased balances</label>
+                            </div>
+                        )}
+
                         <div />
                     </div>
                 </div>
-                {isCouple && (
-                    <div className="mt-3 col-span-full md:col-span-4 flex items-center">
-                        <input
-                            id="useBalancesForSurvivorIncome"
-                            type="checkbox"
-                            checked={!!plan.useBalancesForSurvivorIncome}
-                            onChange={e => handlePlanChange('useBalancesForSurvivorIncome', e.target.checked)}
-                            className="h-5 w-5 rounded text-brand-primary focus:ring-brand-primary"
-                        />
-                        <label htmlFor="useBalancesForSurvivorIncome" className="ml-2 text-sm font-medium">Allow survivor to use deceased balances</label>
-                    </div>
-                )}
 
                 {/* Fat-tail demo removed per user request */}
 
