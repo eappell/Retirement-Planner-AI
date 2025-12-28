@@ -19,7 +19,8 @@
 /* Smooth transition for theme changes */
 html, body {
   transition: background-color 200ms ease, color 200ms ease;
-}
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'system-ui', Roboto, '"Helvetica Neue"', Arial, '"Noto Sans"', sans-serif;
+} 
 
 /* Ensure Tailwind utilities that rely on colors inherit from CSS variables */
 .bg-brand-background { background-color: var(--brand-background) !important; }
