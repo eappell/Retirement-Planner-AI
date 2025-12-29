@@ -55,6 +55,32 @@ html, body {
   color: var(--brand-text-secondary) !important;
 }
 
+/* Make all labels and small-bold labels white in dark mode so they are prominent */
+.theme-dark label,
+.theme-dark .text-sm.font-medium,
+.theme-dark .text-sm.font-semibold {
+  color: #ffffff !important;
+}
+
+/* Tabs: make inactive tab text muted but readable, and selected tab brighter */
+.theme-dark .ml-4.inline-flex button,
+.theme-dark .tabs button,
+.theme-dark .tab-button {
+  color: var(--brand-text-secondary) !important;
+}
+
+/* Selected tab should be the section color but brighter and slightly elevated */
+.theme-dark .bg-brand-primary.text-white,
+.theme-dark .tab-selected.bg-brand-primary.text-white {
+  filter: brightness(1.12) !important;
+  box-shadow: 0 6px 18px rgba(99,102,241,0.16) !important;
+}
+
+/* Ensure that when tabs are not selected they remain readable on surface */
+.theme-dark .bg-transparent {
+  color: var(--brand-text-secondary) !important;
+}
+
 /* Ensure items that use gray backgrounds keep readable labels in dark mode */
 .theme-dark .bg-gray-50,
 .theme-dark .bg-gray-100,
