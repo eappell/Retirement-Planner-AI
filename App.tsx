@@ -111,11 +111,12 @@ const App: React.FC = () => {
         const firstName = getFirstName(portalProfile.name);
         // Only auto-update the planner name when it's still the default placeholder
         if (firstName && (plan.person1.name === 'Person 1' || plan.person1.name.startsWith('Person'))) {
-            updateActivePlan({ person1: { ...plan.person1, name: firstName } });
-            console.log('[App] Set Person 1 name from portal profile:', firstName);
+            if (plan.person1.name !== firstName) {
+                updateActivePlan({ person1: { ...plan.person1, name: firstName } });
+                console.log('[App] Set Person 1 name from portal profile:', firstName);
+            }
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [hasReceivedProfile]);
+    }, [hasReceivedProfile, plan, portalProfile.name, getFirstName]);
 
     // Apply portal profile data to plan when received
     useEffect(() => {
