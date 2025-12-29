@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { RetirementPlan, PlanType, Person, MonteCarloResult } from './types';
 import { UserManualModal } from './components/UserManualModal';
 import DisclaimerModal from './components/DisclaimerModal';
@@ -160,10 +160,16 @@ const App: React.FC = () => {
             }
         }
         
-        // If married filing status from portal, update plan type and person2
+            // If married filing status from portal, update plan type and person2
+        // Only auto-switch to COUPLE if we haven't already applied an automatic switch and
+        // the plan appears to be the default (e.g., person2 still has default name).
         if (isMarried && plan.planType === PlanType.INDIVIDUAL) {
-            updates.planType = PlanType.COUPLE;
-            hasUpdates = true;
+            const person2IsDefault = !plan.person2 || !plan.person2.name || plan.person2.name.startsWith('Person');
+            if (person2IsDefault && !appliedPlanTypeRef.current) {
+                updates.planType = PlanType.COUPLE;
+                hasUpdates = true;
+                appliedPlanTypeRef.current = true;
+            }
         }
         
         // Apply spouse data if married
@@ -214,6 +220,9 @@ const App: React.FC = () => {
         setToastMessage(msg);
         setTimeout(() => setToastMessage(null), ms);
     };
+
+    // Track whether we auto-applied a planType change from portal profile (so we don't repeatedly force it)
+    const appliedPlanTypeRef = useRef(false);
 
     // listen for cross-component toast events
     useEffect(() => {
