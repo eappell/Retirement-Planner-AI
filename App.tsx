@@ -21,7 +21,8 @@ import {
     useAIInsights,
     useSocialSecurityCalculation,
     usePortalIntegration,
-    usePortalAuth 
+    usePortalAuth,
+    usePortalProfile 
 } from './hooks';
 import { buildExport, parseUpload } from './utils/exportImport';
 import useTheme from './hooks/useTheme';
@@ -100,6 +101,81 @@ const App: React.FC = () => {
     useAutoSave(scenariosState);
     
     const plan = activeScenario?.plan;
+    
+    // Portal profile integration - receive profile data from portal
+    const { profile: portalProfile, hasReceivedProfile, currentAge, spouseCurrentAge, getEffectiveState, isMarried } = usePortalProfile();
+    
+    // Apply portal profile data to plan when received
+    useEffect(() => {
+        if (!hasReceivedProfile || !plan) return;
+        
+        const updates: Partial<RetirementPlan> = {};
+        let hasUpdates = false;
+        
+        // Apply state - use retirement state if set, otherwise current state
+        const effectiveState = getEffectiveState();
+        if (effectiveState && effectiveState !== plan.state) {
+            updates.state = effectiveState;
+            hasUpdates = true;
+        }
+        
+        // Apply person1 data from profile
+        if (currentAge !== null || portalProfile.retirementAge !== null || portalProfile.lifeExpectancy !== null || portalProfile.currentAnnualIncome !== null) {
+            const person1Updates: Partial<Person> = { ...plan.person1 };
+            if (currentAge !== null && currentAge !== plan.person1.currentAge) {
+                person1Updates.currentAge = currentAge;
+                hasUpdates = true;
+            }
+            if (portalProfile.retirementAge !== null && portalProfile.retirementAge !== plan.person1.retirementAge) {
+                person1Updates.retirementAge = portalProfile.retirementAge;
+                // Also update claiming age if it matches old retirement age
+                if (plan.person1.claimingAge === plan.person1.retirementAge) {
+                    person1Updates.claimingAge = portalProfile.retirementAge;
+                }
+                hasUpdates = true;
+            }
+            if (portalProfile.lifeExpectancy !== null && portalProfile.lifeExpectancy !== plan.person1.lifeExpectancy) {
+                person1Updates.lifeExpectancy = portalProfile.lifeExpectancy;
+                hasUpdates = true;
+            }
+            if (portalProfile.currentAnnualIncome !== null && portalProfile.currentAnnualIncome !== plan.person1.currentSalary) {
+                person1Updates.currentSalary = portalProfile.currentAnnualIncome;
+                hasUpdates = true;
+            }
+            if (hasUpdates) {
+                updates.person1 = person1Updates as Person;
+            }
+        }
+        
+        // If married filing status from portal, update plan type and person2
+        if (isMarried && plan.planType === PlanType.INDIVIDUAL) {
+            updates.planType = PlanType.COUPLE;
+            hasUpdates = true;
+        }
+        
+        // Apply spouse data if married
+        if (isMarried && portalProfile.spouseName) {
+            const person2Updates: Partial<Person> = { ...plan.person2 };
+            if (portalProfile.spouseName !== plan.person2.name) {
+                person2Updates.name = portalProfile.spouseName;
+                hasUpdates = true;
+            }
+            if (spouseCurrentAge !== null && spouseCurrentAge !== plan.person2.currentAge) {
+                person2Updates.currentAge = spouseCurrentAge;
+                hasUpdates = true;
+            }
+            if (hasUpdates) {
+                updates.person2 = person2Updates as Person;
+            }
+        }
+        
+        if (hasUpdates) {
+            updateActivePlan(updates);
+            console.log('[App] Applied portal profile data to plan:', updates);
+        }
+    // Only run once when profile is first received
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [hasReceivedProfile]);
     
     // Calculation and results management
     const { results, isLoading, error, projectionData, calculatePlan, setResults, setError } = usePlanCalculation(plan);

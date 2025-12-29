@@ -4,3 +4,5 @@ export { usePlanCalculation, useAIInsights, useSocialSecurityCalculation } from 
 export { useMonteCarloWorker } from './useMonteCarloWorker';
 export { usePortalIntegration } from './usePortalIntegration';
 export { usePortalAuth } from './usePortalAuth';
+export { usePortalProfile } from './usePortalProfile';
+export type { PortalProfile } from './usePortalProfile';
