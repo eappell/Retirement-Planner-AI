@@ -203,6 +203,27 @@ const App: React.FC = () => {
     
     // Social Security auto-calculation
     useSocialSecurityCalculation(plan, updateActivePlan);
+
+    // When embedded in an iframe, notify the parent about our scroll state so the portal header can shrink
+    useEffect(() => {
+      if (typeof window === 'undefined') return;
+      if (window.self === window.top) return; // not embedded
+      let lastState: boolean | null = null;
+      const onScroll = () => {
+        const sc = window.scrollY > 20;
+        if (sc === lastState) return;
+        lastState = sc;
+        try {
+          window.parent.postMessage({ type: 'IFRAME_SCROLL', scrolled: sc, scrollY: window.scrollY }, '*');
+        } catch (e) {
+          // ignore
+        }
+      };
+      // Send initial state
+      try { window.parent.postMessage({ type: 'IFRAME_SCROLL', scrolled: window.scrollY > 20, scrollY: window.scrollY }, '*'); } catch (e) {}
+      window.addEventListener('scroll', onScroll, { passive: true });
+      return () => window.removeEventListener('scroll', onScroll);
+    }, []);
     
     // Monte Carlo simulation state
     const [monteCarloResults, setMonteCarloResults] = useState<MonteCarloResult | null>(null);
