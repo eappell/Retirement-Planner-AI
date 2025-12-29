@@ -42,6 +42,19 @@ html, body {
 .theme-dark .bg-gray-100 { background-color: rgba(255,255,255,0.04) !important; }
 .theme-dark .bg-gray-200 { background-color: rgba(255,255,255,0.06) !important; }
 
+/* Ensure muted gray text utilities are readable in dark mode: map them to lighter brand text */
+.theme-dark .text-gray-500,
+.theme-dark .text-gray-600,
+.theme-dark .text-gray-700,
+.theme-dark .text-gray-400 {
+  color: var(--brand-text-secondary) !important;
+}
+
+/* Also ensure small helper text uses readable muted light color */
+.theme-dark .text-sm {
+  color: var(--brand-text-secondary) !important;
+}
+
 /* Ensure items that use gray backgrounds keep readable labels in dark mode */
 .theme-dark .bg-gray-50,
 .theme-dark .bg-gray-100,
