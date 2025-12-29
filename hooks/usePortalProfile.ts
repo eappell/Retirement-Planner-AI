@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 
 export interface PortalProfile {
+  name?: string | null;
   dob: string | null;
   retirementAge: number | null;
   currentAnnualIncome: number | null;
@@ -42,6 +43,7 @@ export const usePortalProfile = () => {
       // Handle profile data from various portal message types
       if (type === 'AUTH_TOKEN' || type === 'USER_ROLE_UPDATE' || type === 'USER_PROFILE_UPDATE') {
         const newProfile: PortalProfile = {
+          name: data.name ?? data.displayName ?? null,
           dob: data.dob ?? null,
           retirementAge: data.retirementAge ?? null,
           currentAnnualIncome: data.currentAnnualIncome ?? null,
@@ -81,6 +83,12 @@ export const usePortalProfile = () => {
     return age;
   }, []);
 
+  const getFirstName = useCallback((fullName?: string | null): string | null => {
+    if (!fullName) return null;
+    const parts = fullName.trim().split(/\s+/);
+    return parts.length > 0 ? parts[0] : fullName;
+  }, []);
+
   /**
    * Get the effective state for tax calculations.
    * Uses retirementState if set, otherwise falls back to currentState.
@@ -96,7 +104,8 @@ export const usePortalProfile = () => {
     spouseCurrentAge: getAgeFromDob(profile.spouseDob),
     getEffectiveState,
     isMarried: profile.filingStatus === 'married',
+    getFirstName,
   };
-};
+}
 
 export default usePortalProfile;

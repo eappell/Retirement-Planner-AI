@@ -103,8 +103,20 @@ const App: React.FC = () => {
     const plan = activeScenario?.plan;
     
     // Portal profile integration - receive profile data from portal
-    const { profile: portalProfile, hasReceivedProfile, currentAge, spouseCurrentAge, getEffectiveState, isMarried } = usePortalProfile();
-    
+    const { profile: portalProfile, hasReceivedProfile, currentAge, spouseCurrentAge, getEffectiveState, isMarried, getFirstName } = usePortalProfile();
+
+    // If portal provides a name, update person1's name (use first name if full name contains spaces)
+    useEffect(() => {
+        if (!hasReceivedProfile || !plan) return;
+        const firstName = getFirstName(portalProfile.name);
+        // Only auto-update the planner name when it's still the default placeholder
+        if (firstName && (plan.person1.name === 'Person 1' || plan.person1.name.startsWith('Person'))) {
+            updateActivePlan({ person1: { ...plan.person1, name: firstName } });
+            console.log('[App] Set Person 1 name from portal profile:', firstName);
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [hasReceivedProfile]);
+
     // Apply portal profile data to plan when received
     useEffect(() => {
         if (!hasReceivedProfile || !plan) return;
