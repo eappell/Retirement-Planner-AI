@@ -118,7 +118,7 @@ const App: React.FC = () => {
         }
     }, [hasReceivedProfile, plan, portalProfile.name, getFirstName]);
 
-    // Apply portal profile data to plan when received
+    // Apply portal profile data to plan when received (re-run when profile or plan changes)
     useEffect(() => {
         if (!hasReceivedProfile || !plan) return;
         
@@ -186,9 +186,8 @@ const App: React.FC = () => {
             updateActivePlan(updates);
             console.log('[App] Applied portal profile data to plan:', updates);
         }
-    // Only run once when profile is first received
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [hasReceivedProfile]);
+    // Re-run when profile values or the plan change so we pick up age updates & plan readiness
+    }, [hasReceivedProfile, plan, currentAge, portalProfile.retirementAge, portalProfile.lifeExpectancy, portalProfile.currentAnnualIncome, isMarried, portalProfile.spouseName, spouseCurrentAge]);
     
     // Calculation and results management
     const { results, isLoading, error, projectionData, calculatePlan, setResults, setError } = usePlanCalculation(plan);
