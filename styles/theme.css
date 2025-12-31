@@ -486,12 +486,14 @@ strong, b,
 
 /* Ensure interactive controls show the pointer cursor so users get proper affordance. */
 /* Targets anchors, buttons, form buttons, and common interactive macros used in the app. */
+/* Also include child elements (icons/spans) so svg or inner spans inherit pointer. */
 /* Do not override disabled controls — they should show not-allowed. */
-a, a[href], button, input[type="button"], input[type="submit"], input[type="reset"],
-[role="button"], .btn, .action-button, .clickable {
+/* Note: Adding child selectors handles cases where an SVG or span inside a button is the hovered element. */
+a, a[href], a *, button, button *, input[type="button"], input[type="submit"], input[type="reset"],
+[role="button"], [role="button"] *, .btn, .btn *, .action-button, .action-button *, .clickable, .clickable * {
   cursor: pointer !important;
 }
 
-button:disabled, input[disabled], [disabled] {
+button:disabled, button[disabled], input[disabled], [disabled] {
   cursor: not-allowed !important;
 }
