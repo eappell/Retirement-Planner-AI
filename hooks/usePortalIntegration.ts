@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 
 interface ToolbarButton {
   id: string;
@@ -16,6 +16,59 @@ export const usePortalIntegration = (buttons: ToolbarButton[]) => {
   useEffect(() => {
     setIsEmbedded(window.self !== window.top);
   }, []);
+
+  // Height reporting function
+  const reportHeight = useCallback(() => {
+    if (typeof window === 'undefined' || window.self === window.top) return;
+    
+    const body = document.body;
+    const html = document.documentElement;
+    const height = Math.max(
+      body.scrollHeight,
+      body.offsetHeight,
+      html.clientHeight,
+      html.scrollHeight,
+      html.offsetHeight
+    );
+    window.parent.postMessage({ type: 'IFRAME_HEIGHT', height }, '*');
+  }, []);
+
+  // Report height to portal when embedded
+  useEffect(() => {
+    if (!isEmbedded) return;
+
+    // Report initial height after a short delay to allow content to render
+    const initialTimeout = setTimeout(() => {
+      reportHeight();
+    }, 100);
+
+    // Report again after longer delays for slower renders
+    const secondTimeout = setTimeout(() => reportHeight(), 500);
+    const thirdTimeout = setTimeout(() => reportHeight(), 1500);
+
+    // Re-report on resize
+    const resizeObserver = new ResizeObserver(() => {
+      reportHeight();
+    });
+    resizeObserver.observe(document.body);
+
+    // Also handle REQUEST_CONTENT_HEIGHT from portal
+    const handleContentHeightRequest = (event: MessageEvent) => {
+      if (event.data?.type === 'REQUEST_CONTENT_HEIGHT') {
+        console.log('[usePortalIntegration] Received REQUEST_CONTENT_HEIGHT');
+        reportHeight();
+      }
+    };
+    window.addEventListener('message', handleContentHeightRequest);
+
+    return () => {
+      clearTimeout(initialTimeout);
+      clearTimeout(secondTimeout);
+      clearTimeout(thirdTimeout);
+      resizeObserver.disconnect();
+      window.removeEventListener('message', handleContentHeightRequest);
+    };
+  }, [isEmbedded, reportHeight]);
 
   // Send toolbar buttons to portal
   useEffect(() => {
@@ -57,7 +110,7 @@ export const usePortalIntegration = (buttons: ToolbarButton[]) => {
     return () => window.removeEventListener('message', handleMessage);
   }, [isEmbedded, buttons]);
 
-  return { isEmbedded, authToken };
+  return { isEmbedded, authToken, reportHeight };
 };
 
 export default usePortalIntegration;
