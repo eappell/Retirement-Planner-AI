@@ -483,3 +483,15 @@ strong, b,
 [style*="font-weight: 900"], [style*="font-weight:900"] {
   font-family: Arial, Helvetica, sans-serif !important;
 }
+
+/* Ensure interactive controls show the pointer cursor so users get proper affordance. */
+/* Targets anchors, buttons, form buttons, and common interactive macros used in the app. */
+/* Do not override disabled controls — they should show not-allowed. */
+a, a[href], button, input[type="button"], input[type="submit"], input[type="reset"],
+[role="button"], .btn, .action-button, .clickable {
+  cursor: pointer !important;
+}
+
+button:disabled, input[disabled], [disabled] {
+  cursor: not-allowed !important;
+}
