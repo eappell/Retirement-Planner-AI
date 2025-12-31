@@ -19,7 +19,7 @@ export const DisclaimerModal: React.FC<DisclaimerModalProps> = ({ isOpen, requir
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" onClick={handleBackdrop}>
+    <div className={`fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 ${!requireAccept ? 'cursor-pointer' : ''}`} onClick={handleBackdrop}>
       <div 
         className="border border-gray-200 dark:border-slate-700 rounded-lg shadow-xl max-w-xl w-full p-6" 
         style={{ backgroundColor: theme === 'dark' ? '#070f24' : '#ffffff' }}
