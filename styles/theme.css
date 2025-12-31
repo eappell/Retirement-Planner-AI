@@ -500,8 +500,5 @@ button:disabled, button[disabled], input[disabled], [disabled] {
   cursor: not-allowed !important;
 }
 
-/* Temporary visual debug: outline interactive elements on hover so it's easy to verify the hover/pointer behavior. Remove after confirmation. */
-button:hover, button *:hover, [role="tab"]:hover, [role="tab"] *:hover, a:hover, a *:hover, label:hover, label *:hover {
-  outline: 1px dashed rgba(34,197,94,0.9) !important; /* lime-500 */
-}
+
 
