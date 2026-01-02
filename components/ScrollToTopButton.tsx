@@ -3,32 +3,31 @@ import React, { useState, useEffect } from 'react';
 
 export const ScrollToTopButton: React.FC = () => {
     const [isMounted, setIsMounted] = useState(false);
-    const [isEmbedded, setIsEmbedded] = useState(false);
+    const [showButton, setShowButton] = useState(false);
 
-    // Scroll to top - handles both standalone and embedded modes
+    // Scroll to top - works in both standalone and embedded modes
     const scrollToTop = () => {
-        if (isEmbedded) {
-            // Send message to parent portal to scroll to top
-            window.parent.postMessage({ type: 'SCROLL_TO_TOP' }, '*');
-        } else {
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
-        }
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
     };
 
     useEffect(() => {
         setIsMounted(true);
-        try {
-            setIsEmbedded(window.self !== window.top);
-        } catch (e) {
-            setIsEmbedded(true);
-        }
+        
+        // Show button when scrolled down
+        const handleScroll = () => {
+            setShowButton(window.scrollY > 300);
+        };
+        
+        window.addEventListener('scroll', handleScroll);
+        handleScroll(); // Check initial state
+        
+        return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    // Don't render in embedded mode - portal will handle scroll-to-top
-    if (!isMounted || isEmbedded) {
+    if (!isMounted || !showButton) {
         return null;
     }
 
