@@ -34,6 +34,7 @@ export const ProjectionTable: React.FC<ProjectionTableProps> = React.memo(({ dat
     const popoverRef = useRef<HTMLDivElement | null>(null);
     // store last mouse position so we can reposition the tooltip during scroll/resize
     const mousePosRef = useRef<{ x: number; y: number } | null>(null);
+    const closeButtonRef = useRef<HTMLButtonElement | null>(null);
     const [selectedRow, setSelectedRow] = useState<YearlyProjection | null>(null);
     const [popoverStyle, setPopoverStyle] = useState<{ top: number; left: number } | null>(null);
 
@@ -45,14 +46,14 @@ export const ProjectionTable: React.FC<ProjectionTableProps> = React.memo(({ dat
                 <th className="p-2 text-sm text-right bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">Inv Bal.</th>
                 <th className="p-2 text-sm text-right bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">Retire Bal.</th>
                 <th className="p-2 text-sm text-right bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">RMD</th>
-                {hasGifts && <th className="p-2 text-sm text-right bg_gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">Gifts</th>}
-                <th className="p-2 text-sm text-right bg_gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">Gross Inc.</th>
-                <th className="p-2 text-sm text-right bg_gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">Expenses</th>
-                <th className="p-2 text-sm text-right bg_gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">Fed Tax</th>
-                <th className="p-2 text-sm text-right bg_gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">State Tax</th>
-                <th className="p-2 text-sm text-right bg_gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">Net Inc.</th>
-                <th className="p-2 text-sm text-right bg_gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">Surplus</th>
-                <th className="p-2 text-sm text-right font-bold bg_gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">Net Worth</th>
+                {hasGifts && <th className="p-2 text-sm text-right bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">Gifts</th>}
+                <th className="p-2 text-sm text-right bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">Gross Inc.</th>
+                <th className="p-2 text-sm text-right bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">Expenses</th>
+                <th className="p-2 text-sm text-right bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">Fed Tax</th>
+                <th className="p-2 text-sm text-right bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">State Tax</th>
+                <th className="p-2 text-sm text-right bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">Net Inc.</th>
+                <th className="p-2 text-sm text-right bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">Surplus</th>
+                <th className="p-2 text-sm text-right font-bold bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">Net Worth</th>
             </tr>
         </thead>
     );
@@ -62,10 +63,9 @@ export const ProjectionTable: React.FC<ProjectionTableProps> = React.memo(({ dat
         const p2Dead = isCouple && row.age2 && row.age2 > person2.lifeExpectancy;
 
         // On click select the row and position the popover near the row's rect inside the container
-        const handleClick = (e: React.MouseEvent<HTMLTableRowElement>) => {
+        const openPopoverAt = (clientX: number, clientY: number) => {
             setSelectedRow(row);
-            // record click position so popover can be positioned and later repositioned on scroll
-            mousePosRef.current = { x: e.clientX, y: e.clientY };
+            mousePosRef.current = { x: clientX, y: clientY };
 
             const containerRect = containerRef.current?.getBoundingClientRect();
             if (containerRect && containerRef.current) {
@@ -74,22 +74,34 @@ export const ProjectionTable: React.FC<ProjectionTableProps> = React.memo(({ dat
                 const scrollTop = containerRef.current.scrollTop || 0;
                 const scrollLeft = containerRef.current.scrollLeft || 0;
 
-                // position tooltip at mouse click location (right of cursor)
-                const rawLeft = e.clientX - containerRect.left + scrollLeft + 12; // right of cursor, include horizontal scroll
+                const rawLeft = clientX - containerRect.left + scrollLeft + 12;
                 const left = Math.max(8, Math.min(rawLeft, containerRect.width - popWidth - 8 + scrollLeft));
 
-                const rawTop = e.clientY - containerRect.top + scrollTop - (popHeight / 2); // center vertically on cursor
+                const rawTop = clientY - containerRect.top + scrollTop - (popHeight / 2);
                 const top = Math.min(Math.max(rawTop, 8), containerRect.height - popHeight - 8 + scrollTop);
+
                 setPopoverStyle({ top, left });
             } else {
                 setPopoverStyle(null);
             }
         };
 
+        const handleClick = (e: React.MouseEvent<HTMLTableRowElement>) => openPopoverAt(e.clientX, e.clientY);
+
         return (
             <tr
                 key={row.year}
                 onClick={handleClick}
+                tabIndex={0}
+                onKeyDown={(ev) => {
+                    if (ev.key === 'Enter' || ev.key === ' ') {
+                        ev.preventDefault();
+                        const r = (ev.currentTarget as HTMLElement).getBoundingClientRect();
+                        const cx = r.left + r.width / 2;
+                        const cy = r.top + r.height / 2;
+                        openPopoverAt(cx, cy);
+                    }
+                }}
                 className={`bg-gray-50 dark:bg-gray-800 text-base text-gray-800 dark:text-gray-200 dark:border-b dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer ${selectedRow?.year === row.year ? 'bg-gray-100 dark:bg-gray-700' : ''}`}
             >
                 <td className="p-2 text-left">{row.year}</td>
@@ -134,7 +146,7 @@ export const ProjectionTable: React.FC<ProjectionTableProps> = React.memo(({ dat
         return () => document.removeEventListener('mousedown', handler);
     }, []);
 
-    // Reposition popover on container scroll / window scroll / resize so it stays anchored to the selected row
+    // Reposition popover on container scroll / window scroll / resize so it stays anchored to the click location
     useEffect(() => {
         const reposition = () => {
             if (!selectedRow || !mousePosRef.current) return;
@@ -156,15 +168,25 @@ export const ProjectionTable: React.FC<ProjectionTableProps> = React.memo(({ dat
             setPopoverStyle({ top, left });
         };
 
+        const escHandler = (ev: KeyboardEvent) => {
+            if (ev.key === 'Escape') {
+                setSelectedRow(null);
+                setPopoverStyle(null);
+                mousePosRef.current = null;
+            }
+        };
+
         const cont = containerRef.current;
         cont?.addEventListener('scroll', reposition, { passive: true });
         window.addEventListener('scroll', reposition, { passive: true });
         window.addEventListener('resize', reposition);
+        window.addEventListener('keydown', escHandler);
 
         return () => {
             cont?.removeEventListener('scroll', reposition);
             window.removeEventListener('scroll', reposition);
             window.removeEventListener('resize', reposition);
+            window.removeEventListener('keydown', escHandler);
         };
     }, [selectedRow]);
 
