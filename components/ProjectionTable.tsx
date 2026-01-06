@@ -33,8 +33,7 @@ export const ProjectionTable: React.FC<ProjectionTableProps> = React.memo(({ dat
     const containerRef = useRef<HTMLDivElement | null>(null);
     const popoverRef = useRef<HTMLDivElement | null>(null);
     // store last mouse position so we can reposition the tooltip during scroll/resize
-    // anchorRectRef stores the bounding rect of the selected row (in container coordinates)
-    const anchorRectRef = useRef<DOMRect | null>(null);
+    const mousePosRef = useRef<{ x: number; y: number } | null>(null);
     const [selectedRow, setSelectedRow] = useState<YearlyProjection | null>(null);
     const [popoverStyle, setPopoverStyle] = useState<{ top: number; left: number } | null>(null);
 
@@ -65,23 +64,22 @@ export const ProjectionTable: React.FC<ProjectionTableProps> = React.memo(({ dat
         // On click select the row and position the popover near the row's rect inside the container
         const handleClick = (e: React.MouseEvent<HTMLTableRowElement>) => {
             setSelectedRow(row);
-            const containerRect = containerRef.current?.getBoundingClientRect();
-            const rowRect = (e.currentTarget as HTMLTableRowElement).getBoundingClientRect();
-            anchorRectRef.current = rowRect;
+            // record click position so popover can be positioned and later repositioned on scroll
+            mousePosRef.current = { x: e.clientX, y: e.clientY };
 
+            const containerRect = containerRef.current?.getBoundingClientRect();
             if (containerRect && containerRef.current) {
                 const popWidth = 300;
                 const popHeight = popoverRef.current?.offsetHeight || 180;
                 const scrollTop = containerRef.current.scrollTop || 0;
                 const scrollLeft = containerRef.current.scrollLeft || 0;
 
-                // position to the right of the row, vertically centered on the row
-                const rawLeft = rowRect.right - containerRect.left + scrollLeft + 8;
+                // position tooltip at mouse click location (right of cursor)
+                const rawLeft = e.clientX - containerRect.left + scrollLeft + 12; // right of cursor, include horizontal scroll
                 const left = Math.max(8, Math.min(rawLeft, containerRect.width - popWidth - 8 + scrollLeft));
 
-                const rawTop = rowRect.top - containerRect.top + scrollTop + (rowRect.height / 2) - (popHeight / 2);
+                const rawTop = e.clientY - containerRect.top + scrollTop - (popHeight / 2); // center vertically on cursor
                 const top = Math.min(Math.max(rawTop, 8), containerRect.height - popHeight - 8 + scrollTop);
-
                 setPopoverStyle({ top, left });
             } else {
                 setPopoverStyle(null);
@@ -130,7 +128,7 @@ export const ProjectionTable: React.FC<ProjectionTableProps> = React.memo(({ dat
             }
             setSelectedRow(null);
             setPopoverStyle(null);
-            anchorRectRef.current = null;
+            mousePosRef.current = null;
         };
         document.addEventListener('mousedown', handler);
         return () => document.removeEventListener('mousedown', handler);
@@ -139,7 +137,7 @@ export const ProjectionTable: React.FC<ProjectionTableProps> = React.memo(({ dat
     // Reposition popover on container scroll / window scroll / resize so it stays anchored to the selected row
     useEffect(() => {
         const reposition = () => {
-            if (!selectedRow || !anchorRectRef.current) return;
+            if (!selectedRow || !mousePosRef.current) return;
             const containerRect = containerRef.current?.getBoundingClientRect();
             if (!containerRect || !containerRef.current) return;
 
@@ -149,11 +147,10 @@ export const ProjectionTable: React.FC<ProjectionTableProps> = React.memo(({ dat
             const scrollTop = containerRef.current?.scrollTop || 0;
             const scrollLeft = containerRef.current?.scrollLeft || 0;
 
-            const rowRect = anchorRectRef.current;
-            const rawLeft = rowRect.right - containerRect.left + scrollLeft + 8;
+            const rawLeft = mousePosRef.current.x - containerRect.left + scrollLeft + 12;
             const left = Math.max(8, Math.min(rawLeft, containerRect.width - popWidth - 8 + scrollLeft));
 
-            const rawTop = rowRect.top - containerRect.top + scrollTop + (rowRect.height / 2) - (popHeight / 2);
+            const rawTop = mousePosRef.current.y - containerRect.top + scrollTop - (popHeight / 2);
             const top = Math.min(Math.max(rawTop, 8), containerRect.height - popHeight - 8 + scrollTop);
 
             setPopoverStyle({ top, left });
@@ -184,7 +181,7 @@ export const ProjectionTable: React.FC<ProjectionTableProps> = React.memo(({ dat
                 <div
                     ref={popoverRef}
                     style={{ ['--tp-x' as any]: `${popoverStyle.left}px`, ['--tp-y' as any]: `${popoverStyle.top}px` }}
-                    className="projection-popover absolute z-20 w-72 shadow-lg rounded-md p-3 text-sm border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
+                    className="projection-popover absolute z-20 w-72 shadow-lg rounded-md p-3 text-sm border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                 >
                     <div className="flex justify-between items-start">
                         <div>
