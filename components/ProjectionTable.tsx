@@ -180,8 +180,14 @@ export const ProjectionTable: React.FC<ProjectionTableProps> = React.memo(({ dat
             {selectedRow && popoverStyle && (
                 <div
                     ref={popoverRef}
-                    style={{ ['--tp-x' as any]: `${popoverStyle.left}px`, ['--tp-y' as any]: `${popoverStyle.top}px` }}
-                    className="projection-popover absolute z-20 w-72 shadow-lg rounded-md p-3 text-sm border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                    // Inline styles to lock popover to light-mode appearance regardless of theme
+                    style={{
+                        ['--tp-x' as any]: `${popoverStyle.left}px`,
+                        ['--tp-y' as any]: `${popoverStyle.top}px`,
+                        backgroundColor: '#ffffff',
+                        color: '#111827'
+                    }}
+                    className="projection-popover absolute z-20 w-72 shadow-lg rounded-md p-3 text-sm border border-gray-200"
                 >
                     <div className="flex justify-between items-start">
                         <div>
