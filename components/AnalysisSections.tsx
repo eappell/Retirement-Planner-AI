@@ -150,14 +150,7 @@ export const AnalysisSections: React.FC<AnalysisSectionsProps> = ({
                     </button>
                     {aiInsights && (
                         <div className="mt-4 p-4 border rounded-md bg-purple-50 dark:bg-purple-900/20 dark:border-purple-700">
-                            <div className="flex items-start justify-between">
-                                <div className="prose prose-sm max-w-none ai-insights dark:prose-invert" dangerouslySetInnerHTML={{__html: markdownToHtml(aiInsights)}}></div>
-                                {aiProvider && (
-                                    <div className="ml-4 flex-shrink-0">
-                                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 border dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600">{aiProvider}</span>
-                                    </div>
-                                )}
-                            </div>
+                            <div className="prose prose-sm max-w-none ai-insights dark:prose-invert" dangerouslySetInnerHTML={{__html: markdownToHtml(aiInsights)}}></div>
                         </div>
                     )}
                 </PremiumGate>
