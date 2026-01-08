@@ -33,6 +33,9 @@ const markdownToHtml = (text: string): string => {
     for (const line of lines) {
         let processedLine = line;
         
+        // Remove backslash before dollar signs (common issue with some AI models)
+        processedLine = processedLine.replace(/\\\$/g, '$');
+        
         // Handle bold text first
         processedLine = processedLine.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
 
