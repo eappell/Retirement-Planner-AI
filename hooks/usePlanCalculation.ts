@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { functions, httpsCallable } from '../services/firebaseClient';
 import { RetirementPlan, CalculationResult, YearlyProjection } from '../types';
 import { runSimulation } from '../services/simulationService';
@@ -47,11 +47,18 @@ export const usePlanCalculation = (plan: RetirementPlan | undefined) => {
 
 /**
  * Custom hook for managing AI insights
+ * @param initialInsight - Optional initial insight value (e.g., loaded from scenario)
+ * @param onInsightGenerated - Optional callback when a new insight is generated
  */
-export const useAIInsights = () => {
+export const useAIInsights = (initialInsight?: string, onInsightGenerated?: (insight: string) => void) => {
     const [isAiLoading, setIsAiLoading] = useState(false);
-    const [aiInsights, setAiInsights] = useState<string>('');
+    const [aiInsights, setAiInsights] = useState<string>(initialInsight || '');
     const [aiProvider, setAiProvider] = useState<string | null>(null);
+
+    // Update local state when initialInsight changes (e.g., scenario switch)
+    React.useEffect(() => {
+        setAiInsights(initialInsight || '');
+    }, [initialInsight]);
 
     const getInsights = useCallback(async (plan: RetirementPlan, results: CalculationResult) => {
         // Prefer explicit env var; default to the local proxy on port 3000 for dev
@@ -111,6 +118,7 @@ export const useAIInsights = () => {
                     if (responseFromParent) {
                         setAiProvider('portal-proxy');
                         setAiInsights(responseFromParent);
+                        if (onInsightGenerated) onInsightGenerated(responseFromParent);
                         setIsAiLoading(false);
                         return;
                     }
@@ -191,6 +199,7 @@ export const useAIInsights = () => {
                 setAiInsights('AI Insights are currently unavailable. Please try again later.');
             } else {
                 setAiInsights(resultText);
+                if (onInsightGenerated) onInsightGenerated(resultText);
             }
         } catch (error) {
             console.error('Error getting AI insights:', error);
@@ -198,7 +207,7 @@ export const useAIInsights = () => {
         } finally {
             setIsAiLoading(false);
         }
-    }, []);
+    }, [onInsightGenerated]);
 
     const clearInsights = useCallback(() => {
         setAiInsights('');

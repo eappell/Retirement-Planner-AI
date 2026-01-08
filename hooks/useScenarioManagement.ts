@@ -171,6 +171,36 @@ export const useScenarioManagement = (initialState?: ScenariosState) => {
         });
     }, []);
 
+    // Update the AI insight for the active scenario
+    const updateActiveScenarioInsight = useCallback((insight: string) => {
+        setScenariosState(prev => {
+            const id = prev.activeScenarioId;
+            if (!id || !prev.scenarios[id]) return prev;
+            return {
+                ...prev,
+                scenarios: {
+                    ...prev.scenarios,
+                    [id]: { ...prev.scenarios[id], aiInsight: insight },
+                },
+            };
+        });
+    }, []);
+
+    // Clear the AI insight for the active scenario
+    const clearActiveScenarioInsight = useCallback(() => {
+        setScenariosState(prev => {
+            const id = prev.activeScenarioId;
+            if (!id || !prev.scenarios[id]) return prev;
+            return {
+                ...prev,
+                scenarios: {
+                    ...prev.scenarios,
+                    [id]: { ...prev.scenarios[id], aiInsight: undefined },
+                },
+            };
+        });
+    }, []);
+
     const resetAllScenarios = useCallback(() => {
         const defaultScenario = getDefaultScenario();
         setScenariosState({
@@ -254,6 +284,8 @@ export const useScenarioManagement = (initialState?: ScenariosState) => {
         copyScenario,
         updateScenarioName,
         updateScenarioNameById,
+        updateActiveScenarioInsight,
+        clearActiveScenarioInsight,
         resetAllScenarios,
         uploadScenarios,
     };

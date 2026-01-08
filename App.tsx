@@ -75,6 +75,8 @@ const App: React.FC = () => {
         copyScenario,
         updateScenarioName,
         updateScenarioNameById,
+        updateActiveScenarioInsight,
+        clearActiveScenarioInsight,
         resetAllScenarios,
         uploadScenarios,
         updateAllScenarios,
@@ -198,8 +200,11 @@ const App: React.FC = () => {
     // Calculation and results management
     const { results, isLoading, error, projectionData, calculatePlan, setResults, setError } = usePlanCalculation(plan);
     
-    // AI insights management
-    const { isAiLoading, aiInsights, aiProvider, getInsights, clearInsights } = useAIInsights();
+    // AI insights management - pass saved insight from active scenario and callback to save new insights
+    const { isAiLoading, aiInsights, aiProvider, getInsights, clearInsights } = useAIInsights(
+        activeScenario?.aiInsight,
+        updateActiveScenarioInsight
+    );
     
     // Social Security auto-calculation
     useSocialSecurityCalculation(plan, updateActivePlan);
@@ -536,8 +541,13 @@ const App: React.FC = () => {
 
     const handleSelectScenario = useCallback((id: string) => {
         selectScenario(id);
-        clearCalculationResults();
-    }, [selectScenario, clearCalculationResults]);
+        // Clear calculation results but AI insights will be loaded from scenario via the hook
+        setResults(null);
+        setError(null);
+        setMonteCarloResults(null);
+        // Note: Don't call clearInsights() here - the useAIInsights hook will automatically
+        // load the saved insight from the newly selected scenario
+    }, [selectScenario, setResults, setError]);
 
     const handleNewScenario = useCallback(() => {
         createNewScenario();

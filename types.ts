@@ -217,6 +217,7 @@ export interface Scenario {
   id: string;
   name: string;
   plan: RetirementPlan;
+  aiInsight?: string; // Saved AI insight for this scenario
 }
 
 export interface ScenariosState {
