@@ -27,15 +27,7 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ onRunS
 
     return (
         <div className="space-y-4">
-            {results && results.useFatTails && (
-                <div
-                    className="flex items-center space-x-2"
-                    title={"Fat-tail sampling increases the probability of large market moves (positive and negative). Lower df => fatter tails; interpret success rates with that in mind."}
-                    aria-label={`Fat tails enabled, df=${results.fatTailDf ?? 4}`}>
-                    <span className="px-2 py-0.5 bg-red-100 text-red-800 text-xs rounded-full">Fat tails</span>
-                    <span className="text-xs text-gray-600">df={results.fatTailDf ?? 4}</span>
-                </div>
-            )}
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
                 <div className="flex flex-col">
                     <label htmlFor="mc-simulations" className="mb-1 text-sm font-medium text-brand-text-secondary">Simulations</label>
