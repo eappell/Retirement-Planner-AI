@@ -149,7 +149,7 @@ export const AnalysisSections: React.FC<AnalysisSectionsProps> = ({
                         {isAiLoading ? 'Analyzing...' : aiInsights ? 'AI Insight Generated' : 'Generate AI Insights'}
                     </button>
                     {aiInsights && (
-                        <div className="mt-4 p-4 border rounded-md dark:bg-purple-900/20 dark:border-purple-700">
+                        <div className="mt-4 p-4 border rounded-md dark:border-purple-700">
                             <div className="prose prose-sm max-w-none ai-insights dark:prose-invert" dangerouslySetInnerHTML={{__html: markdownToHtml(aiInsights)}}></div>
                         </div>
                     )}

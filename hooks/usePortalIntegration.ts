@@ -37,35 +37,23 @@ export const usePortalIntegration = (buttons: ToolbarButton[]) => {
   useEffect(() => {
     if (!isEmbedded) return;
 
-    // Report initial height after a short delay to allow content to render
-    const initialTimeout = setTimeout(() => {
-      reportHeight();
-    }, 100);
-
-    // Report again after longer delays for slower renders
-    const secondTimeout = setTimeout(() => reportHeight(), 500);
-    const thirdTimeout = setTimeout(() => reportHeight(), 1500);
-
-    // Re-report on resize
-    const resizeObserver = new ResizeObserver(() => {
-      reportHeight();
-    });
-    resizeObserver.observe(document.body);
+    // (height reporting disabled to allow inner scrollbar)
+    // const resizeObserver = new ResizeObserver(() => {
+    //   reportHeight();
+    // });
+    // resizeObserver.observe(document.body);
 
     // Also handle REQUEST_CONTENT_HEIGHT from portal
     const handleContentHeightRequest = (event: MessageEvent) => {
-      if (event.data?.type === 'REQUEST_CONTENT_HEIGHT') {
-        console.log('[usePortalIntegration] Received REQUEST_CONTENT_HEIGHT');
-        reportHeight();
-      }
+      // if (event.data?.type === 'REQUEST_CONTENT_HEIGHT') {
+      //   console.log('[usePortalIntegration] Received REQUEST_CONTENT_HEIGHT');
+      //   reportHeight();
+      // }
     };
     window.addEventListener('message', handleContentHeightRequest);
 
     return () => {
-      clearTimeout(initialTimeout);
-      clearTimeout(secondTimeout);
-      clearTimeout(thirdTimeout);
-      resizeObserver.disconnect();
+      // resizeObserver.disconnect();
       window.removeEventListener('message', handleContentHeightRequest);
     };
   }, [isEmbedded, reportHeight]);

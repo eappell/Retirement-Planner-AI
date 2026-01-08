@@ -209,7 +209,8 @@ const App: React.FC = () => {
     // Social Security auto-calculation
     useSocialSecurityCalculation(plan, updateActivePlan);
 
-    // When embedded in an iframe, notify the parent about our scroll state so the portal header can shrink
+    // (IFRAME_SCROLL reporting removed to prevent duplicate scroll-to-top buttons in portal)
+    /*
     useEffect(() => {
       if (typeof window === 'undefined') return;
       if (window.self === window.top) return; // not embedded
@@ -229,104 +230,9 @@ const App: React.FC = () => {
       window.addEventListener('scroll', onScroll, { passive: true });
       return () => window.removeEventListener('scroll', onScroll);
     }, []);
+    */
 
-    // When embedded, post our content height so the portal can size the iframe and avoid dual scrollbars
-    useEffect(() => {
-      if (typeof window === 'undefined') return;
-      if (window.self === window.top) return; // not embedded
-
-      let timeout: any = null;
-      // Stabilized sendHeight with echo-guard
-      let last = 0;
-      let lastTs = 0;
-      let attempts = 0;
-      let lastApplied = 0;
-      let ignoreUntil = 0;
-      const MIN_DELTA = 16;
-      const sendHeight = () => {
-        try {
-          const h = Math.max(300, Math.ceil(document.documentElement.scrollHeight || document.body.scrollHeight || 0));
-          const now = Date.now();
-
-          // If the parent just applied a height that's >= our content size, avoid immediately re-sending
-          if (now < ignoreUntil && h <= lastApplied + MIN_DELTA) return;
-
-          // Do not echo back the parent's applied height (tolerance)
-          if (Math.abs(h - lastApplied) <= MIN_DELTA) return;
-
-          if (Math.abs(h - last) <= MIN_DELTA) return;
-          if (now - lastTs < 250) {
-            attempts++;
-            if (attempts > 6) return;
-          } else {
-            attempts = 0;
-          }
-          last = h;
-          lastTs = now;
-          window.parent.postMessage({ type: 'IFRAME_HEIGHT', height: h }, '*');
-        } catch (e) {
-          // ignore
-        }
-      };
-
-      const schedule = () => {
-        if (timeout) clearTimeout(timeout);
-        timeout = setTimeout(() => { sendHeight(); timeout = null; }, 150);
-      };
-
-      const ro = new ResizeObserver(() => schedule());
-      ro.observe(document.documentElement);
-      if (document.body) ro.observe(document.body);
-
-      window.addEventListener('load', schedule);
-      window.addEventListener('resize', schedule);
-
-      const ackHandler = (e: MessageEvent) => {
-        if (e.data?.type === 'IFRAME_HEIGHT_APPLIED') {
-          const applied = Number(e.data.height || 0);
-          const contentHeight = Math.ceil(document.documentElement.scrollHeight || document.body.scrollHeight || 0);
-          console.log('[Planner] Portal applied height:', applied, 'local scrollHeight:', contentHeight, 'innerHeight:', window.innerHeight);
-
-          // record applied height and ignore small echoes for a short window
-          lastApplied = applied;
-          ignoreUntil = Date.now() + 600;
-
-          const diff = contentHeight - applied;
-          try {
-            (window as any).__iframe_resize_attempts = (window as any).__iframe_resize_attempts || { count: 0, ts: 0 };
-            const now = Date.now();
-            if (now - (window as any).__iframe_resize_attempts.ts > 5000) { (window as any).__iframe_resize_attempts.count = 0; (window as any).__iframe_resize_attempts.ts = now; }
-            if (diff > MIN_DELTA && (window as any).__iframe_resize_attempts.count < 4) {
-              (window as any).__iframe_resize_attempts.count++;
-              setTimeout(() => { try { window.parent.postMessage({ type: 'IFRAME_HEIGHT', height: Math.ceil(contentHeight) + 24 }, '*'); } catch (e) {} }, 300);
-            } else if (diff > MIN_DELTA) {
-              console.warn('[Planner] Giving up resize after repeated attempts');
-            }
-          } catch (err) {}
-        }
-        if (e.data?.type === 'REQUEST_CONTENT_HEIGHT') {
-          try {
-            const contentHeight = Math.max(document.documentElement.scrollHeight || 0, document.body.scrollHeight || 0, document.documentElement.offsetHeight || 0, document.documentElement.clientHeight || 0);
-            const bodyMarginBottom = parseFloat(getComputedStyle(document.body).marginBottom || '0') || 0;
-            const measured = Math.ceil(contentHeight + bodyMarginBottom);
-            window.parent.postMessage({ type: 'CONTENT_HEIGHT', height: measured }, '*');
-            console.log('[Planner] Responded with CONTENT_HEIGHT:', measured);
-          } catch (err) {}
-        }
-      };
-      window.addEventListener('message', ackHandler as EventListener);
-
-      // initial send
-      schedule();
-
-      return () => {
-        ro.disconnect();
-        window.removeEventListener('load', schedule);
-        window.removeEventListener('resize', schedule);
-        window.removeEventListener('message', ackHandler as EventListener);
-        if (timeout) clearTimeout(timeout);
-      };
-    }, []);
+    // (height sync removed to restore inner scrollbar)
     
     // Monte Carlo simulation state
     const [monteCarloResults, setMonteCarloResults] = useState<MonteCarloResult | null>(null);
@@ -852,7 +758,7 @@ const App: React.FC = () => {
                     )}
 
                 <div className="max-w-[1400px] mx-auto p-4 sm:p-6 lg:p-8">
-                    <div className={`sticky z-10 ${isEmbedded ? 'top-0' : 'top-16'}`}>
+                    <div className={`sticky z-30 ${isEmbedded ? 'top-0' : 'top-16'}`}>
                         <ScenariosBar
                             scenarios={scenarios}
                             activeScenarioId={activeScenarioId}
