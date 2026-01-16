@@ -7,10 +7,20 @@ export const ScrollToTopButton: React.FC = () => {
 
     // Scroll to top - works in both standalone and embedded modes
     const scrollToTop = () => {
+        // Scroll local window
         window.scrollTo({
             top: 0,
             behavior: 'smooth'
         });
+        
+        // Also request parent to scroll (handles portal scenarios)
+        try {
+            if (window.self !== window.top) {
+                window.parent.postMessage({ type: 'SCROLL_TO_TOP' }, '*');
+            }
+        } catch (e) {
+            // ignore
+        }
     };
 
     useEffect(() => {
